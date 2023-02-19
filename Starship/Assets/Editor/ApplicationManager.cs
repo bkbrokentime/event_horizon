@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor.Callbacks;
-using Utils;
 
 public class ApplicationManager : EditorWindow
 {
@@ -64,7 +63,7 @@ public class ApplicationManager : EditorWindow
             var prefabPath = "Combat/Ships/" + sprite.name;
             var prefab = Resources.Load<GameObject>(prefabPath);
 
-            OptimizedDebug.Log(sprite.name + (prefab ? " - ok" : " - not found"));
+            UnityEngine.Debug.Log(sprite.name + (prefab ? " - ok" : " - not found"));
             
             if (prefab)
                 continue;
@@ -99,7 +98,7 @@ public class ApplicationManager : EditorWindow
 
 		PlayerSettings.applicationIdentifier = id;
 
-		OptimizedDebug.Log("bundle id updated");
+		Debug.Log("bundle id updated");
     }
 
 	private void UpdateVersion(string version)
@@ -108,7 +107,7 @@ public class ApplicationManager : EditorWindow
 
         PlayerSettings.bundleVersion = version;
 
-		OptimizedDebug.Log("bundle version updated");
+		Debug.Log("bundle version updated");
     }
 
 	private void UpdateAndroidVersionCode(string version)
@@ -119,7 +118,7 @@ public class ApplicationManager : EditorWindow
 			if (code != PlayerSettings.Android.bundleVersionCode)
 			{
 				PlayerSettings.Android.bundleVersionCode = code;
-				OptimizedDebug.Log("android bundle version code updated");
+				Debug.Log("android bundle version code updated");
             }
         }
         catch (System.Exception)
@@ -151,7 +150,7 @@ public class ApplicationManager : EditorWindow
 	{
 		if (System.String.IsNullOrEmpty (code))
 		{
-			OptimizedDebug.Log ("Code generation stopped, no code to write.");
+			Debug.Log ("Code generation stopped, no code to write.");
 		}
 
 		CheckOrCreateDirectory(AssetsDir + ConfigDir);
@@ -168,7 +167,7 @@ public class ApplicationManager : EditorWindow
 			catch (System.Exception ex) 
 			{
 				string msg = " \n" + ex.ToString ();
-				OptimizedDebug.LogError (msg);
+				Debug.LogError (msg);
 				EditorUtility.DisplayDialog("Error when trying to generate file " + fileName, msg, "OK");
 			}
 		}
@@ -182,7 +181,7 @@ public class ApplicationManager : EditorWindow
 	{
 		if (File.Exists(dir)) 
 		{
-			OptimizedDebug.LogWarning(dir + " is a file instead of a directory !");
+			Debug.LogWarning(dir + " is a file instead of a directory !");
 			return;
 		}
 		else if (!Directory.Exists(dir)) 
@@ -193,7 +192,7 @@ public class ApplicationManager : EditorWindow
 			}
 			catch (System.Exception ex) 
 			{
-				OptimizedDebug.LogWarning(ex.Message);
+				Debug.LogWarning(ex.Message);
 				throw ex;
 			}
 		}

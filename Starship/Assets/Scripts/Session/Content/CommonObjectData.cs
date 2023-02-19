@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GameModel.Serialization;
-using Utils;
 using Zenject;
 
 namespace Session.Content
@@ -85,7 +84,7 @@ namespace Session.Content
 			var version = Helpers.DeserializeInt(buffer, ref index);
 			if (version != CurrentVersion && !TryUpgrade(ref buffer, version))
 			{
-				OptimizedDebug.Log("CommonObjectData: incorrect data version");
+				UnityEngine.Debug.Log("CommonObjectData: incorrect data version");
                 throw new ArgumentException();
             }
 

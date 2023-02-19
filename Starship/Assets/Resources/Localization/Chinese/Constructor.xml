@@ -8,26 +8,68 @@
     <string name="Armor">防护</string>
     <string name="Reactor">能源</string>
     <string name="Engine">引擎</string>
+    <string name="Equipment">设备</string>
     <string name="FuelTank">燃料箱</string>
     <string name="WeightReduction">减重器</string>
     <string name="DroneBayCapacity">容量</string>
+    <string name="DroneBaySquadron">飞行中队</string>
     <string name="DroneBayCooldown">冷却</string>
     <string name="WeaponType">武器</string>
     <string name="WeaponSlots">武器槽</string>
+	
     <string name="CellCount">尺寸</string>
     <string name="EngineSize">引擎尺寸</string>
+    <string name="WeaponSize">武器空间</string>
+    <string name="EnergySize">能源空间</string>
+    <string name="ArmorSize">装甲空间</string>
+    <string name="SpecialSize">设备空间</string>
+    <string name="UAVplatformSize">无人机平台空间</string>
+    <string name="CompoundSpaceSize">复合空间</string>
+	
+    <string name="SecondCellCount">内部尺寸</string>
+    <string name="SecondEngineSize">内部引擎尺寸</string>
+    <string name="SecondWeaponSize">内部武器空间</string>
+    <string name="SecondEnergySize">内部能源空间</string>
+    <string name="SecondArmorSize">内部装甲空间</string>
+    <string name="SecondSpecialSize">内部设备空间</string>
+    <string name="SecondUAVplatformSize">内部无人机平台空间</string>
+    <string name="SecondCompoundSpaceSize">内部复合空间</string>
+	
     <string name="Damage">攻击</string>
     <string name="HitPoints">装甲值</string>
-    <string name="Energy">能量</string>
-    <string name="ShieldPoints">护盾值</string>
-    <string name="ShieldRechargeRate">护盾充能速率</string>
     <string name="RepairRate">修复速率</string>
+	<string name="ArmorRepairCooldown">维修延迟</string>
+    <string name="ArmorPointsAttenuatableRate">装甲衰减</string>
+    <string name="ArmorRepairAttenuatableRate">维修衰减</string>
+	
+    <string name="Energy">能量</string>
     <string name="RechargeRate">再充速率</string>
-    <string name="Weight">重量</string>
-    <string name="RamDamage">撞击伤害</string>
+	<string name="EnergyRechargeCooldown">再充延迟</string>
+	<string name="EnergyPointsAttenuatableRate">能量衰减</string>
+	<string name="EnergyRechargeAttenuatableRate">再充衰减</string>
+	
+	<string name="ShieldPoints">盾容值</string>
+    <string name="ShieldRechargeRate">盾容充能速率</string>
+	<string name="ShieldRechargeCooldown">盾容充能延迟</string>
+	<string name="ShieldPointsAttenuatableRate">盾容衰减</string>
+	<string name="ShieldRechargeAttenuatableRate">盾容充能衰减</string>
+	
+	<string name="EnergyShieldPoints">护盾值</string>
+	<string name="EnergyShieldRechargeRate">护盾充能速率</string>
+	<string name="EnergyShieldRechargeCooldown">护盾充能延迟</string>
+	<string name="EnergyShieldPointsAttenuatableRate">护盾衰减</string>
+	<string name="EnergyShieldRechargeAttenuatableRate">护盾充能衰减</string>
+	
+	<string name="Weight">重量</string>
+    <string name="RamDamage">撞击伤害加成</string>
+    <string name="ExpectRamDamage">预计撞击伤害</string>
     <string name="DamageAbsorption">能量吸收</string>
-    <string name="Velocity">速度</string>
-    <string name="TurnRate">转向速度</string>
+    <string name="Velocity">引擎推力</string>
+    <string name="TurnRate">引擎转矩</string>
+    <string name="ShipVelocity">航行加速度</string>
+    <string name="ShipTurnRate">转向加速度</string>
+    <string name="MAXShipVelocity">最大航行速度</string>
+    <string name="MAXShipTurnRate">最大转向速度</string>
     <string name="WeaponModifiers">武器</string>
     <string name="DamageModifier">伤害</string>
     <string name="FireRateModifier">射速</string>
@@ -39,8 +81,17 @@
     <string name="DroneDefenseModifier">无人机防御</string>
     <string name="DroneReconstructionTime">无人机重建时间</string>
     <string name="KineticDamageResistance">动能抗性</string>
-    <string name="ThermalDamageResistance">热能抗性</string>
+    <string name="ThermalDamageResistance">燃烧抗性</string>
     <string name="EnergyDamageResistance">能量抗性</string>
+    <string name="QuantumDamageResistance">量子抗性</string>
+    <string name="ShieldKineticDamageResistance">盾容动能抗性</string>
+    <string name="ShieldThermalDamageResistance">盾容燃烧抗性</string>
+    <string name="ShieldEnergyDamageResistance">盾容能量抗性</string>
+    <string name="ShieldQuantumDamageResistance">盾容量子抗性</string>
+    <string name="EnergyShieldKineticDamageResistance">护盾动能抗性</string>
+    <string name="EnergyShieldThermalDamageResistance">护盾燃烧抗性</string>
+    <string name="EnergyShieldEnergyDamageResistance">护盾能量抗性</string>
+    <string name="EnergyShieldQuantumDamageResistance">护盾量子抗性</string>
     <string name="Size">尺寸</string>
     <string name="EnergyConsumption">能耗</string>
     <string name="MenuWeapon">攻击</string>
@@ -82,41 +133,190 @@
     <string name="WeaponVelocity">弹药初速</string>
     <string name="WeaponArea">影响范围</string>
     <string name="WeaponImpulse">冲击力</string>
+	
     <string name="DamageType">伤害类型</string>
     <string name="ImpactDamage">动能</string>
     <string name="EnergyDamage">能量</string>
     <string name="HeatDamage">热能</string>
+    <string name="DirectDamage">-</string>
+    <string name="FlameDamage">燃烧</string>
+    <string name="AntimatterDamage">反物质</string>
+    <string name="CorrosionDamage">腐蚀</string>
+    <string name="QuantumDamage">量子</string>
+    <string name="DarkmatterDamage">暗物质</string>
+    <string name="DarkenergyDamage">暗能量</string>
+    <string name="AnnihilationDamage">湮灭</string>
+	
+    <string name="DamageTypeDescription">伤害描述</string>
+    <string name="ImpactDamageDescription">对装甲伤害+50%，对护盾伤害-50%。受动能抗性影响</string>
+    <string name="EnergyDamageDescription">对装甲伤害-50%，对护盾伤害+50%，受能量抗性影响</string>
+    <string name="HeatDamageDescription">受燃烧抗性影响</string>
+    <string name="DirectDamageDescription">无视抗性</string>
+    <string name="FlameDamageDescription">每次命中施加1层燃烧，每层燃烧+1%受到的燃烧伤害，上限300%，无视盾容，受燃烧抗性影响</string>
+    <string name="AntimatterDamageDescription">对装甲伤害+200%，对盾容伤害+100%，对护盾伤害+50%，无视抗性</string>
+    <string name="CorrosionDamageDescription">每次命中施加1层腐蚀，每层腐蚀+2.5% 受到的腐蚀伤害，上限500%，无视盾容，无视抗性</string>
+    <string name="QuantumDamageDescription">无视护盾，但会受护盾量子抗性影响</string>
+    <string name="DarkmatterDamageDescription">对护盾50%穿透，对盾容30%穿透</string>
+    <string name="DarkenergyDamageDescription">对护盾30%穿透，对盾容50%穿透</string>
+    <string name="AnnihilationDamageDescription">无视抗性</string>
+	
     <string name="ShipName">飞船名</string>
     <string name="ClickToInstall">点击安装</string>
     <string name="ClickToRemove">点击移除</string>
     <string name="CantBeInstalled">无法安装</string>
-    <string name="LeftSide">左舷</string>
-    <string name="RightSide">右舷</string>
+    <string name="LeftSide_1">左舷_1</string>
+    <string name="RightSide_1">右舷_1</string>
+    <string name="LeftSide_2">左舷_2</string>
+    <string name="RightSide_2">右舷_2</string>
+    <string name="LeftSide_3">左舷_3</string>
+    <string name="RightSide_3">右舷_3</string>
+    <string name="LeftSide_4">左舷_4</string>
+    <string name="RightSide_4">右舷_4</string>
+    <string name="LeftSide_5">左舷_5</string>
+    <string name="RightSide_5">右舷_5</string>
     <string name="LockedSlot">这个槽目前不可用。你可以在科技树里解锁它。</string>
     <string name="EmptySlot0">可放置护卫舰级飞船的空船位</string>
     <string name="EmptySlot1">可放置驱逐舰级飞船的空船位</string>
     <string name="EmptySlot2">可放置巡洋舰级飞船的空船位</string>
     <string name="EmptySlot3">可放置战舰级飞船的空船位</string>
     <string name="EmptySlot4">可放置旗舰的空船位</string>
+    <string name="EmptySlot5">可放置超级旗舰的空船位</string>
     <string name="ShipClass">级别:</string>
     <string name="ClassFrigate">护卫舰</string>
     <string name="ClassDestroyer">驱逐舰</string>
     <string name="ClassCruiser">巡洋舰</string>
-    <string name="ClassBattleship">战舰</string>
-    <string name="ClassTitan">旗舰</string>
-    <string name="GroupAll">所有组件</string>
+    <string name="ClassBattleship">战列舰</string>
+	<string name="ClassTitan">旗舰</string>
+	<string name="ClassDominate">超旗</string>
+	<string name="GroupAll">所有组件</string>
     <string name="GroupWeapon">武器</string>
     <string name="GroupArmor">防御组件</string>
     <string name="GroupEngines">引擎</string>
     <string name="GroupEnergy">能源组件</string>
     <string name="GroupDrones">无人机</string>
     <string name="GroupSpecial">特殊组件</string>
+    <string name="GroupEquipment">特殊设备</string>
     <string name="GroupShip">$1的组件</string>
     <string name="GroupShips">飞船</string>
     <string name="GroupWeaponAny">任意槽位的武器</string>
+    <string name="GroupWeaponOther">其他槽位的武器</string>
     <string name="GroupWeaponC">弹道武器</string>
     <string name="GroupWeaponL">光束武器</string>
     <string name="GroupWeaponM">导弹</string>
     <string name="GroupWeaponT">鱼雷</string>
     <string name="GroupWeaponS">特殊武器</string>
+    <string name="GroupWeaponF">力场武器</string>
+    <string name="GroupWeaponB">炸弹</string>
+	
+    <string name="ShipScore">总战力</string>
+    <string name="ArmorDefenseScore">装甲防御评分</string>
+    <string name="ArmorEnduranceScore">装甲续航评分</string>
+    <string name="ShieldDefenseScore">盾容防御评分</string>
+    <string name="ShieldEnduranceScore">盾容续航评分</string>
+    <string name="EnergyShieldDefenseScore">护盾防御评分</string>
+    <string name="EnergyShieldEnduranceScore">护盾续航评分</string>
+	
+    <string name="DEFdefensescore">总防御评分</string>
+    <string name="DEFendurancescore">总续航评分</string>
+    <string name="DEFscore">舰船生存评分</string>
+	
+    <string name="EnergyScore">储能评分</string>
+    <string name="EnergyEnduranceScore">充能评分</string>
+    <string name="ENEscore">舰船能量评分</string>
+	
+    <string name="EngineScore">机动评分</string>
+	
+    <string name="DevicesScore">设备评分</string>
+	
+    <string name="DroneBaysScore">无人机停机坪评分</string>
+    <string name="UAVplatformsScore">飞行平台评分</string>
+    <string name="UAVScore">无人机评分</string>
+	
+    <string name="WeaponsDPS">全武器平均秒伤</string>
+    <string name="WeaponsMDPS">全武器最大秒伤</string>
+    <string name="WeaponsEPS">全武器平均秒能耗</string>
+    <string name="WeaponsMEPS">全武器最大秒能耗</string>
+    <string name="WeaponsConcentration">火力集中度</string>
+    <string name="WeaponsDispersion">火力离散度</string>
+    <string name="WeaponsScore">舰船火力评分</string>
+	
+    <string name="WeaponDPS2">武器平均秒伤</string>
+    <string name="WeaponMDPS">武器最大秒伤</string>
+    <string name="WeaponEPS2">武器平均秒能耗</string>
+    <string name="WeaponMEPS">武器最大秒能耗</string>
+    <string name="WeaponScore">武器评分</string>
+
+	<string name="DeviceClass">设备类型</string>
+	
+	<string name="Accelerator">加速器</string>
+	<string name="Decoy">干扰器</string>
+	<string name="%EnergyShield">能量护盾</string>
+	<string name="Ghost">隐匿</string>
+	<string name="GravityGenerator">重力发生器</string>
+	<string name="PartialShield">前置护盾</string>
+	<string name="%PointDefense">点防御系统</string>
+	<string name="RepairBot">维修机</string>
+	<string name="Detonator">自毁</string>
+	<string name="Stealth">隐身</string>
+	<string name="%Teleporter">折跃器</string>
+	<string name="Brake">惯性阻尼</string>
+	<string name="SuperStealth">超级隐身</string>
+	<string name="Fortification">舰体防御</string>
+	<string name="ToxicWaste">辐射残骸</string>
+	<string name="WormTail">虫尾系统</string>
+	<string name="ClonningCenter">克隆中心</string>
+	<string name="TimeMachine">时间机器</string>
+	<string name="Jammer">干扰机</string>
+	<string name="CombustionInhibition">燃烧抑制</string>
+	<string name="EnergyDiversion">能量回流</string>
+	<string name="Denseshield">致密护盾</string>
+	<string name="FireAssault">强袭火力</string>
+	<string name="%Equipment">增幅设备</string>
+	
+	<string name="DeviceEnergyConsumption">激活能耗</string>
+	<string name="DevicePower">强度</string>
+	<string name="DeviceQuantity">数量</string>
+	<string name="DeviceRange">范围</string>
+	<string name="DeviceSize">大小</string>
+	<string name="DeviceCooldown">设备冷却</string>
+	<string name="DeviceLifetime">持续时间</string>
+
+	<string name="EquipmentKineticResistance">装甲动能减伤</string>
+	<string name="EquipmentThermalDamageResistance">装甲燃烧减伤</string>
+	<string name="EquipmentEnergyDamageResistance">装甲能量减伤</string>
+	<string name="EquipmentQuantumDamageResistance">装甲量子减伤</string>
+	<string name="EquipmentShieldKineticDamageResistance">盾容动能减伤</string>
+	<string name="EquipmentShieldThermalDamageResistance">盾容燃烧减伤</string>
+	<string name="EquipmentShieldEnergyDamageResistance">盾容能量减伤</string>
+	<string name="EquipmentShieldQuantumDamageResistance">盾容量子减伤</string>
+	<string name="EquipmentEnergyShieldKineticDamageResistance">护盾动能减伤</string>
+	<string name="EquipmentEnergyShieldThermalDamageResistance">护盾燃烧减伤</string>
+	<string name="EquipmentEnergyShieldEnergyDamageResistance">护盾能量减伤</string>
+	<string name="EquipmentEnergyShieldQuantumDamageResistance">护盾量子减伤</string>
+	
+	<string name="EquipmentWeaponDamageMultiplier">武器伤害增幅</string>
+	<string name="EquipmentWeaponFireRateMultiplier">武器射速增幅</string>
+	<string name="EquipmentWeaponRangeMultiplier">武器射程增幅</string>
+	<string name="EquipmentWeaponEnergyCostMultiplier">武器能耗增幅</string>
+	<string name="EquipmentWeaponSizeMultiplier">弹头大小增幅</string>
+	<string name="EquipmentWeaponVelocityMultiplier">弹头弹速增幅</string>
+	<string name="EquipmentWeaponWeightMultiplier">弹头重量增幅</string>
+	<string name="EquipmentWeaponLifetimeMultiplier">弹头存在时间增幅</string>
+	<string name="EquipmentWeaponAoeRadiusMultiplier">弹头影响范围增幅</string>
+	<string name="EquipmentWeaponSpreadMultiplier">武器散射增幅</string>
+	<string name="EquipmentWeaponMagazineMultiplier">武器弹匣增幅</string>
+	
+	<string name="QualityLow5">废品的</string>
+	<string name="QualityLow4">损坏的</string>
+	<string name="QualityLow3">破损的</string>
+	<string name="QualityLow2">劣质的</string>
+	<string name="QualityLow1">瑕疵的</string>
+	<string name="QualityCommon">普通的</string>
+	<string name="QualityMedium">改良的</string>
+	<string name="QualityHigh">优秀的</string>
+	<string name="QualityPerfect">高级的</string>
+	<string name="QualityEpic">顶尖的</string>
+	<string name="QualityLegend">终极的</string>
+
+
 </resources>

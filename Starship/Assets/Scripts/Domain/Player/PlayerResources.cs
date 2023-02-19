@@ -29,8 +29,8 @@ namespace GameServices.Player
 
         public int Stars
         {
-            get { return _session.Resources.Stars; }
-            set { _session.Resources.Stars = Clamp(value); }
+            get { return _session.Resources.Stars + _session.Purchases.ExtraStarCount; }
+            set { _session.Resources.Stars = Clamp(value) - _session.Purchases.ExtraStarCount; }
         }
 
         public int Tokens

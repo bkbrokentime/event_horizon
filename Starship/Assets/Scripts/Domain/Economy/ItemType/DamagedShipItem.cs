@@ -28,19 +28,19 @@ namespace Economy.ItemType
         public string Name { get { return _localization.GetString(_build.Ship.Name); } }
         public string Description { get { return string.Empty; } }
         public Sprite GetIcon(IResourceLocator resourceLocator) { return resourceLocator.GetSprite(_build.Ship.ModelImage); }
-        public Price Price { get { return Price.Common(_build.Ship.Layout.CellCount * _build.Ship.Layout.CellCount); } }
+        public Price Price { get { return Price.Common(_build.Ship.Layout.CellCount * _build.Ship.Layout.CellCount + _build.Ship.SecondLayout.CellCount * _build.Ship.SecondLayout.CellCount); } }
         public Color Color { get { return Color.white; } }
         public Currency Currency { get { return Currency.Credits; } }
         public ItemQuality Quality { get { return ItemQuality.Common; } }
 
         public IEnumerable<IntegratedComponent> GetComponents()
         {
-            var freespace = _build.Ship.Layout.CellCount / 4 + 1;
+            var freespace = _build.Ship.Layout.CellCount / 4 + 1 + _build.Ship.SecondLayout.CellCount / 3;
             var random = new System.Random(_seed);
 
             return LimitBySize(_build.Components.
                 Select(item => { var component = ComponentExtensions.FromDatabase(item); component.Locked = false; return component; }).
-                RandomElements(random.Next(freespace / 5), random), freespace);
+                RandomElements(1, random.Next(freespace / 5), random), freespace);
         }
 
         public void Consume(int amount)

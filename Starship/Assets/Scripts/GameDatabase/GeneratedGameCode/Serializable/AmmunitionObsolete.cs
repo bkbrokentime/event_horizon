@@ -31,6 +31,8 @@ namespace GameDatabase.Serializable
 		public float EnergyCost;
 		public int CoupledAmmunitionId;
 		public string Color;
+		public bool RandomColor;
+		public bool ChangeableColor;
 		public string FireSound;
 		public string HitSound;
 		public string HitEffectPrefab;

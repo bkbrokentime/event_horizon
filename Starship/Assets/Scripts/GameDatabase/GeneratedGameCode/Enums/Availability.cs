@@ -15,5 +15,7 @@ namespace GameDatabase.Enums
 		Rare = 2,
 		Special = 3,
 		Hidden = 4,
+		BlackMarketOnly = 5,
+		XmasOnly = 6,
 	}
 }

@@ -5,44 +5,67 @@ using GameDatabase.DataModel;
 
 namespace Combat.Component.Systems.Devices
 {
-    public class AcceleratorDevice : ContinuouslyActivatedDevice, IEngineModification
+    public class AcceleratorDevice : SystemBase, IDevice, IEngineModification
     {
         public AcceleratorDevice(IShip ship, DeviceStats deviceSpec, int keyBinding)
-            : base(keyBinding,
-                deviceSpec.ControlButtonIcon, ship,
-                deviceSpec.Lifetime,
-                deviceSpec.EnergyConsumption)
+            : base(keyBinding, deviceSpec.ControlButtonIcon, ship)
         {
             MaxCooldown = deviceSpec.Cooldown;
 
-            _power = deviceSpec.Power / 20;
+            _ship = ship;
+            _energyCost = deviceSpec.EnergyConsumption;
         }
 
-        public override IEngineModification EngineModification => this;
+        public override IEngineModification EngineModification { get { return this; } }
 
         public bool TryApplyModification(ref EngineData data)
         {
-            if (IsEnabled)
+            if (_isEnabled)
             {
                 data.Throttle = 1.0f;
-                data.Propulsion *= 4 * _power;
-                data.Velocity *= 8 * _power;
+                data.Propulsion *= 4;
+                data.Velocity *= 8;
             }
 
             return true;
         }
 
-        protected override bool RemainActive(float elapsedTime)
+        public void Deactivate()
         {
-            if (!base.RemainActive(elapsedTime)) return false;
-            InvokeTriggers(ConditionType.OnRemainActive);
-            return true;
+            if (!_isEnabled)
+                return;
+
+            _isEnabled = false;
+            TimeFromLastUse = 0;
+            InvokeTriggers(ConditionType.OnDeactivate);
+        }
+
+        protected override void OnUpdatePhysics(float elapsedTime)
+        {
+            if (Active && CanBeActivated && _ship.Stats.Energy.TryGet(_energyCost * elapsedTime))
+            {
+                if (!_isEnabled)
+                {
+                    InvokeTriggers(ConditionType.OnActivate);
+                    _isEnabled = true;
+                }
+                else
+                {
+                    InvokeTriggers(ConditionType.OnRemainActive);
+                }
+            }
+            else if (_isEnabled)
+            {
+                Deactivate();
+            }
         }
 
         protected override void OnUpdateView(float elapsedTime) { }
 
         protected override void OnDispose() { }
 
-        private readonly float _power;
+        private bool _isEnabled;
+        private readonly float _energyCost;
+        private readonly IShip _ship;
     }
 }

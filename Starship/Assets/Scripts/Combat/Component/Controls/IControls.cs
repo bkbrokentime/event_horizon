@@ -1,6 +1,4 @@
-﻿using System.Collections;
-
-namespace Combat.Component.Controls
+﻿namespace Combat.Component.Controls
 {
     public interface IControls
     {
@@ -11,6 +9,6 @@ namespace Combat.Component.Controls
 
         void SetSystemState(int id, bool active);
         bool GetSystemState(int id);
-        BitArray SystemsState { get; set; }
+        ulong SystemsState { get; set; }
     }
 }

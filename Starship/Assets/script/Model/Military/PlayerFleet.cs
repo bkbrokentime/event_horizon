@@ -26,10 +26,31 @@ namespace Model
 						yield return ship;
 					}
 
-					if (count == 0)
-						yield return new CommonShip(_database.GetShipBuild(LegacyShipBuildNames.GetId("mothership_1")));
-				}
-			}
+                    if (count == 0)
+                        if (_database.GalaxySettings.MotherShip != null)
+                            yield return new CommonShip(_database.GetShipBuild(_database.GalaxySettings.MotherShip.Id));
+                        else
+                            yield return new CommonShip(_database.GetShipBuild(LegacyShipBuildNames.GetId("mothership_1")));
+                }
+            }
+            public IEnumerable<IShip> AllShips 
+			{
+				get
+				{
+					int count = 0;
+					foreach (var ship in _fleet.Ships)
+					{
+						count++;
+						yield return ship;
+					}
+
+                    if (count == 0)
+                        if (_database.GalaxySettings.MotherShip != null)
+                            yield return new CommonShip(_database.GetShipBuild(_database.GalaxySettings.MotherShip.Id));
+                        else
+                            yield return new CommonShip(_database.GetShipBuild(LegacyShipBuildNames.GetId("mothership_1")));
+                }
+            }
 
 			public int AiLevel { get { return 100; } }			
 			public float Power { get { return _fleet.Power; } }

@@ -18,6 +18,7 @@ namespace Gui.StarMap
         [SerializeField] private Image _emptyImage3;
         [SerializeField] private Image _emptyImage4;
         [SerializeField] private Image _emptyImage5;
+        [SerializeField] private Image _emptyImage6;
 
         [Inject] private readonly IResourceLocator _resourceLocator;
 
@@ -56,6 +57,8 @@ namespace Gui.StarMap
                         return _emptyImage4.sprite;
                     case SizeClass.Titan:
                         return _emptyImage5.sprite;
+                    case SizeClass.Dominate:
+                        return _emptyImage6.sprite;
                     default:
                         return null;
                 }
@@ -103,6 +106,7 @@ namespace Gui.StarMap
                 _emptyImage3.gameObject.SetActive(false);
                 _emptyImage4.gameObject.SetActive(false);
                 _emptyImage5.gameObject.SetActive(false);
+                _emptyImage6.gameObject.SetActive(false);
                 _lockIcon.gameObject.SetActive(true);
                 return;
             }
@@ -127,6 +131,7 @@ namespace Gui.StarMap
             _emptyImage3.gameObject.SetActive(!_icon.gameObject.activeSelf && _sizeClass == SizeClass.Cruiser);
             _emptyImage4.gameObject.SetActive(!_icon.gameObject.activeSelf && _sizeClass == SizeClass.Battleship);
             _emptyImage5.gameObject.SetActive(!_icon.gameObject.activeSelf && _sizeClass == SizeClass.Titan);
+            _emptyImage6.gameObject.SetActive(!_icon.gameObject.activeSelf && _sizeClass == SizeClass.Dominate);
         }
 
         private IShip _ship;

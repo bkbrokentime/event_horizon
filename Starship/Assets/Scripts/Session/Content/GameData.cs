@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GameModel.Serialization;
-using Utils;
 using Zenject;
 
 namespace Session.Content
@@ -103,14 +102,14 @@ namespace Session.Content
             var version = Helpers.DeserializeInt(buffer, ref index);
             if (version != CurrentVersion && !TryUpgrade(ref buffer, version))
             {
-                OptimizedDebug.Log("GameData: incorrect data version - " + version);
+                UnityEngine.Debug.Log("GameData: incorrect data version - " + version);
                 throw new ArgumentException();
             }
 
             _seed = Helpers.DeserializeInt(buffer, ref index);
             _gameStartTime = Helpers.DeserializeLong(buffer, ref index);
 
-            OptimizedDebug.Log("Start time: " + _gameStartTime);
+            UnityEngine.Debug.Log("Start time: " + _gameStartTime);
 
             _supplyShipStartTime = Helpers.DeserializeLong(buffer, ref index);
             _totalPlayTime = Helpers.DeserializeLong(buffer, ref index);

@@ -8,6 +8,7 @@ namespace Economy
         None,
         Credits,
         Stars,
+        Money,
         Tokens,
         Snowflakes,
     }
@@ -21,9 +22,10 @@ namespace Economy
 #if UNITY_PURCHASING && !UNITY_STANDALONE
         public static bool PremiumCurrencyAllowed => true;
 #else
-        public static bool PremiumCurrencyAllowed => false;
+        //public static bool PremiumCurrencyAllowed => false;
+        public static bool PremiumCurrencyAllowed => true;
 #endif
-
+        public static bool PremiumCurrencySell => true;
         //public static IProductType ProductType(this Currency currency)
         //{
         //    switch (currency)

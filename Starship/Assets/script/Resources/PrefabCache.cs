@@ -7,7 +7,6 @@ using GameDatabase.DataModel;
 using GameDatabase.Enums;
 using GameDatabase.Model;
 using Services.Reources;
-using Utils;
 using Zenject;
 
 public class PrefabCache : MonoBehaviour
@@ -22,7 +21,7 @@ public class PrefabCache : MonoBehaviour
             prefab = Resources.Load<GameObject>(path);
             if (prefab == null)
             {
-                if (!noExceptions) OptimizedDebug.LogException(new ArgumentException("prefab not found: " + path));
+                if (!noExceptions) Debug.LogException(new ArgumentException("prefab not found: " + path));
                 return null;
             }
 
@@ -40,7 +39,7 @@ public class PrefabCache : MonoBehaviour
 			prefab = Resources.Load<GameObject>("Prefabs/" + path);
 		    if (prefab == null)
 		    {
-                OptimizedDebug.LogException(new ArgumentException("prefab not found: " + path));
+		        Debug.LogException(new ArgumentException("prefab not found: " + path));
 		        return null;
 		    }
 
@@ -122,7 +121,7 @@ public class PrefabCache : MonoBehaviour
         return prefab;
     }
 
-    private readonly Dictionary<string, GameObject> _prefabs = new Dictionary<string, GameObject>();
+    public readonly Dictionary<string, GameObject> _prefabs = new Dictionary<string, GameObject>();
     private readonly Dictionary<int, GameObject> _bulletPrefabs = new Dictionary<int, GameObject>();
     private readonly Dictionary<string, GameObject> _effectPrefabs = new Dictionary<string, GameObject>();
 }

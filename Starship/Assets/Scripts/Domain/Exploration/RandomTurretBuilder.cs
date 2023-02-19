@@ -65,7 +65,7 @@ namespace Game.Exploration
         private static bool IsSuitableWeapon(Component component, int level)
         {
             if (component.Ammunition == null && component.AmmunitionObsolete == null) return false;
-            if (component.WeaponSlotType != (char) WeaponSlotType.Cannon) return false;
+            if (component.WeaponSlotType != WeaponSlotType.Cannon) return false;
             if (component.Level > level) return false;
             if (component.Layout.CellCount < 3) return false;
 
@@ -74,7 +74,7 @@ namespace Game.Exploration
 
         private static IntegratedComponent Create(Component item, int barrelId = -1)
         {
-            return new IntegratedComponent(new ComponentInfo(item), 0, 0, barrelId, 0, 0, false);
+            return new IntegratedComponent(new ComponentInfo(item),0, 0, 0, barrelId, 0, 0, false);
         }
 
         private readonly int _seed;

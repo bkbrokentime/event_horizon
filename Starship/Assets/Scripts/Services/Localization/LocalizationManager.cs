@@ -2,24 +2,15 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Xml.Serialization;
-using GameDatabase;
-using GameDatabase.DataModel;
-using GameDatabase.Model;
 using GameServices.Settings;
-using Session;
 using UnityEngine.Assertions;
-using Utils;
 using Zenject;
-using Component = GameDatabase.DataModel.Component;
 
 namespace Services.Localization
 {
 	public class LocalizationManager : ILocalization
 	{
-		[Inject] private ISessionData _sessionData;
-		[Inject] private IDatabase _database;
         [Inject]
 	    public LocalizationManager(GameSettings gameSettings)
         {
@@ -33,38 +24,28 @@ namespace Services.Localization
 	        LoadDefault();
 	    }
 
-	    public string GetString(string key, params object[] parameters)
-	    {
-		    if (string.IsNullOrEmpty(key))
-			    return key;
-		    
-		    var data = GetRawString(key, parameters);
-
-		    data = ApplyParameters(data, parameters);
-
-		    ApplySpecialChars(ref data);
-		    ApplyInjections(ref data);
-		    return data;
-	    }
-		
-		private string GetRawString(string key, params object[] parameters)
+		public string GetString(string key, params object[] parameters)
 		{
 		    try
 		    {
-		        if (key[0] != SpecialChar)
+		        if (string.IsNullOrEmpty(key) || key[0] != SpecialChar)
 		            return key;
 
-		        if (_keys.TryGetValue(key.Substring(1), out var value)) return value;
-		        if (_defaultLocalization != null)
-			        return _defaultLocalization.GetString(key, parameters);
+		        if (!_keys.TryGetValue(key.Substring(1), out var value))
+		        {
+		            if (_defaultLocalization != null)
+		                return _defaultLocalization.GetString(key, parameters);
 
-		        OptimizedDebug.Log("key not found: '" + key + "'");
-		        return key;
+                    UnityEngine.Debug.Log("key not found: '" + key + "'");
+	                return key;
+		        }
 
-		    }
+		        value = value.Replace("\\n", "\n").Replace("\\", string.Empty);
+                return ApplyParameters(value, parameters);
+            }
             catch (Exception e)
 		    {
-			    OptimizedDebug.LogException(e);
+		        UnityEngine.Debug.LogException(e);
                 return key;
 		    }
 		}
@@ -106,7 +87,7 @@ namespace Services.Localization
 	        }
             catch (Exception e)
 	        {
-	            OptimizedDebug.LogError("Unable to load localization from database: " + e.Message);
+	            Debug.LogError("Unable to load localization from database: " + e.Message);
 	        }
         }
 
@@ -133,7 +114,7 @@ namespace Services.Localization
 			    }
                 catch (Exception e)
 			    {
-                    OptimizedDebug.LogError("Unable to load localization file: " + e.Message);
+                    Debug.LogError("Unable to load localization file: " + e.Message);
 			    }
 			}
 
@@ -150,7 +131,7 @@ namespace Services.Localization
 	        {
 	            if (_keys.ContainsKey(item.name))
 	            {
-	                OptimizedDebug.Log("LocalizationManager: duplicate name - " + item.name);
+	                UnityEngine.Debug.Log("LocalizationManager: duplicate name - " + item.name);
                     continue;
                 }
 
@@ -194,12 +175,13 @@ namespace Services.Localization
 				else if (char.IsLetter(ch))
 				{
                     var start = index;
-                    while (index < value.Length && !char.IsWhiteSpace(value[index]))
+                    while (index < value.Length && char.IsLetterOrDigit(value[index]))
                         ++index;
 
 				    var key = value.Substring(start, index - start);
-				    if (_keys.ContainsKey(key))
-				        builder.Append(GetString(SpecialChar + key));
+				    string parameter;
+				    if (_keys.TryGetValue(key, out parameter))
+				        builder.Append(parameter);
 				    else
 				        AddInvalidParameter(builder, key);
 				}
@@ -274,55 +256,6 @@ namespace Services.Localization
 				_pluralForms.Add(PluralForm.FromString(item));
 		}
 
-        private void ApplySpecialChars(ref string text)
-        {
-	        text = text.Replace("\\n", "\n").Replace("\\", "");
-        }
-        
-        private void ApplyInjections(ref string text)
-        {
-	        if (_sessionData == null)
-	        {
-		        text = FormatterRegex.Replace(text, "!!!Session is not initialized!!!");
-		        return;
-	        }
-	        if (_database == null)
-	        {
-		        text = FormatterRegex.Replace(text, "!!!Database is not initialized!!!");
-		        return;
-	        }
-	        text = FormatterRegex.Replace(text, FormatOneGroup);
-        }
-
-        private string FormatOneGroup(Match match)
-        {
-	        var type = match.Groups[1].Value;
-	        var id = int.Parse(match.Groups[2].Value);
-	        switch (type)
-	        {
-		        case "rep":
-			        if (_database.GetCharacter(new ItemId<Character>(id)) == Character.DefaultValue)
-			        {
-				        return $"!!!Character with id {id} was not found!!!";
-			        }
-			        return _sessionData.Quests.GetCharacterRelations(id).ToString();
-		        case "item":
-			        if (_database.GetQuestItem(new ItemId<QuestItem>(id)) == QuestItem.DefaultValue)
-			        {
-				        return $"!!!Quest item with id {id} was not found!!!";
-			        }
-			        return _sessionData.Resources.Resources.GetQuantity(id).ToString();
-		        case "comp":
-			        if (_database.GetComponent(new ItemId<Component>(id)) == Component.DefaultValue)
-			        {
-				        return $"!!!Component with id {id} was not found!!!";
-			        }
-			        return _sessionData.Inventory.Components.GetQuantity(id).ToString();
-		        default:
-			        throw new Exception(
-				        $"Invalid request type encountered, got {type} where rep, item or comp was expected");
-	        }
-        }
 		private void Awake()
 		{
 			Reload();
@@ -387,10 +320,9 @@ namespace Services.Localization
 
 		private List<PluralForm> _pluralForms = new List<PluralForm>();
 		private Dictionary<string, string> _keys = new Dictionary<string, string>();
-		public const char SpecialChar = '$';
+		private const char SpecialChar = '$';
 	    private GameSettings _gameSettings;
-	    
-	    private static readonly Regex FormatterRegex = new Regex(@"@(rep|item|comp)\{(\d+)\}");
+
 	    private const string _defaultLanguage = "English";
         private readonly LocalizationManager _defaultLocalization;
 	}

@@ -23,6 +23,7 @@ namespace GameDatabase.Serializable
 		public int Faction;
 		public int Level;
 		public string Icon;
+		public bool GIFIcon;
 		public string Color;
 		public string Layout;
 		public string CellType;
@@ -33,6 +34,7 @@ namespace GameDatabase.Serializable
 		public int DroneBayId;
 		public int DroneId;
 		public ComponentRestrictionsSerializable Restrictions;
+		public PresetModListType PresetMod;
 		public int[] PossibleModifications;
 	}
 }

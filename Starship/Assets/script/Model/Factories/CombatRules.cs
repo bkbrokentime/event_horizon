@@ -13,15 +13,19 @@ namespace Model
 				return new Model.Military.CombatRules {
 					RewardType = Military.RewardType.Default,
 					LootCondition = RewardCondition.Default,
-                    ExpCondition = RewardCondition.Default,
+					ExpCondition = RewardCondition.Default,
 					TimeLimit = Maths.Distance.CombatTime(level),
 					TimeoutBehaviour = Military.TimeoutBehaviour.NextEnemy,
 					CanSelectShips = true,
-                    CanCallEnemies = true,
+					CanCallEnemies = true,
+					CanCallAllies = true,
 					AsteroidsEnabled = true,
 					PlanetEnabled = true,
-                    InitialEnemies = 1,
-                    MaxEnemies = 3,
+					InitialEnemies = 1,
+					MaxEnemies = 3,
+					NoLimitSet = false,
+					NoLimitMaxAllies = 0,
+					NoLimitMaxEnemies = 0,
 				};
 			}
 		
@@ -58,6 +62,13 @@ namespace Model
 			public static Military.CombatRules Flagship(int level)
 			{
 				var rules = Default(level);
+				return rules;
+			}
+
+			public static Military.CombatRules Flagship_rank(int level,int rank)
+			{
+				var rules = Default(level);
+				rules.MaxEnemies = rank;
 				return rules;
 			}
 
@@ -109,6 +120,21 @@ namespace Model
 				var rules = Default(level + 10);
 			    rules.LootCondition = RewardCondition.Always;
 			    rules.ExpCondition = RewardCondition.Always;
+                return rules;
+			}
+
+			public static Military.CombatRules Endlessness()
+			{
+				var rules = Default();
+				rules.TimeLimit = 0;
+			    rules.LootCondition = RewardCondition.Always;
+			    rules.ExpCondition = RewardCondition.Always;
+				rules.AsteroidsEnabled = false;
+				rules.PlanetEnabled = false;
+				rules.InitialEnemies = 5;
+				rules.NoLimitSet = true;
+				rules.NoLimitMaxEnemies = 50;
+				rules.NoLimitMaxAllies = 50;
                 return rules;
 			}
 		}

@@ -29,6 +29,7 @@ namespace Model
                     return _ships;
                 }
             }
+            public IEnumerable<IShip> AllShips { get { return Ships; } }
 
             public int AiLevel { get; private set; }
 
@@ -37,7 +38,7 @@ namespace Model
                 get
                 {
                     if (_power < 0)
-                        _power = Maths.Threat.GetShipsPower(Ships);
+                        _power = Maths.Power.GetShipsComprehensivePower(Ships, _database.ShipSettings);//_power = Maths.Threat.GetShipsPower(Ships);
                     return _power;
                 }
             }

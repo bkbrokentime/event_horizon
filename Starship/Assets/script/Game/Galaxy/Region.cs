@@ -1,57 +1,50 @@
+using System;
 using System.Linq;
 using GameDatabase;
 using GameDatabase.DataModel;
 using GameDatabase.Extensions;
+using GameServices.Random;
 using Session;
 using UnityEngine;
-using Utils;
+using Zenject;
 
 namespace GameModel
 {
 	public class Region
 	{
-		private Region(int id, bool isPirateBase, ISessionData session, IDatabase database, BaseCapturedSignal.Trigger baseCapturedTrigger, RegionFleetDefeatedSignal.Trigger regionFleetDefeatedTrigger)
+        public Region(int id, int randomsize, IRandom _random, bool isPirateBase, ISessionData session, IDatabase database, BaseCapturedSignal.Trigger baseCapturedTrigger, RegionFleetDefeatedSignal.Trigger regionFleetDefeatedTrigger)
         {
             _session = session;
             _database = database;
             _baseCapturedTrigger = baseCapturedTrigger;
             _regionFleetDefeatedTrigger = regionFleetDefeatedTrigger;
-
-			Id = Mathf.Max(id, 0);
+			_randomsize = _random.RandomInt(id, 0, randomsize);
+            Id = Mathf.Max(id, 0);
 			OwnerId = Id;
 
-			if (Id == 0 || Id == PlayerHomeRegionId || isPirateBase)
+			if (Id == 0 || Id == PlayerHomeRegionId)
 			{
-				_faction = Faction.Neutral;
-			    Size = 0;
+                if (_database.GalaxySettings.InitialStarbaseFaction != null)
+                    _faction = _database.GalaxySettings.InitialStarbaseFaction;
+                else
+                    _faction = Faction.Neutral;
+                Size = 0;
 			}
 			else
 			{
-				Size = RegionLayout.RegionFourthSize*2 - 1;// Game.Data.RandomInt(id, 1, RegionLayout.RegionMaxSize);
-			}
-			
-			// If session have data about faction ID stored, we clear any faction that might've been set during initialization
-			if (_session.Regions.GetRegionFactionId(Id) != Faction.Undefined.Id)
-			{
-				_faction = Faction.Undefined;
-			}
+				//Size = RegionLayout.RegionFourthSize*2 - 1;// Game.Data.RandomInt(id, 1, RegionLayout.RegionMaxSize);
+				Size = _random.RandomInt(id, 1, RegionLayout.RegionFourthSize) * (_randomsize + 5) / 5;
+				if (isPirateBase)
+					Size = _random.RandomInt(id, 0, _random.RandomInt(0, _random.RandomInt(0, 2)));
+            }
 
-			_defeatedFleetCount = _session.Regions.GetDefeatedFleetCount(Id);
+            _defeatedFleetCount = _session.Regions.GetDefeatedFleetCount(Id);
 			_isCaptured = Id == PlayerHomeRegionId || _session.Regions.IsRegionCaptured(Id);
-		}
-
-		public static Region TryCreate(int id, bool isPirateBase, ISessionData session, IDatabase database,
-			BaseCapturedSignal.Trigger baseCapturedTrigger,
-			RegionFleetDefeatedSignal.Trigger regionFleetDefeatedTrigger)
-		{
-			var region = new Region(id, isPirateBase, session, database, baseCapturedTrigger,
-				regionFleetDefeatedTrigger);
-			return region.Faction == Faction.Undefined ? Empty : region;
 		}
 
 		public void OnFleetDefeated()
 		{
-			OptimizedDebug.Log("RegionFleetDefeated: " + Id);
+			UnityEngine.Debug.Log("RegionFleetDefeated: " + Id);
 
 			if (Id == UnoccupiedRegionId)
 				return;
@@ -64,6 +57,7 @@ namespace GameModel
 		public int Id { get; private set; }
 		public int OwnerId { get; private set; }
 		public int Size { get; private set; }
+		public int _randomsize { get; private set; }
 
 	    public bool IsPirateBase => _faction == Faction.Neutral;
 
@@ -97,7 +91,13 @@ namespace GameModel
 		{
 			get
 			{
-				return Mathf.Max(0.5f, Mathf.Min(3.0f + 0.05f * MilitaryPower, 10.0f) - _defeatedFleetCount*0.1f);
+				float powermultiplier = 1 + Size * Size * 1.0f / 2;
+				float MINpower = 0.5f;
+				float defeatedpowermultiplier =0.01f / Mathf.Sqrt(Size + 1);
+
+				float Power = 1.0f + 0.05f * Mathf.Sqrt(MilitaryPower) * powermultiplier;
+				float DefeatedPower = 0.05f + Mathf.Sqrt(MilitaryPower / 10) * defeatedpowermultiplier;
+				return Mathf.Max(MINpower, Power - _defeatedFleetCount * Mathf.Min(0.5f, DefeatedPower));
 			}
 		}
 
@@ -121,12 +121,12 @@ namespace GameModel
 			    if (factionId != Faction.Undefined.Id)
 			    {
 			        var faction = _database.GetFaction(factionId);
-			        if (faction != Faction.Undefined)
+			        if (faction != Faction.Undefined && !faction.Hidden)
 			            return _faction = faction;
 			    }
 
-			    _faction = _database.FactionList.Visible().AtDistance(MilitaryPower).Where(item => item != Faction.Neutral).RandomElement(new System.Random(HomeStar + _session.Game.Seed)) ?? Faction.Undefined;
-				_session.Regions.SetRegionFactionId(Id, _faction.Id);
+			    _faction = _database.FactionList.Visible().AtDistance(MilitaryPower).Where(item => item != Faction.Neutral).RandomElement(new System.Random(HomeStar + _session.Game.Seed));
+			    _session.Regions.SetRegionFactionId(Id, _faction.Id);
 
                 return _faction;
 			}
@@ -144,7 +144,10 @@ namespace GameModel
 			get
 			{
 				if (_homeStar < 0)
+				{  
 					_homeStar = RegionLayout.GetRegionHomeStar(Id);
+					//_homeStar = RegionLayout.GetRandomSizeRegionHomeStar(Id, _randomsize);
+				}
 
 				return _homeStar;
 			}

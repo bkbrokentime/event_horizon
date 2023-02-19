@@ -12,7 +12,7 @@ namespace Combat
 		{
 			[SerializeField] GameObject Background;
 			[SerializeField] float MinSize = 5;
-            [SerializeField] float MaxSize = 25;
+            [SerializeField] float MaxSize = 50;
             //[SerializeField] float Border = 5;
 			[SerializeField] float ZoomSpeed = 5;
 			[SerializeField] float LinearSpeed = 5;
@@ -26,31 +26,27 @@ namespace Combat
 		    }
 
             private void Start()
-            {
-	            if (Background == null) Background = null;
-	            _camera = gameObject.GetComponent<UnityEngine.Camera>();
-	            _zoom = ZoomOverride >= 0 ? ZoomOverride : _gameSettings.CameraZoom;
-            }
+			{
+                _zoom = ZoomOverride >= 0 ? ZoomOverride : _gameSettings.CameraZoom;
+			}
 			
 			private void LateUpdate()
 			{
+				var camera = gameObject.GetComponent<UnityEngine.Camera>();
 				var viewRect = _scene.ViewRect;
-				var orthographicSize = Mathf.Clamp(0.5f*Mathf.Max(viewRect.width/_camera.aspect, viewRect.height), MinSize + _zoom*(MaxSize - MinSize), MaxSize);
+				var orthographicSize = Mathf.Clamp(0.5f*Mathf.Max(viewRect.width/camera.aspect, viewRect.height), MinSize + _zoom*(MaxSize - MinSize), MaxSize);
 				var delta = Mathf.Min(ZoomSpeed*Time.unscaledDeltaTime, 1);
-				var size = _camera.orthographicSize;
-				size += (orthographicSize - size) * delta;
-				_camera.orthographicSize = size;
+				camera.orthographicSize += (orthographicSize - camera.orthographicSize)*delta;
 				var position = Vector2.Lerp(transform.position, viewRect.center, LinearSpeed*Time.unscaledDeltaTime);
 				gameObject.Move(position);
 
-				// ReSharper disable once Unity.NoNullPropagation
-				Background?.Move(position);
+				if (Background != null)
+					Background.Move(position);
 			}
 
 			private float _zoom;
             private IScene _scene;
 		    private GameSettings _gameSettings;
-		    private UnityEngine.Camera _camera;
 		}
     }
 }

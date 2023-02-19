@@ -18,6 +18,8 @@ namespace Combat.Component.Ship.Effects
         IFeaturesModification FeaturesModification { get; }
         ISystemsModification SystemsModification { get; }
         IStatsModification StatsModification { get; }
+        IStatsWeaponModification StatsWeaponModification { get; }
+        IStatsAttenuationModification StatsAttenuationModifications { get; }
         IUnitAction UnitAction { get; }
     }
 }

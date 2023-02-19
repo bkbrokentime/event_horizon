@@ -38,11 +38,12 @@ namespace Game.Exploration
 
         public int Seed => _planet.Seed;
         public Color PlanetColor => _planet.Color;
+        public Color PlanetTypeColor => _planet.TypeColor;
         public bool HasSolidGround => _planet.Type != PlanetType.Gas;
 
         public EnvironmentObjectType GetEnvironmentObject(System.Random random)
         {
-            if (_planet.Type == PlanetType.Barren)
+            if (_planet.Type == PlanetType.Barren || _planet.Type == PlanetType.Molten || _planet.Type == PlanetType.Frozen)
                 return random.Percentage(80) ? EnvironmentObjectType.SmallCrater : EnvironmentObjectType.BigCrater;
             if (_planet.Type == PlanetType.Gas)
                 return EnvironmentObjectType.GasCloud;
@@ -97,6 +98,8 @@ namespace Game.Exploration
                         case PlanetType.Gas: AddObjective(CreateGasPlanetObjective(random, i)); break;
                         case PlanetType.Barren: AddObjective(CreateBarrenPlanetObjective(random, i)); break;
                         case PlanetType.Terran: AddObjective(CreateTerranPlanetObjective(random, i)); break;
+                        case PlanetType.Molten: AddObjective(CreateMoltenPlanetObjective(random, i)); break;
+                        case PlanetType.Frozen: AddObjective(CreateFrozenPlanetObjective(random, i)); break;
                         case PlanetType.Infected: AddObjective(CreateInfectedPlanetObjective(random, i)); break;
                         default: throw new ArgumentException("Invalid planet type: " + _planet.Type);
                     }
@@ -109,10 +112,10 @@ namespace Game.Exploration
         private ObjectiveType CreateGasPlanetObjective(System.Random random, int id)
         {
             var value = random.Next(100);
-            if (value < 30) return ObjectiveType.Meteorite;
+            if (value < 25) return ObjectiveType.Meteorite;
             if (value < 40) return ObjectiveType.MineralsRare;
-            if (value < 50) return ObjectiveType.ShipWreck;
-            if (value < 60) return ObjectiveType.Container;
+            if (value < 45) return ObjectiveType.ShipWreck;
+            if (value < 50) return ObjectiveType.Container;
             return ObjectiveType.Minerals;
         }
 
@@ -127,6 +130,23 @@ namespace Game.Exploration
             return ObjectiveType.Minerals;
         }
 
+        private ObjectiveType CreateMoltenPlanetObjective(System.Random random, int id)
+        {
+            var value = random.Next(100);
+            if (value < 30) return ObjectiveType.Meteorite;
+            if (value < 50) return ObjectiveType.MineralsRare;
+            if (value < 55) return ObjectiveType.ShipWreck;
+            return ObjectiveType.Minerals;
+        }
+
+        private ObjectiveType CreateFrozenPlanetObjective(System.Random random, int id)
+        {
+            var value = random.Next(100);
+            if (value < 30) return ObjectiveType.ShipWreck;
+            if (value < 40) return ObjectiveType.Outpost;
+            return ObjectiveType.Container;
+        }
+
         private ObjectiveType CreateTerranPlanetObjective(System.Random random, int id)
         {
             var haveOutpost = _planet.Level > 10;
@@ -134,11 +154,11 @@ namespace Game.Exploration
             if (id == 0 && haveOutpost) return ObjectiveType.Outpost;
 
             var value = random.Next(100);
-            if (value < 40) return ObjectiveType.Meteorite;
-            if (value < 45) return ObjectiveType.MineralsRare;
-            if (value < 60) return ObjectiveType.Minerals;
-            if (value < 75) return ObjectiveType.ShipWreck;
-            if (value < 95) return ObjectiveType.Container;
+            if (value < 5) return ObjectiveType.Meteorite;
+            if (value < 20) return ObjectiveType.MineralsRare;
+            if (value < 40) return ObjectiveType.Minerals;
+            if (value < 65) return ObjectiveType.ShipWreck;
+            if (value < 80) return ObjectiveType.Container;
             return haveOutpost ? ObjectiveType.Outpost : ObjectiveType.Container;
         }
 
@@ -147,11 +167,11 @@ namespace Game.Exploration
             if (id == 0) return ObjectiveType.Hive;
 
             var value = random.Next(100);
-            if (value < 40) return ObjectiveType.Meteorite;
-            if (value < 45) return ObjectiveType.MineralsRare;
-            if (value < 60) return ObjectiveType.Minerals;
-            if (value < 75) return ObjectiveType.ShipWreck;
-            if (value < 95) return ObjectiveType.Container;
+            if (value < 10) return ObjectiveType.Meteorite;
+            if (value < 25) return ObjectiveType.MineralsRare;
+            if (value < 50) return ObjectiveType.Minerals;
+            if (value < 70) return ObjectiveType.ShipWreck;
+            if (value < 80) return ObjectiveType.Container;
             return ObjectiveType.Hive;
         }
 
@@ -165,7 +185,7 @@ namespace Game.Exploration
         {
             get
             {
-                var count = Mathf.Clamp(_planet.Level/2, 10, 100);
+                var count = Mathf.Clamp(_planet.Level / 5, 5, 500);
                 var random = new System.Random(Seed + 10000);
 
                 for (var i = 0; i < count; ++i)
@@ -237,12 +257,12 @@ namespace Game.Exploration
 
         private int GetRandomShip(System.Random random)
         {
-            var value = random.Next2(Mathf.Min(140, 60 + _planet.Level/2));
+            var value = random.Next2(Mathf.Min(300, _planet.Level));
             if (value < 50)
                 return Drones[random.Next(Drones.Count)];
-            if (value < 90)
+            if (value < 150)
                 return SmallShips[random.Next(SmallShips.Count)];
-            if (value < 100)
+            if (value < 250)
                 return BigShips[random.Next(BigShips.Count)];
 
             return Flagships[random.Next(Flagships.Count)];
@@ -392,6 +412,7 @@ namespace Game.Exploration
         Minerals,
         MineralsRare,
         Hive,
+        // TODO: XmasBox,
     }
 
     public struct ObjectiveInfo

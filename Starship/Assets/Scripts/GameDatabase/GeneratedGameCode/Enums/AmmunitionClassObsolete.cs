@@ -42,5 +42,7 @@ namespace GameDatabase.Enums
 		BlackHole,
 		ClusterMissile,
 		HomingCarrier,
+		RandomRocket,
+		IntelligentRocket,
 	}
 }

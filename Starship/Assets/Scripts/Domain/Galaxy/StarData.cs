@@ -29,13 +29,17 @@ namespace Galaxy
         [Inject] private readonly Occupants _occupants;
         [Inject] private readonly Boss _boss;
         [Inject] private readonly Ruins _ruins;
+        [Inject] private readonly Fortification _fortification;
         [Inject] private readonly Challenge _challenge;
         [Inject] private readonly LocalEvent _localEvent;
         [Inject] private readonly Survival _survival;
+        [Inject] private readonly Endlessness _endlessness;
         [Inject] private readonly Wormhole _wormhole;
         [Inject] private readonly StarBase _starBase;
         [Inject] private readonly XmasTree _xmas;
         [Inject] private readonly Hive _hive;
+
+        public int boss_level = 0;
 
         [Inject]
         public StarData(ISessionData session, SessionDataLoadedSignal dataLoadedSignal, SessionCreatedSignal sessionCreatedSignal)
@@ -60,6 +64,7 @@ namespace Galaxy
         public bool HasBookmark(int starId) { return _session.StarMap.HasBookmark(starId); }
 
         public Region GetRegion(int starId) { return _regionMap.GetStarRegion(starId); }
+        //public Region GetRegion(int starId) { return _regionMap.GetRandomSizeStarRegion(starId); }
 
         public bool IsQuestObjective(int starId) { return _questManager.IsQuestObjective(starId); }
 
@@ -87,10 +92,22 @@ namespace Galaxy
             	objects.Add(StarObjectType.Event);
             if (value >= 300 && value < 325 && faction == Faction.Neutral)
                 objects.Add(StarObjectType.Survival);
-            if (value >= 350 && value < 375 && faction != Faction.Neutral)
-                objects.Add(StarObjectType.Arena);
+            if (value >= 325 && value < 340 && faction == Faction.Neutral)
+                objects.Add(StarObjectType.Endlessness);
+            //if (value >= 350 && value < 375 && faction != Faction.Neutral)
+            //    objects.Add(StarObjectType.Arena);
             if (value >= 400 && value < 450 && (faction != Faction.Neutral || value < 420))
+            {
                 objects.Add(StarObjectType.Boss);
+
+                var bossvalue = _random.RandomInt(starId, 100);
+                if (bossvalue < 30)
+                    boss_level = 1;
+                else if (bossvalue < 30 + 40)
+                    boss_level = 2;
+                else
+                    boss_level = 3;
+            }
             if (value >= 450 && value < 475 && faction == Faction.Neutral)
                 objects.Add(StarObjectType.Ruins);
             if (CurrencyExtensions.PremiumCurrencyAllowed)
@@ -104,6 +121,8 @@ namespace Galaxy
                 objects.Add(StarObjectType.BlackMarket);
             if (value >= 800 && value < 810 && _holidayManager.IsChristmas)
                 objects.Add(StarObjectType.Xmas);
+            if (value >= 850 && value < 900 && faction != Faction.Neutral)
+                objects.Add(StarObjectType.Fortification);
 
             return objects;
         }
@@ -112,9 +131,14 @@ namespace Galaxy
         {
             int x, y;
 			StarLayout.IdToPosition(starId, out x, out y);
+            /*
+            if (!RegionMap.IsRandomSizeHomeStar(_random, x, y))
+                return false;
+            */
+
             if (!RegionMap.IsHomeStar(x, y))
                 return false;
-
+            
             return GetRegion(starId).Id != Region.UnoccupiedRegionId;
         }
 
@@ -124,12 +148,16 @@ namespace Galaxy
         }
 
 		public Occupants.Facade GetOccupant(int starId) { return new Occupants.Facade(_occupants, starId); }
-        public Boss.Facade GetBoss(int starId) { return new Boss.Facade(_boss, starId); }
+        public Boss.Facade GetBoss(int starId,int level) { return new Boss.Facade(_boss, starId,level); }
+
+        public int GetBoss_level() { return boss_level; }
         public Ruins.Facade GetRuins(int starId) { return new Ruins.Facade(_ruins, starId); }
+        public Fortification.Facade GetFortification(int starId) { return new Fortification.Facade(_fortification, starId); }
         public XmasTree.Facade GetXmasTree(int starId) { return new XmasTree.Facade(_xmas, starId); }
         public Challenge.Facade GetChallenge(int starId) { return new Challenge.Facade(_challenge, starId); }
         public LocalEvent.Facade GetLocalEvent(int starId) { return new LocalEvent.Facade(_localEvent, starId); }
         public Survival.Facade GetSurvival(int starId) { return new Survival.Facade(_survival, starId); }
+        public Endlessness.Facade GetEndlessness(int starId) { return new Endlessness.Facade(_endlessness, starId); }
         public Wormhole.Facade GetWormhole(int starId) { return new Wormhole.Facade(_wormhole, starId); }
         public StarContent.Hive.Facade GetPandemic(int starId) { return new Hive.Facade(_hive, starId); }
         protected override void OnSessionDataLoaded()
@@ -147,7 +175,13 @@ namespace Galaxy
             _customStarObjects.Add(stars.Dequeue(), StarObjects.Create(StarObjectType.Event));
             _customStarObjects.Add(stars.Dequeue(), StarObjects.Create(StarObjectType.Event));
             _customStarObjects.Add(stars.Dequeue(), StarObjects.Create(StarObjectType.Survival));
+            _customStarObjects.Add(stars.Dequeue(), StarObjects.Create(StarObjectType.Endlessness));
             _customStarObjects.Add(stars.Dequeue(), StarObjects.Create(StarObjectType.Wormhole));
+            if (_holidayManager.IsChristmas)
+                _customStarObjects.Add(stars.Dequeue(), StarObjects.Create(StarObjectType.Xmas));
+#if UNITY_ANDROID
+            // TODO: _customStarObjects.Add(stars.Dequeue(), StarObjects.Create(StarObjectType.Multiplayer));
+#endif
 
             while (stars.Count > 0)
                 _customStarObjects.Add(stars.Dequeue(), new StarObjects());

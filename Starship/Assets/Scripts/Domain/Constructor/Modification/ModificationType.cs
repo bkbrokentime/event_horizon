@@ -76,6 +76,20 @@ namespace Constructor.Modification
                 return new DroneRange(quality);
             case ComponentModType.Recoil:
                 return new Recoil(quality);
+            case ComponentModType.Implosion:
+                return new Implosion(quality);
+            case ComponentModType.WideExplosion:
+                return new WideExplosion(quality);
+            case ComponentModType.Burst:
+                return new Burst(quality);
+            case ComponentModType.HeavyWeapon:
+                return new HeavyWeapon(quality);
+            case ComponentModType.Accurate:
+                return new Accurate(quality);
+            case ComponentModType.Scatter:
+                return new Scatter(quality);
+            case ComponentModType.Magazine:
+                return new Magazine(quality);
             default:
                 return null;
             }

@@ -5,21 +5,25 @@ namespace Constructor
 {
     public enum ComponentQuality
     {
-        N3 = 0,
-        N2 = 1,
-        N1 = 2,
-        P0 = 3,
-        P1 = 4,
-        P2 = 5,
-        P3 = 6,
+        N5,
+        N4,
+        N3,
+        N2,
+        N1,
+        P0,
+        P1,
+        P2,
+        P3,
+        P4,
+        P5,
     }
 
     public static class ComponentQualityExtensions
     {
         public static ComponentQuality Randomize(this ComponentQuality quality, System.Random random)
         {
-            var min = quality <= ComponentQuality.N3 ? ComponentQuality.N3 : quality - 1;
-            var max = quality >= ComponentQuality.P3 ? ComponentQuality.P3 : quality + 1;
+            var min = quality <= ComponentQuality.N5 ? ComponentQuality.N5 : quality - 1;
+            var max = quality >= ComponentQuality.P5 ? ComponentQuality.P5 : quality + 1;
             return (ComponentQuality)random.SquareRange((int) min, (int) max);
         }
 
@@ -27,6 +31,10 @@ namespace Constructor
         {
             switch (quality)
             {
+                case ComponentQuality.N5:
+                    return 5*baseLevel/10;
+                case ComponentQuality.N4:
+                    return 6*baseLevel/10;
                 case ComponentQuality.N3:
                     return 7*baseLevel/10;
                 case ComponentQuality.N2:
@@ -36,11 +44,15 @@ namespace Constructor
                 case ComponentQuality.P0:
                     return baseLevel;
                 case ComponentQuality.P1:
-                    return 4*baseLevel/3 + 40;
+                    return 12*baseLevel/10 + 50;
                 case ComponentQuality.P2:
-                    return 5*baseLevel/3 + 100;
+                    return 15*baseLevel/10 + 100;
                 case ComponentQuality.P3:
-                    return 6*baseLevel/3 + 150;
+                    return 18*baseLevel/10 + 150;
+                case ComponentQuality.P4:
+                    return 24*baseLevel/10 + 200;
+                case ComponentQuality.P5:
+                    return 30*baseLevel/10 + 250;
                 default:
                     throw new InvalidEnumArgumentException("quality", (int)quality, typeof(ComponentQuality));
             }
@@ -48,12 +60,21 @@ namespace Constructor
 
         public static ComponentQuality FromLevel(int level, int baseLevel)
         {
+            if (level >= GetLevel(ComponentQuality.P5, baseLevel))
+                return ComponentQuality.P5;
+            if (level >= GetLevel(ComponentQuality.P4, baseLevel))
+                return ComponentQuality.P4;
             if (level >= GetLevel(ComponentQuality.P3, baseLevel))
                 return ComponentQuality.P3;
             if (level >= GetLevel(ComponentQuality.P2, baseLevel))
                 return ComponentQuality.P2;
             if (level >= GetLevel(ComponentQuality.P1, baseLevel))
                 return ComponentQuality.P1;
+
+            if (level <= GetLevel(ComponentQuality.N5, baseLevel))
+                return ComponentQuality.N5;
+            if (level <= GetLevel(ComponentQuality.N4, baseLevel))
+                return ComponentQuality.N4;
             if (level <= GetLevel(ComponentQuality.N3, baseLevel))
                 return ComponentQuality.N3;
             if (level <= GetLevel(ComponentQuality.N2, baseLevel))
@@ -68,6 +89,10 @@ namespace Constructor
         {
             switch (quality)
             {
+                case ComponentQuality.N5:
+                    return ModificationQuality.N5;
+                case ComponentQuality.N4:
+                    return ModificationQuality.N4;
                 case ComponentQuality.N3:
                     return ModificationQuality.N3;
                 case ComponentQuality.N2:
@@ -80,6 +105,10 @@ namespace Constructor
                     return ModificationQuality.P2;
                 case ComponentQuality.P3:
                     return ModificationQuality.P3;
+                case ComponentQuality.P4:
+                    return ModificationQuality.P4;
+                case ComponentQuality.P5:
+                    return ModificationQuality.P5;
                 default:
                     throw new InvalidEnumArgumentException("quality", (int)quality, typeof(ComponentQuality));
             }

@@ -82,7 +82,7 @@ namespace Session.Content
 
             if (version != CurrentVersion && !TryUpgrade(ref buffer, version, database))
             {
-                OptimizedDebug.Log("FleetData: incorrect data version");
+                UnityEngine.Debug.Log("FleetData: incorrect data version");
                 throw new ArgumentException();
             }
 
@@ -195,10 +195,26 @@ namespace Session.Content
                     shipId = LegacyShipNames.GetId(ship.Id).Value;
 
                 int id;
-                var satellite1 = database.GetSatellite(int.TryParse(ship.FirstSatellite.Id, out id) ? new ItemId<Satellite>(id) : LegacySatelliteNames.GetId(ship.FirstSatellite.Id));
-                var satellite2 = database.GetSatellite(int.TryParse(ship.SecondSatellite.Id, out id) ? new ItemId<Satellite>(id) : LegacySatelliteNames.GetId(ship.SecondSatellite.Id));
-                var satelliteComponents1 = ship.FirstSatellite.Components.Select(item => ComponentExtensions.Deserialize(database, item)).ToShipComponentsData();
-                var satelliteComponents2 = ship.SecondSatellite.Components.Select(item => ComponentExtensions.Deserialize(database, item)).ToShipComponentsData();
+                var satellite_left_1 = database.GetSatellite(int.TryParse(ship.Satellite_Left_1.Id, out id) ? new ItemId<Satellite>(id) : LegacySatelliteNames.GetId(ship.Satellite_Left_1.Id));
+                var satellite_right_1 = database.GetSatellite(int.TryParse(ship.Satellite_Right_1.Id, out id) ? new ItemId<Satellite>(id) : LegacySatelliteNames.GetId(ship.Satellite_Right_1.Id));
+                var satellite_left_2 = database.GetSatellite(int.TryParse(ship.Satellite_Left_2.Id, out id) ? new ItemId<Satellite>(id) : LegacySatelliteNames.GetId(ship.Satellite_Left_2.Id));
+                var satellite_right_2 = database.GetSatellite(int.TryParse(ship.Satellite_Right_2.Id, out id) ? new ItemId<Satellite>(id) : LegacySatelliteNames.GetId(ship.Satellite_Right_2.Id));
+                var satellite_left_3 = database.GetSatellite(int.TryParse(ship.Satellite_Left_3.Id, out id) ? new ItemId<Satellite>(id) : LegacySatelliteNames.GetId(ship.Satellite_Left_3.Id));
+                var satellite_right_3 = database.GetSatellite(int.TryParse(ship.Satellite_Right_3.Id, out id) ? new ItemId<Satellite>(id) : LegacySatelliteNames.GetId(ship.Satellite_Right_3.Id));
+                var satellite_left_4 = database.GetSatellite(int.TryParse(ship.Satellite_Left_4.Id, out id) ? new ItemId<Satellite>(id) : LegacySatelliteNames.GetId(ship.Satellite_Left_4.Id));
+                var satellite_right_4 = database.GetSatellite(int.TryParse(ship.Satellite_Right_4.Id, out id) ? new ItemId<Satellite>(id) : LegacySatelliteNames.GetId(ship.Satellite_Right_4.Id));
+                var satellite_left_5 = database.GetSatellite(int.TryParse(ship.Satellite_Left_5.Id, out id) ? new ItemId<Satellite>(id) : LegacySatelliteNames.GetId(ship.Satellite_Left_5.Id));
+                var satellite_right_5 = database.GetSatellite(int.TryParse(ship.Satellite_Right_5.Id, out id) ? new ItemId<Satellite>(id) : LegacySatelliteNames.GetId(ship.Satellite_Right_5.Id));
+                var satelliteComponents_left_1 = ship.Satellite_Left_1.Components.Select(item => ComponentExtensions.Deserialize(database, item)).ToShipComponentsData();
+                var satelliteComponents_right_1 = ship.Satellite_Right_1.Components.Select(item => ComponentExtensions.Deserialize(database, item)).ToShipComponentsData();
+                var satelliteComponents_left_2 = ship.Satellite_Left_2.Components.Select(item => ComponentExtensions.Deserialize(database, item)).ToShipComponentsData();
+                var satelliteComponents_right_2 = ship.Satellite_Right_2.Components.Select(item => ComponentExtensions.Deserialize(database, item)).ToShipComponentsData();
+                var satelliteComponents_left_3 = ship.Satellite_Left_3.Components.Select(item => ComponentExtensions.Deserialize(database, item)).ToShipComponentsData();
+                var satelliteComponents_right_3 = ship.Satellite_Right_3.Components.Select(item => ComponentExtensions.Deserialize(database, item)).ToShipComponentsData();
+                var satelliteComponents_left_4 = ship.Satellite_Left_4.Components.Select(item => ComponentExtensions.Deserialize(database, item)).ToShipComponentsData();
+                var satelliteComponents_right_4 = ship.Satellite_Right_4.Components.Select(item => ComponentExtensions.Deserialize(database, item)).ToShipComponentsData();
+                var satelliteComponents_left_5 = ship.Satellite_Left_5.Components.Select(item => ComponentExtensions.Deserialize(database, item)).ToShipComponentsData();
+                var satelliteComponents_right_5 = ship.Satellite_Right_5.Components.Select(item => ComponentExtensions.Deserialize(database, item)).ToShipComponentsData();
 
                 var shipData = new ShipData
                 {
@@ -208,8 +224,16 @@ namespace Session.Content
                     Experience = ship.Experience,
                     Components = ship.Components.Select(item => ComponentExtensions.Deserialize(database, item)).ToShipComponentsData(),
                     Modifications = new ShipModificationsData { Modifications = ship.Modifications.Select(item => (item >> 32) == 4 ? (6 << 32) : item ) },
-                    Satellite1 = satellite1 != null ? new SatelliteData { Id = satellite1.Id.Value, Components = satelliteComponents1 } : new SatelliteData(),
-                    Satellite2 = satellite2 != null ? new SatelliteData { Id = satellite2.Id.Value, Components = satelliteComponents2 } : new SatelliteData(),
+                    Satellite_Left_1 = satellite_left_1 != null ? new SatelliteData { Id = satellite_left_1.Id.Value, Components = satelliteComponents_left_1 } : new SatelliteData(),
+                    Satellite_Right_1 = satellite_right_1 != null ? new SatelliteData { Id = satellite_right_1.Id.Value, Components = satelliteComponents_right_1 } : new SatelliteData(),
+                    Satellite_Left_2 = satellite_left_2 != null ? new SatelliteData { Id = satellite_left_2.Id.Value, Components = satelliteComponents_left_2 } : new SatelliteData(),
+                    Satellite_Right_2 = satellite_right_2 != null ? new SatelliteData { Id = satellite_right_2.Id.Value, Components = satelliteComponents_right_2 } : new SatelliteData(),
+                    Satellite_Left_3 = satellite_left_3 != null ? new SatelliteData { Id = satellite_left_3.Id.Value, Components = satelliteComponents_left_3 } : new SatelliteData(),
+                    Satellite_Right_3 = satellite_right_3 != null ? new SatelliteData { Id = satellite_right_3.Id.Value, Components = satelliteComponents_right_3 } : new SatelliteData(),
+                    Satellite_Left_4 = satellite_left_4 != null ? new SatelliteData { Id = satellite_left_4.Id.Value, Components = satelliteComponents_left_4 } : new SatelliteData(),
+                    Satellite_Right_4 = satellite_right_4 != null ? new SatelliteData { Id = satellite_right_4.Id.Value, Components = satelliteComponents_right_4 } : new SatelliteData(),
+                    Satellite_Left_5 = satellite_left_5 != null ? new SatelliteData { Id = satellite_left_5.Id.Value, Components = satelliteComponents_left_5 } : new SatelliteData(),
+                    Satellite_Right_5 = satellite_right_5 != null ? new SatelliteData { Id = satellite_right_5.Id.Value, Components = satelliteComponents_right_5 } : new SatelliteData(),
                 };
 
                 foreach (var value in shipData.Serialize())
@@ -254,8 +278,16 @@ namespace Session.Content
             public ObscuredLong Experience;
             public IEnumerable<long> Components;
             public IEnumerable<long> Modifications;
-            public SatelliteInfoV1 FirstSatellite;
-            public SatelliteInfoV1 SecondSatellite;
+            public SatelliteInfoV1 Satellite_Left_1;
+            public SatelliteInfoV1 Satellite_Right_1;
+            public SatelliteInfoV1 Satellite_Left_2;
+            public SatelliteInfoV1 Satellite_Right_2;
+            public SatelliteInfoV1 Satellite_Left_3;
+            public SatelliteInfoV1 Satellite_Right_3;
+            public SatelliteInfoV1 Satellite_Left_4;
+            public SatelliteInfoV1 Satellite_Right_4;
+            public SatelliteInfoV1 Satellite_Left_5;
+            public SatelliteInfoV1 Satellite_Right_5;
 
             public IEnumerable<byte> Serialize()
             {
@@ -269,9 +301,25 @@ namespace Session.Content
                     yield return value;
                 foreach (var value in Helpers.Serialize(Modifications))
                     yield return value;
-                foreach (var value in FirstSatellite.Serialize())
+                foreach (var value in Satellite_Left_1.Serialize())
                     yield return value;
-                foreach (var value in SecondSatellite.Serialize())
+                foreach (var value in Satellite_Right_1.Serialize())
+                    yield return value;
+                foreach (var value in Satellite_Left_2.Serialize())
+                    yield return value;
+                foreach (var value in Satellite_Right_2.Serialize())
+                    yield return value;
+                foreach (var value in Satellite_Left_3.Serialize())
+                    yield return value;
+                foreach (var value in Satellite_Right_3.Serialize())
+                    yield return value;
+                foreach (var value in Satellite_Left_4.Serialize())
+                    yield return value;
+                foreach (var value in Satellite_Right_4.Serialize())
+                    yield return value;
+                foreach (var value in Satellite_Left_5.Serialize())
+                    yield return value;
+                foreach (var value in Satellite_Right_5.Serialize())
                     yield return value;
             }
 
@@ -283,8 +331,16 @@ namespace Session.Content
                 info.Experience = Experience;
                 info.Components = Components.Select(item => ComponentExtensions.DeserializeFromInt64Obsolete(database, item).SerializeObsolete().ToArray());
                 info.Modifications = Modifications;
-                info.FirstSatellite = FirstSatellite.ToSatelliteInfo(database);
-                info.SecondSatellite = SecondSatellite.ToSatelliteInfo(database);
+                info.Satellite_Left_1 = Satellite_Left_1.ToSatelliteInfo(database);
+                info.Satellite_Right_1 = Satellite_Right_1.ToSatelliteInfo(database);
+                info.Satellite_Left_2 = Satellite_Left_2.ToSatelliteInfo(database);
+                info.Satellite_Right_2 = Satellite_Right_2.ToSatelliteInfo(database);
+                info.Satellite_Left_3 = Satellite_Left_3.ToSatelliteInfo(database);
+                info.Satellite_Right_3 = Satellite_Right_3.ToSatelliteInfo(database);
+                info.Satellite_Left_4 = Satellite_Left_4.ToSatelliteInfo(database);
+                info.Satellite_Right_4 = Satellite_Right_4.ToSatelliteInfo(database);
+                info.Satellite_Left_5 = Satellite_Left_5.ToSatelliteInfo(database);
+                info.Satellite_Right_5 = Satellite_Right_5.ToSatelliteInfo(database);
                 return info;
             }
 
@@ -296,8 +352,16 @@ namespace Session.Content
                 info.Experience = Experience;
                 info.Components = Components.Select(item => ComponentExtensions.DeserializeFromInt64Obsolete(database, item).Serialize().ToArray());
                 info.Modifications = Modifications;
-                info.FirstSatellite = FirstSatellite.ToSatelliteInfo(database);
-                info.SecondSatellite = SecondSatellite.ToSatelliteInfo(database);
+                info.Satellite_Left_1 = Satellite_Left_1.ToSatelliteInfo(database);
+                info.Satellite_Right_1 = Satellite_Right_1.ToSatelliteInfo(database);
+                info.Satellite_Left_2 = Satellite_Left_2.ToSatelliteInfo(database);
+                info.Satellite_Right_2 = Satellite_Right_2.ToSatelliteInfo(database);
+                info.Satellite_Left_3 = Satellite_Left_3.ToSatelliteInfo(database);
+                info.Satellite_Right_3 = Satellite_Right_3.ToSatelliteInfo(database);
+                info.Satellite_Left_4 = Satellite_Left_4.ToSatelliteInfo(database);
+                info.Satellite_Right_4 = Satellite_Right_4.ToSatelliteInfo(database);
+                info.Satellite_Left_5 = Satellite_Left_5.ToSatelliteInfo(database);
+                info.Satellite_Right_5 = Satellite_Right_5.ToSatelliteInfo(database);
                 return info;
             }
 
@@ -309,8 +373,16 @@ namespace Session.Content
                 info.Experience = Helpers.DeserializeLong(buffer, ref index);
                 info.Components = Helpers.DeserializeLongArray(buffer, ref index);
                 info.Modifications = Helpers.DeserializeLongArray(buffer, ref index);
-                info.FirstSatellite = SatelliteInfoV1.Deserialize(buffer, ref index);
-                info.SecondSatellite = SatelliteInfoV1.Deserialize(buffer, ref index);
+                info.Satellite_Left_1 = SatelliteInfoV1.Deserialize(buffer, ref index);
+                info.Satellite_Right_1 = SatelliteInfoV1.Deserialize(buffer, ref index);
+                info.Satellite_Left_2 = SatelliteInfoV1.Deserialize(buffer, ref index);
+                info.Satellite_Right_2 = SatelliteInfoV1.Deserialize(buffer, ref index);
+                info.Satellite_Left_3 = SatelliteInfoV1.Deserialize(buffer, ref index);
+                info.Satellite_Right_3 = SatelliteInfoV1.Deserialize(buffer, ref index);
+                info.Satellite_Left_4 = SatelliteInfoV1.Deserialize(buffer, ref index);
+                info.Satellite_Right_4 = SatelliteInfoV1.Deserialize(buffer, ref index);
+                info.Satellite_Left_5 = SatelliteInfoV1.Deserialize(buffer, ref index);
+                info.Satellite_Right_5 = SatelliteInfoV1.Deserialize(buffer, ref index);
                 return info;
             }
         }
@@ -322,8 +394,16 @@ namespace Session.Content
             public ObscuredLong Experience;
             public IEnumerable<byte[]> Components;
             public IEnumerable<long> Modifications;
-            public SatelliteInfoV2 FirstSatellite;
-            public SatelliteInfoV2 SecondSatellite;
+            public SatelliteInfoV2 Satellite_Left_1;
+            public SatelliteInfoV2 Satellite_Right_1;
+            public SatelliteInfoV2 Satellite_Left_2;
+            public SatelliteInfoV2 Satellite_Right_2;
+            public SatelliteInfoV2 Satellite_Left_3;
+            public SatelliteInfoV2 Satellite_Right_3;
+            public SatelliteInfoV2 Satellite_Left_4;
+            public SatelliteInfoV2 Satellite_Right_4;
+            public SatelliteInfoV2 Satellite_Left_5;
+            public SatelliteInfoV2 Satellite_Right_5;
 
             public IEnumerable<byte> Serialize()
             {
@@ -337,9 +417,25 @@ namespace Session.Content
                     yield return value;
                 foreach (var value in Helpers.Serialize(Modifications))
                     yield return value;
-                foreach (var value in FirstSatellite.Serialize())
+                foreach (var value in Satellite_Left_1.Serialize())
                     yield return value;
-                foreach (var value in SecondSatellite.Serialize())
+                foreach (var value in Satellite_Right_1.Serialize())
+                    yield return value;
+                foreach (var value in Satellite_Left_2.Serialize())
+                    yield return value;
+                foreach (var value in Satellite_Right_2.Serialize())
+                    yield return value;
+                foreach (var value in Satellite_Left_3.Serialize())
+                    yield return value;
+                foreach (var value in Satellite_Right_3.Serialize())
+                    yield return value;
+                foreach (var value in Satellite_Left_4.Serialize())
+                    yield return value;
+                foreach (var value in Satellite_Right_4.Serialize())
+                    yield return value;
+                foreach (var value in Satellite_Left_5.Serialize())
+                    yield return value;
+                foreach (var value in Satellite_Right_5.Serialize())
                     yield return value;
             }
 
@@ -351,8 +447,16 @@ namespace Session.Content
                 info.Experience = Helpers.DeserializeLong(buffer, ref index);
                 info.Components = Helpers.DeserializeByteArrays(buffer, ref index);
                 info.Modifications = Helpers.DeserializeLongArray(buffer, ref index);
-                info.FirstSatellite = SatelliteInfoV2.Deserialize(buffer, ref index);
-                info.SecondSatellite = SatelliteInfoV2.Deserialize(buffer, ref index);
+                info.Satellite_Left_1 = SatelliteInfoV2.Deserialize(buffer, ref index);
+                info.Satellite_Right_1 = SatelliteInfoV2.Deserialize(buffer, ref index);
+                info.Satellite_Left_2 = SatelliteInfoV2.Deserialize(buffer, ref index);
+                info.Satellite_Right_2 = SatelliteInfoV2.Deserialize(buffer, ref index);
+                info.Satellite_Left_3 = SatelliteInfoV2.Deserialize(buffer, ref index);
+                info.Satellite_Right_3 = SatelliteInfoV2.Deserialize(buffer, ref index);
+                info.Satellite_Left_4 = SatelliteInfoV2.Deserialize(buffer, ref index);
+                info.Satellite_Right_4 = SatelliteInfoV2.Deserialize(buffer, ref index);
+                info.Satellite_Left_5 = SatelliteInfoV2.Deserialize(buffer, ref index);
+                info.Satellite_Right_5 = SatelliteInfoV2.Deserialize(buffer, ref index);
                 return info;
             }
 
@@ -360,8 +464,16 @@ namespace Session.Content
             {
                 var ship = Deserialize(buffer, ref index);
                 ship.Components = ship.Components.Select(item => ComponentExtensions.DeserializeObsolete(database, item).Serialize().ToArray()).ToArray();
-                ship.FirstSatellite.Components = ship.FirstSatellite.Components.Select(item => ComponentExtensions.DeserializeObsolete(database, item).Serialize().ToArray()).ToArray();
-                ship.SecondSatellite.Components = ship.SecondSatellite.Components.Select(item => ComponentExtensions.DeserializeObsolete(database, item).Serialize().ToArray()).ToArray();
+                ship.Satellite_Left_1.Components = ship.Satellite_Left_1.Components.Select(item => ComponentExtensions.DeserializeObsolete(database, item).Serialize().ToArray()).ToArray();
+                ship.Satellite_Right_1.Components = ship.Satellite_Right_1.Components.Select(item => ComponentExtensions.DeserializeObsolete(database, item).Serialize().ToArray()).ToArray();
+                ship.Satellite_Left_2.Components = ship.Satellite_Left_2.Components.Select(item => ComponentExtensions.DeserializeObsolete(database, item).Serialize().ToArray()).ToArray();
+                ship.Satellite_Right_2.Components = ship.Satellite_Right_2.Components.Select(item => ComponentExtensions.DeserializeObsolete(database, item).Serialize().ToArray()).ToArray();
+                ship.Satellite_Left_3.Components = ship.Satellite_Left_3.Components.Select(item => ComponentExtensions.DeserializeObsolete(database, item).Serialize().ToArray()).ToArray();
+                ship.Satellite_Right_3.Components = ship.Satellite_Right_3.Components.Select(item => ComponentExtensions.DeserializeObsolete(database, item).Serialize().ToArray()).ToArray();
+                ship.Satellite_Left_4.Components = ship.Satellite_Left_4.Components.Select(item => ComponentExtensions.DeserializeObsolete(database, item).Serialize().ToArray()).ToArray();
+                ship.Satellite_Right_4.Components = ship.Satellite_Right_4.Components.Select(item => ComponentExtensions.DeserializeObsolete(database, item).Serialize().ToArray()).ToArray();
+                ship.Satellite_Left_5.Components = ship.Satellite_Left_5.Components.Select(item => ComponentExtensions.DeserializeObsolete(database, item).Serialize().ToArray()).ToArray();
+                ship.Satellite_Right_5.Components = ship.Satellite_Right_5.Components.Select(item => ComponentExtensions.DeserializeObsolete(database, item).Serialize().ToArray()).ToArray();
                 return ship;
             }
         }

@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using Utils;
 
 namespace GameDatabase.Model
 {
@@ -15,20 +14,10 @@ namespace GameDatabase.Model
             return new StatMultiplier(value - 1.0f);
         }
 
-        public float Value
-        {
-            get { return 1.0f + _value; }
-        }
+        public float Value { get { return 1.0f + _value; } }
+        public float Bonus { get { return _value; } }
 
-        public float Bonus
-        {
-            get { return _value; }
-        }
-
-        public bool HasValue
-        {
-            get { return !Mathf.Approximately(_value, 0); }
-        }
+        public bool HasValue { get { return !Mathf.Approximately(_value, 0); } }
 
         public static StatMultiplier operator +(StatMultiplier first, StatMultiplier second)
         {
@@ -56,7 +45,7 @@ namespace GameDatabase.Model
 
         public static StatMultiplier operator *(StatMultiplier first, float multiplier)
         {
-            first._value = first.Value * multiplier - 1f;
+            first._value = first.Value*multiplier - 1f;
             return first;
         }
 
@@ -68,12 +57,10 @@ namespace GameDatabase.Model
 
         public override string ToString()
         {
-            var percents = 100 * _value;
-            return (_value >= 0 ? "+" : "") +
-                   (percents < 1e6 ? Mathf.RoundToInt(percents).ToString() : Mathd.ToInGameString(percents, BigFormat.Decimal))+
-                   "%";
+            return (_value >= 0 ? "+" : "") + Mathf.RoundToInt(100*_value) + "%";
         }
 
         private float _value;
     }
+
 }

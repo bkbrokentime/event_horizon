@@ -3,7 +3,6 @@ using GameDatabase.Enums;
 using GameServices.LevelManager;
 using Scripts.GameStateMachine;
 using Services.Gui;
-using Utils;
 using Zenject;
 
 namespace GameStateMachine.States
@@ -32,7 +31,7 @@ namespace GameStateMachine.States
 
 		protected override void OnActivate()
 		{
-			OptimizedDebug.Log("QuestState loaded");
+			UnityEngine.Debug.Log("QuestState loaded");
 
 		    var args = new WindowArgs(_userInteraction);
 

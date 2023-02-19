@@ -26,7 +26,7 @@ namespace ViewModel
                 return;
 
             if (!data.dragging)
-                OnClickEvent.Invoke(_mainCamera.ScreenToWorldPoint(data.position));
+                OnClickEvent.Invoke(Camera.main.ScreenToWorldPoint(data.position));
         }
 
         public void OnDrag(PointerEventData data)
@@ -93,13 +93,13 @@ namespace ViewModel
             {
                 var lastPosition = _currentPosition;
                 _currentPosition = AveragePosition;
-                var delta = (Vector2) _mainCamera.ScreenToWorldPoint(_currentPosition) -
-                            (Vector2) _mainCamera.ScreenToWorldPoint(lastPosition);
+                var delta = (Vector2) Camera.main.ScreenToWorldPoint(_currentPosition) -
+                            (Vector2) Camera.main.ScreenToWorldPoint(lastPosition);
                 OnMoveEvent.Invoke(delta);
                 var deltaTime = Mathf.Max(0.01f, Time.deltaTime);
                 _speed = _speed*0.9f + 0.2f*delta/deltaTime;
 
-                var speedLimit = _mainCamera.orthographicSize*10;
+                var speedLimit = Camera.main.orthographicSize*10;
                 _speed.x = Mathf.Clamp(_speed.x, -speedLimit, speedLimit);
                 _speed.y = Mathf.Clamp(_speed.y, -speedLimit, speedLimit);
 
@@ -125,11 +125,6 @@ namespace ViewModel
                 _timeLeft = ZoomCooldown;
                 _zoom *= 1 - ZoomSpeed;
             }
-        }
-
-        private void Start()
-        {
-            _mainCamera = Camera.main;
         }
 
         private bool Interactable { get { return _canvasGroup ? _canvasGroup.interactable : true; } }
@@ -158,6 +153,5 @@ namespace ViewModel
         private CanvasGroup _canvasGroup;
         private const float ZoomCooldown = 0.02f;
         private const float ZoomSpeed = 0.1f;
-        private Camera _mainCamera;
     }
 }

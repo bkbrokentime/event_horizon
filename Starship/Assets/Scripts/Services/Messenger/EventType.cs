@@ -5,6 +5,7 @@ public enum EventType
     DatabaseLoaded,
 
     ConstructorShipChanged, // GameModel.Ship
+    ConstructorSatelliteChanged, // GameModel.Satellite
 
     GameSettingsChanged, // string key
 
@@ -57,14 +58,21 @@ public enum EventType
     PlayerGainedExperience,
     PlayerSkillsChanged,
 
+    IapItemsRefreshed,
+
     PlayerShipCountChanged, // int
     EnemyShipCountChanged, // int
+    AllyShipCountChanged, // int
 	CombatShipCreated, // IShip
     CombatShipDestroyed, // IShip
     GamePaused, // bool
     PlayerShipDocked, // int
     PlayerShipUndocked, // int
     ObjectiveDestroyed, // int
+
+    AdsManagerStatusChanged,
+    RewardedVideoCompleted,
+    SocialShareCompleted,
 
     Surrender,
     KillAllEnemies,

@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
-using Utils;
 using Zenject;
 
 namespace ViewModel
@@ -56,26 +55,26 @@ namespace ViewModel
 				SlideToMove.isOn = false;
 				ThrustWithJoystick.isOn = true;
 				StopWhenWeaponActive.isOn = false;
-				LoadControlsLayout("Action0,1430,100,180 Action1,1240,100,180 Action2,1050,100,180 Action3,860,100,180 Action4,670,100,180 Action5,480,100,180 Joystick,220,160,300");
+				LoadControlsLayout("Action0,1430,100,180 Action1,1240,100,180 Action2,1050,100,180 Action3,860,100,180 Action4,670,100,180 Action5,1430,300,180 Action6,1240,300,180 Action7,1050,300,180 Action8,860,300,180 Action9,670,300,180 Joystick,220,160,300");
 				break;
 			case 1:
 				SlideToMove.isOn = true;
 				ThrustWithJoystick.isOn = true;
 				StopWhenWeaponActive.isOn = false;
-				LoadControlsLayout("Action0,1430,100,180 Action1,1240,100,180 Action2,1050,100,180 Action3,860,100,180 Action4,670,100,180 Action5,480,100,180");
+				LoadControlsLayout("Action0,1430,100,180 Action1,1240,100,180 Action2,1050,100,180 Action3,860,100,180 Action4,670,100,180 Action5,1430,300,180 Action6,1240,300,180 Action7,1050,300,180 Action8,860,300,180 Action9,670,300,180");
 				break;
 			case 2:
 				SlideToMove.isOn = false;
 				ThrustWithJoystick.isOn = false;
 				StopWhenWeaponActive.isOn = false;
-				LoadControlsLayout("Left,180,120,220 Right,400,120,220 Thrust,1350,170,320 Action0,1150,70,120 Action1,1130,190,120 Action2,1174,305,120 Action3,1274,378,120 Action4,1397,386,120 Action5,1504,330,120");
+				LoadControlsLayout("Left,180,120,220 Right,400,120,220 Thrust,1350,170,320 Action0,1150,70,120 Action1,1130,190,120 Action2,1174,305,120 Action3,1274,378,120 Action4,1397,386,120 Action5,1504,330,120 Action6,1036,112,120 Action7,1054,284,120 Action8,1164,426,120 Action9,1328,486,120");
 				break;
 			case 3:
 				SlideToMove.isOn = false;
 				ThrustWithJoystick.isOn = false;
 				StopWhenWeaponActive.isOn = false;
-				LoadControlsLayout("Joystick,220,160,300 Thrust,1350,170,320 Action0,1150,70,120 Action1,1130,190,120 Action2,1174,305,120 Action3,1274,378,120 Action4,1397,386,120 Action5,1504,330,120");
-				break;
+				LoadControlsLayout("Joystick,220,160,300 Thrust,1350,170,320 Action0,1150,70,120 Action1,1130,190,120 Action2,1174,305,120 Action3,1274,378,120 Action4,1397,386,120 Action5,1504,330,120 Action6,1036,112,120 Action7,1054,284,120 Action8,1164,426,120 Action9,1328,486,120");
+                    break;
 			}
 
 			UpdateControlInfo();
@@ -162,7 +161,7 @@ namespace ViewModel
 				ButtonLayoutViewModel item;
 				if (!buttons.TryGetValue(id, out item))
 				{
-                    OptimizedDebug.Log("Button not found: " + id);
+                    UnityEngine.Debug.Log("Button not found: " + id);
                     continue;
                 }
 

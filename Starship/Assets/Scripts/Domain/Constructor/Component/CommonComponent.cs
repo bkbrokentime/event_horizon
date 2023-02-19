@@ -17,6 +17,7 @@ namespace Constructor.Component
             _component = data;
         }
 
+        public GameDatabase.DataModel.Component GetComponent() { return _component; }
         public void UpdateStats(ref ShipEquipmentStats shipStats)
         {
             var stats = ShipEquipmentStats.FromComponent(_component.Stats, _component.Layout.CellCount);
@@ -26,9 +27,21 @@ namespace Constructor.Component
                 var multiplier = 1f + 0.1f * UpgradeLevel;
                 stats.ArmorPoints *= multiplier;
                 stats.ShieldPoints *= multiplier;
+                stats.EnergyShieldPoints *= multiplier;
                 stats.EnergyResistance *= multiplier;
                 stats.KineticResistance *= multiplier;
                 stats.ThermalResistance *= multiplier;
+                stats.QuantumResistance *= multiplier;
+
+                stats.ShieldEnergyResistance *= multiplier;
+                stats.ShieldKineticResistance *= multiplier;
+                stats.ShieldThermalResistance *= multiplier;
+                stats.ShieldQuantumResistance *= multiplier;
+
+                stats.EnergyShieldEnergyResistance *= multiplier;
+                stats.EnergyShieldKineticResistance *= multiplier;
+                stats.EnergyShieldThermalResistance *= multiplier;
+                stats.EnergyShieldQuantumResistance *= multiplier;
             }
 
             if (_component.Device != null)

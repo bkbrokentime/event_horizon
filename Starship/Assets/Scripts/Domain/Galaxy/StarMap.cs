@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using GameModel;
 using UnityEngine;
-using Utils;
 using Zenject;
 
 namespace Galaxy
@@ -76,7 +75,7 @@ namespace Galaxy
                 if (id >= 0) return id;
             }
 
-            OptimizedDebug.Log("max iterations reached");
+            UnityEngine.Debug.Log("max iterations reached");
             return -1;
         }
 
@@ -119,9 +118,9 @@ namespace Galaxy
             var objects = _starData.GetObjects(starId);
             if (ShowStores && objects.Contain(StarObjectType.BlackMarket))
                 return true;
-            if (ShowArenas && objects.Contain(StarObjectType.Arena))
-                return true;
-            if (ShowBosses && objects.Contain(StarObjectType.Boss) && !_starData.GetBoss(starId).IsDefeated)
+            //if (ShowArenas && objects.Contain(StarObjectType.Arena))
+            //    return true;
+            if (ShowBosses && objects.Contain(StarObjectType.Boss) && !_starData.GetBoss(starId, _starData.boss_level).IsDefeated)
                 return true;
             if (ShowXmas && objects.Contain(StarObjectType.Xmas))
                 return true;

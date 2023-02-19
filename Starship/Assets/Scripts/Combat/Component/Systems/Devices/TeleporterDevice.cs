@@ -1,21 +1,17 @@
-﻿using Combat.Component.Body;
-using Combat.Component.Ship;
+﻿using Combat.Component.Ship;
 using Combat.Component.Triggers;
 using GameDatabase.DataModel;
-using UnityEngine;
 
 namespace Combat.Component.Systems.Devices
 {
     public class TeleporterDevice : SystemBase, IDevice
     {
         public TeleporterDevice(IShip ship, DeviceStats deviceSpec, int keyBinding)
-            : base(keyBinding, deviceSpec.ControlButtonIcon)
+            : base(keyBinding, deviceSpec.ControlButtonIcon, ship)
         {
             MaxCooldown = deviceSpec.Cooldown;
 
             _ship = ship;
-            _offset = deviceSpec.Offset;
-            if (_offset.x == 0 && _offset.y == 0) _offset = Vector2.right;
             _range = deviceSpec.Range;
             _energyCost = deviceSpec.EnergyConsumption;
         }
@@ -31,7 +27,7 @@ namespace Combat.Component.Systems.Devices
             {
                 InvokeTriggers(ConditionType.OnActivate);
 
-                _ship.Body.ShiftWithDependants(RotationHelpers.Transform(_offset, _ship.Body.Rotation) * _range);
+                _ship.Body.Move(_ship.Body.Position + RotationHelpers.Direction(_ship.Body.Rotation)*_range);
                 _ship.Body.ApplyAcceleration(-_ship.Body.Velocity);
                 TimeFromLastUse = 0;
 
@@ -46,6 +42,5 @@ namespace Combat.Component.Systems.Devices
         private readonly float _energyCost;
         private readonly float _range;
         private readonly IShip _ship;
-        private readonly Vector2 _offset;
     }
 }

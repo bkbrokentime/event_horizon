@@ -45,7 +45,15 @@ namespace Gui.Constructor
                 _components.Add(common, 999);
                 foreach (var mod in item.PossibleModifications)
                 {
-                    var component = new ComponentInfo(item, mod.Type, ModificationQuality.P3);
+                    var component = new ComponentInfo(item, mod.Type, ModificationQuality.P1);
+                    _components.Add(component, 999);
+                    component = new ComponentInfo(item, mod.Type, ModificationQuality.P2);
+                    _components.Add(component, 999);
+                    component = new ComponentInfo(item, mod.Type, ModificationQuality.P3);
+                    _components.Add(component, 999);
+                    component = new ComponentInfo(item, mod.Type, ModificationQuality.P4);
+                    _components.Add(component, 999);
+                    component = new ComponentInfo(item, mod.Type, ModificationQuality.P5);
                     _components.Add(component, 999);
                 }
             }

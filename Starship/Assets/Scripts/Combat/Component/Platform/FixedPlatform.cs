@@ -1,26 +1,27 @@
-﻿using System.Collections.Generic;
-using Combat.Component.Body;
-using Combat.Component.Bullet;
+﻿using Combat.Component.Body;
 using Combat.Component.Ship;
-using Combat.Component.Triggers;
-using Combat.Component.Unit;
 using Combat.Component.Unit.Classification;
 using Combat.Component.View;
 using Combat.Unit.HitPoints;
-using Gui.Utils;
 using UnityEngine;
 
 namespace Combat.Component.Platform
 {
-    public sealed class FixedPlatform : IWeaponPlatform, IUnitAction
+    public sealed class FixedPlatform : IWeaponPlatform
     {
-        public FixedPlatform(IShip ship, IBody body, float cooldown, UnitBase parent, IAimingSystem aimingSystem = null)
+        public FixedPlatform(IShip ship, IBody body, float cooldown, float rotation, float basespread, Vector2 MoveCenterPosition, float MoveSpeed, Vector2 MoveCenterRange, IAimingSystem aimingSystem = null)
         {
             _body = body;
             _ship = ship;
             _cooldown = cooldown;
             _aimingSystem = aimingSystem;
-            parent.AddTrigger(this);
+            _MoveCenterPosition = MoveCenterPosition;
+            _MoveSpeed = MoveSpeed;
+            _MoveCenterRange = MoveCenterRange;
+
+            _startrotation = _moverotation = rotation;
+
+            _basespread = basespread;
         }
 
         public UnitType Type { get { return _ship.Type; } }
@@ -30,9 +31,14 @@ namespace Combat.Component.Platform
 
         public bool IsReady { get { return _timeFromLastShot > _cooldown; } }
         public float Cooldown { get { return Mathf.Clamp01(1f - _timeFromLastShot / _cooldown); } }
+        public float CooldownTime { get { return _cooldown; } }
 
         public float FixedRotation { get { return _body.WorldRotation(); } }
         public float AutoAimingAngle { get { return 0; } }
+        public Vector2 MoveCenterPosition { get { return _MoveCenterPosition; } }
+        public float MoveSpeed { get { return _MoveSpeed; } }
+        public Vector2 MoveCenterRange { get { return _MoveCenterRange; } }
+        public float BaseSpread { get { return _basespread; } }
 
         public void SetView(IView view, UnityEngine.Color color)
         {
@@ -54,11 +60,17 @@ namespace Combat.Component.Platform
         public void UpdatePhysics(float elapsedTime)
         {
             _timeFromLastShot += elapsedTime;
-            if (_timeFromLastCleanup >= CleanupInterval)
+
+            if (_MoveSpeed != 0)
             {
-                _attachedChildren.Purge();
-                _timeFromLastCleanup = 0;
+                _moverotation += _MoveSpeed * elapsedTime;
+                var newposition = new Vector2(Mathf.Cos(_moverotation * Mathf.Deg2Rad) * _MoveCenterRange.x, Mathf.Sin(_moverotation * Mathf.Deg2Rad) * _MoveCenterRange.y);
+                var setpositopn = Vector2.zero;
+                setpositopn.x = newposition.x * Mathf.Cos(_startrotation * Mathf.Deg2Rad) - newposition.y * Mathf.Sin(_startrotation * Mathf.Deg2Rad);
+                setpositopn.y = newposition.y * Mathf.Cos(_startrotation * Mathf.Deg2Rad) + newposition.x * Mathf.Sin(_startrotation * Mathf.Deg2Rad);
+                _body.Move(_MoveCenterPosition + setpositopn);
             }
+
         }
 
         public void UpdateView(float elapsedTime)
@@ -70,42 +82,24 @@ namespace Combat.Component.Platform
             }
         }
 
-        public void AddAttachedChild(IBullet bullet)
-        {
-            _attachedChildren.Add(new WeakReference<IBullet>(bullet));
-        }
-
         public void Dispose() {}
 
         private IView _view;
         private Color _color;
-        private float _timeFromLastCleanup;
-        private const float CleanupInterval = 1;
         private float _timeFromLastShot;
         private readonly IShip _ship;
         private readonly float _cooldown;
         private readonly IBody _body;
         private readonly IAimingSystem _aimingSystem;
-        private readonly IList<WeakReference<IBullet>> _attachedChildren = new List<WeakReference<IBullet>>();
 
-        public ConditionType TriggerCondition => ConditionType.OnDestroy;
+        public Vector2 _MoveCenterPosition;
+        public float _MoveSpeed;
+        public Vector2 _MoveCenterRange;
 
-        public bool TryUpdateAction(float elapsedTime)
-        {
-            return false;
-        }
+        private float _moverotation;
+        private float _startrotation;
 
-        public bool TryInvokeAction(ConditionType condition)
-        {
-            foreach (var child in _attachedChildren)
-            {
-                if(child.IsAlive)
-                {
-                  child.Target.Detonate();  
-                }
-            }
+        private float _basespread;
 
-            return true;
-        }
     }
 }

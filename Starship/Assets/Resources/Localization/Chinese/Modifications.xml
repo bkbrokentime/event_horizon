@@ -19,11 +19,38 @@
     <string name="DamageMod2">伤害 $1\n冷却速度 $2</string>
     <string name="DroneSpeedMod">无人机速度 $1</string>
     <string name="RecoilMod">弹头重量 $1</string>
+    <string name="ImplosionMod">伤害 $1
+作用范围 $2</string>
+    <string name="WideExplosionMod">伤害 $1
+作用范围 $2</string>
+    <string name="BurstMod">伤害 $1
+冷却时间 $2</string>
+    <string name="HeavyWeaponMod">伤害 $1
+冷却时间 $2</string>
+    <string name="AccurateMod">散射 $1
+冷却时间 $2</string>
+    <string name="ScatterMod">散射 $1
+冷却时间 $2</string>
+    <string name="MagazineMod">弹容量 $1</string>
+	
     <string name="Ship_EmptySlot">[空槽位]</string>
     <string name="Ship_AutoTargeting">内置自动瞄准系统</string>
-    <string name="Ship_HeatDefense">增加热能抗性</string>
-    <string name="Ship_KineticDefense">增加动能抗性</string>
-    <string name="Ship_EnergyDefense">增加能量抗性</string>
+	
+    <string name="Ship_HeatDefense">增加装甲燃烧抗性</string>
+    <string name="Ship_KineticDefense">增加装甲动能抗性</string>
+    <string name="Ship_EnergyDefense">增加装甲能量抗性</string>
+    <string name="Ship_QuantumDefense">增加装甲量子抗性</string>
+	
+    <string name="Ship_ShieldHeatDefense">增加盾容燃烧抗性</string>
+    <string name="Ship_ShieldKineticDefense">增加盾容动能抗性</string>
+    <string name="Ship_ShieldEnergyDefense">增加盾容能量抗性</string>
+    <string name="Ship_ShieldQuantumDefense">增加盾容量子抗性</string>
+	
+    <string name="Ship_EnergyShieldHeatDefense">增加护盾燃烧抗性</string>
+    <string name="Ship_EnergyShieldKineticDefense">增加护盾动能抗性</string>
+    <string name="Ship_EnergyShieldEnergyDefense">增加护盾能量抗性</string>
+    <string name="Ship_EnergyShieldQuantumDefense">增加护盾量子抗性</string>
+	
     <string name="Ship_ExtraBlueCells">额外装备槽位</string>
     <string name="Ship_Lightweight">船体基础重量减轻 $1%</string>
     <string name="Ship_Infected">减少$1%装甲值，但每秒回复装甲值的$2%</string>

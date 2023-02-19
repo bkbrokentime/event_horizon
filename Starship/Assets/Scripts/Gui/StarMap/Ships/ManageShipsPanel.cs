@@ -7,7 +7,6 @@ using Constructor.Ships;
 using GameDatabase.Enums;
 using UnityEngine;
 using UnityEngine.UI;
-using Utils;
 using Zenject;
 
 namespace Gui.StarMap
@@ -33,7 +32,7 @@ namespace Gui.StarMap
 
         public void OnBeginShipDrag(ShipListItem item)
         {
-            OptimizedDebug.Log("OnBeginDrag: " + item.Ship.Name);
+            UnityEngine.Debug.Log("OnBeginDrag: " + item.Ship.Name);
             _draggableShip = item;
         }
 
@@ -50,7 +49,7 @@ namespace Gui.StarMap
 
         public void OnEndShipDrag(Vector2 position)
         {
-            OptimizedDebug.Log("OnEndDrag");
+            UnityEngine.Debug.Log("OnEndDrag");
 
             var selectedSlotId = -1;
             var corners = new Vector3[4];
@@ -173,7 +172,7 @@ namespace Gui.StarMap
 
         private void UpdateSlots()
         {
-            var size = SizeClass.Titan;
+            var size = SizeClass.Dominate;
             var count = _playerSkills.GetAvailableHangarSlots(size);
 
             foreach (var slot in Slots)

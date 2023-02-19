@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using Combat.Component.Unit;
 using Combat.Scene;
 using Combat.Unit;
@@ -13,12 +12,22 @@ namespace Gui.Combat
         [SerializeField] private Image Background;
         [SerializeField] private float Size = 24;
 
-        public void Open(IUnit unit, IScene scene)
+        [SerializeField] private Sprite Container;
+        [SerializeField] private Sprite Meteorite;
+        [SerializeField] private Sprite ShipWreck;
+        [SerializeField] private Sprite Minerals;
+        [SerializeField] private Sprite MineralsRare;
+        [SerializeField] private Sprite Outpost;
+        [SerializeField] private Sprite Hive;
+
+        public void Open(IUnit unit, Game.Exploration.ObjectiveType type, IScene scene)
         {
             _scene = scene;
             _unit = unit;
+            _type = type;
 
             Initialize();
+            Update();
             gameObject.SetActive(true);
         }
 
@@ -34,8 +43,8 @@ namespace Gui.Combat
 
             var itemPosition = _unit.Body.Position;
             var position = _scene.ViewPoint.Direction(itemPosition);
-            var cameraHeight = _mainCamera.orthographicSize;
-            var cameraWidth = cameraHeight * _mainCamera.aspect;
+            var cameraHeight = Camera.main.orthographicSize;
+            var cameraWidth = cameraHeight * Camera.main.aspect;
 
             var x = position.x / cameraWidth;
             var y = position.y / cameraHeight;
@@ -91,17 +100,51 @@ namespace Gui.Combat
             _screenSize = RectTransform.parent.GetComponent<RectTransform>().rect.size;
             RectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Size * 2);
             RectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Size * 2);
-        }
+            switch (_type)
+            {
+                case Game.Exploration.ObjectiveType.Container:
+                    {
+                        Image.sprite = Container;
+                    }
+                    break;
+                case Game.Exploration.ObjectiveType.Meteorite:
+                    {
+                        Image.sprite = Meteorite;
+                    }
+                    break;
+                case Game.Exploration.ObjectiveType.ShipWreck:
+                    {
+                        Image.sprite = ShipWreck;
+                    }
+                    break;
+                case Game.Exploration.ObjectiveType.Minerals:
+                    {
+                        Image.sprite = Minerals;
+                    }
+                    break;
+                case Game.Exploration.ObjectiveType.MineralsRare:
+                    {
+                        Image.sprite = MineralsRare;
+                    }
+                    break;
+                case Game.Exploration.ObjectiveType.Outpost:
+                    {
+                        Image.sprite = Outpost;
+                    }
+                    break;
+                case Game.Exploration.ObjectiveType.Hive:
+                    {
+                        Image.sprite = Hive;
+                    }
+                    break;
 
-        private void Start()
-        {
-            _mainCamera = Camera.main;
+            }
         }
 
         private Vector2 _screenSize;
         private RectTransform _rectTransform;
         private IUnit _unit;
+        private Game.Exploration.ObjectiveType _type;
         private IScene _scene;
-        private Camera _mainCamera;
     }
 }

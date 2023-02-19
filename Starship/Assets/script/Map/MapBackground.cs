@@ -9,11 +9,11 @@ public class MapBackground : MonoBehaviour
 	public int DetailTextureScale = 20;
 	public Material Material;
 
-	private void Start() 
+	void Start() 
 	{
-		_mainCamera = Camera.main;
+		var camera = Camera.main;
 		gameObject.AddComponent<MeshRenderer>();
-		Create(gameObject.GetMesh(), 2 * _mainCamera.aspect, 2 * _mainCamera.aspect);
+		Create(gameObject.GetMesh(), 2*camera.aspect, 2*camera.aspect);
 	}
 	
 	void LateUpdate() 
@@ -21,7 +21,7 @@ public class MapBackground : MonoBehaviour
 		if (Material == null)
 			return;
 
-		var cameraSize = _mainCamera.orthographicSize;
+		var cameraSize = Camera.main.orthographicSize;
 
 		UpdateTexture("_MainTex", TextureScale, cameraSize);
 		UpdateTexture("_DecalTex", DetailTextureScale, cameraSize);
@@ -38,7 +38,7 @@ public class MapBackground : MonoBehaviour
 		
 		var targetPosition = _lastPosition;
 		_lastPosition = target.transform.localPosition/Scale;
-		var offset = 0.5f*(targetPosition - _lastPosition)/(textureSize*_mainCamera.aspect);
+		var offset = 0.5f*(targetPosition - _lastPosition)/(textureSize*Camera.main.aspect);
 
         _textureOffset += offset;
 		
@@ -52,7 +52,7 @@ public class MapBackground : MonoBehaviour
 		y = y - Mathf.FloorToInt(y) - 1;
 		
 		Material.SetTextureOffset(name, new Vector2(x, y));
-		Material.SetTextureScale(name, Vector2.one * (cameraSize * textureScale) / textureSize);
+		Material.SetTextureScale(name, Vector2.one * cameraSize * textureScale / textureSize);
 	}
 
 	private void Create(Mesh mesh, float width, float height)
@@ -82,5 +82,4 @@ public class MapBackground : MonoBehaviour
 
 	private Vector2 _textureOffset = Vector2.zero;
 	private Vector2 _lastPosition = Vector2.zero;
-	private Camera _mainCamera;
 }

@@ -10,6 +10,8 @@ using Services.Localization;
 using Services.Reources;
 using UnityEngine;
 using Zenject;
+using PlistCS;
+using System;
 
 namespace Game.Exploration
 {
@@ -20,6 +22,8 @@ namespace Game.Exploration
         Terran,
         Asteroids,
         Infected,
+        Molten,
+        Frozen,
     }
 
     public static class PlanetTypeExtensions
@@ -43,21 +47,46 @@ namespace Game.Exploration
             Seed = index * 13 + star.Id + _random.Seed;
             var random =  _random.CreateRandom(Seed);
 
-            Type = GetPlanetType(index, star.Id, random);
+            GetPlanetTypes(star.Id);
+
+            Type = GetPlanetType(index, random);
             Icon = GetPlanetImage(Type, random);
             Size = GetPlanetSize(Type, random);
             Level = star.Level;
-            Faction = Type == PlanetType.Infected ? database.ExplorationSettings.InfectedPlanetFaction : star.Region.Faction;
-            TotalObjectives = random.Range(8,16);
-            Color = Type == PlanetType.Infected ? GetInfectedPlanetColor(random) : GetPlanetColor(random);
+            Faction = Type == PlanetType.Infected ? database.GetFaction(new ItemId<Faction>(16)) : star.Region.Faction;
+            if(Type==PlanetType.Barren)
+                TotalObjectives = random.Range(6,12);
+            else if(Type==PlanetType.Gas)
+                TotalObjectives = random.Range(8,16);
+            else if(Type==PlanetType.Terran)
+                TotalObjectives = random.Range(12,20);
+            else if(Type==PlanetType.Molten)
+                TotalObjectives = random.Range(16,32);
+            else if(Type==PlanetType.Frozen)
+                TotalObjectives = random.Range(6,8);
+            else if(Type==PlanetType.Infected)
+                TotalObjectives = random.Range(8,24);
+            Color = Type == PlanetType.Infected ? GetInfectedPlanetColor(random) : GetPlanetColor(random, Type);
         }
 
-        private PlanetType GetPlanetType(int index, int starId, System.Random random)
+        private PlanetType GetPlanetType(int index, System.Random random)
         {
             if (index == InfectedPlanetId) return PlanetType.Infected;
 
-            var firstGasPlanetId = _random.RandomInt(starId, 5);
+            if (index > 0 && _planetTypes[index] != PlanetType.Gas)
+            {
+                var value = random.Next(100);
+                if (value < 10)
+                    return PlanetType.Asteroids;
+            }
+            return _planetTypes[index];
+            /*
+            var lastMoltenPlanetId = random.Next(20) > 10 ? _random.RandomInt(starId, 0, 2) : 0;
+            var lastBarrenPlanetId = _random.RandomInt(starId+1, lastMoltenPlanetId, 5);
+            var firstGasPlanetId = _random.RandomInt(starId+2, lastBarrenPlanetId, 12);
+            if (index <= lastMoltenPlanetId) return PlanetType.Molten;
             if (index >= firstGasPlanetId) return PlanetType.Gas;
+            if (index > lastBarrenPlanetId) return PlanetType.Frozen;
 
             var value = random.Next(100);
             if (value < 20)
@@ -66,7 +95,47 @@ namespace Game.Exploration
                 return PlanetType.Terran;
             else
                 return PlanetType.Barren;
+            */
         }
+        private void GetPlanetTypes(int starId)
+        {
+            _planetTypesRange[0] = _random.RandomInt(starId, 0, 6) - 2;//molten
+            _planetTypesRange[1] = _planetTypesRange[0] + _random.RandomInt(starId + 10 + _planetTypesRange[0], 0, 4);//barren
+            _planetTypesRange[2] = _planetTypesRange[1] + _random.RandomInt(starId + 20 + _planetTypesRange[1], 0, 2);//terran
+            _planetTypesRange[3] = _planetTypesRange[2] + _random.RandomInt(starId + 30 + _planetTypesRange[2], 0, 3);//frozen
+            if (_planetTypesRange[0] < 0) _planetTypesRange[0] = 0;
+            if (_planetTypesRange[1] < 0) _planetTypesRange[1] = 0;
+            if (_planetTypesRange[2] < 0) _planetTypesRange[2] = 0;
+            if (_planetTypesRange[3] < 0) _planetTypesRange[3] = 0;
+
+            for (int i = 0; i < 12; i++)
+            {
+                if (i < _planetTypesRange[0])
+                    _planetTypes[i] = PlanetType.Molten;
+                else if (i < _planetTypesRange[1])
+                    _planetTypes[i] = PlanetType.Barren;
+                else if (i < _planetTypesRange[2])
+                    _planetTypes[i] = PlanetType.Terran;
+                else if (i < _planetTypesRange[3])
+                    _planetTypes[i] = PlanetType.Frozen;
+                else
+                    _planetTypes[i] = PlanetType.Gas;
+            }
+            if (_planetTypesRange[1] - _planetTypesRange[0] > 0 && _planetTypesRange[2] - _planetTypesRange[1] > 0)
+            {
+                int randomcount = _random.RandomInt(starId + 50 + _planetTypesRange[0] + _planetTypesRange[1] + _planetTypesRange[2], 0, 10);
+                for (int i = 0; i < randomcount; i++)
+                {
+                    int random1 = _random.RandomInt(starId + 100 + _planetTypesRange[0] * (i + 1) + _planetTypesRange[1] * (i - 2) + _planetTypesRange[2] * (i + 3), _planetTypesRange[0], _planetTypesRange[2] - 1);
+                    int random2 = _random.RandomInt(starId + 200 + _planetTypesRange[0] * (i - 4) + _planetTypesRange[1] * (i + 5) + _planetTypesRange[2] * (i - 6), _planetTypesRange[0], _planetTypesRange[2] - 1);
+                    if (random1 != random2)
+                        Generic.Swap(ref _planetTypes[random1], ref _planetTypes[random2]);
+                    else
+                        _planetTypes[random1] = _random.RandomInt(starId + 300 + i * randomcount, 0, 1) == 0 ? PlanetType.Barren : PlanetType.Terran;
+                }
+            }
+        }
+        
 
         private static float GetPlanetSize(PlanetType type, System.Random random)
         {
@@ -91,6 +160,10 @@ namespace Game.Exploration
                     return CommonSpriteTable.GasPlanet(random);
                 case PlanetType.Terran:
                     return CommonSpriteTable.TerranPlanet(random);
+                case PlanetType.Molten:
+                    return CommonSpriteTable.MoltenPlanet(random);
+                case PlanetType.Frozen:
+                    return CommonSpriteTable.FrozenPlanet(random);
                 case PlanetType.Asteroids:
                     return CommonSpriteTable.AsteroidBelt;
                 default:
@@ -98,7 +171,7 @@ namespace Game.Exploration
             }
         }
 
-        private static Color GetPlanetColor(System.Random random)
+        private static Color GetPlanetColor(System.Random random, PlanetType type)
         {
             var p1 = random.NextFloat();
             var p2 = random.NextFloat();
@@ -111,10 +184,13 @@ namespace Game.Exploration
             var toxicity = p2 - p1;
             var enemies = p3 - p2;
 
-            var r = temperature * 0.8f + 0.2f;
+            var r = type == PlanetType.Molten ? 0.5f + temperature * 0.5f : type == PlanetType.Frozen ? 0.7f + temperature * 0.3f : temperature * 0.8f + 0.2f;
             var g = toxicity * 0.8f + 0.2f;
 
-            return new Color(r + random.NextFloat() * (1f - r), g + random.NextFloat() * (1f - g), 0.5f + random.NextFloat() * 0.5f);
+            return new Color(
+                type == PlanetType.Frozen ? g + random.NextFloat() * (1f - r) : r + random.NextFloat() / 2 * (1f - r),
+                type == PlanetType.Frozen ? g + random.NextFloat() * (1f - r) : g + random.NextFloat() / 2 * (1f - g),
+                type == PlanetType.Frozen ? r + random.NextFloat() * (1f - r) : 0.5f + random.NextFloat() * 0.5f);
         }
 
         private static Color GetInfectedPlanetColor(System.Random random)
@@ -133,6 +209,7 @@ namespace Game.Exploration
         public PlanetType Type { get; private set; }
         public float Size { get; private set; }
         public Color Color { get; private set; }
+        public Color TypeColor { get; set; }
         public int Level { get; private set; }
         public int Seed { get; private set; }
         public Faction Faction { get; private set; }
@@ -177,6 +254,8 @@ namespace Game.Exploration
         private readonly ISessionData _session;
         private readonly IRandom _random;
         //private readonly PlayerSkills _playerSkills;
+        private int[] _planetTypesRange = new int[4];
+        private PlanetType[] _planetTypes = new PlanetType[12];
 
         public class Factory : IFactory<int, int, Planet>
         {
@@ -192,7 +271,7 @@ namespace Game.Exploration
 
             public IEnumerable<Planet> CreatePlanets(int starId)
             {
-                var count = _random.RandomInt(starId + 32, 1, 4);
+                var count = _random.RandomInt(starId + 32, 1, 12);
                 for (var i = 0; i < count; ++i)
                     yield return Create(starId, i);
             }

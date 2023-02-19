@@ -4,26 +4,31 @@ using Combat.Component.Triggers;
 using Combat.Unit;
 using GameDatabase.DataModel;
 using UnityEngine;
+using Combat.Component.Ship;
+
 
 namespace Combat.Component.Systems.Weapons
 {
     public class ContinuousCannon : SystemBase, IWeapon
     {
-        public ContinuousCannon(IWeaponPlatform platform, WeaponStats weaponStats, Factory.IBulletFactory bulletFactory, int keyBinding)
-            : base(keyBinding, weaponStats.ControlButtonIcon)
+        public ContinuousCannon(IWeaponPlatform platform, WeaponStats weaponStats, Factory.IBulletFactory bulletFactory, int keyBinding, IShip ship)
+            : base(keyBinding, weaponStats.ControlButtonIcon, ship)
         {
-            MaxCooldown = weaponStats.FireRate > 0 ? 1f / weaponStats.FireRate : 0f;
+            MaxCooldown = weaponStats.FireRate > 0.0000001f ? 1f / weaponStats.FireRate : 0;
 
             _bulletFactory = bulletFactory;
             _platform = platform;
             _energyConsumption = bulletFactory.Stats.EnergyCost;
             _spread = weaponStats.Spread;
 
+            _weaponStats = weaponStats;
+            _ship = ship;
+
             Info = new WeaponInfo(WeaponType.Continuous, _spread, bulletFactory, platform);
         }
 
-        public override bool CanBeActivated { get { return base.CanBeActivated && (HasActiveBullet || _platform.IsReady && _platform.EnergyPoints.Value > _energyConsumption * 0.5f); } }
-        public override float Cooldown { get { return Mathf.Max(base.Cooldown, _platform.Cooldown); } }
+        public override bool CanBeActivated { get { return base.CanBeActivated && (HasActiveBullet || _platform.IsReady && _platform.EnergyPoints.Value > _energyConsumption * _ship.Stats.WeaponUpgrade.EnergyCostMultiplier * 0.5f); } }
+        public override float Cooldown { get { return Mathf.Max(_platform.Cooldown, base.Cooldown); } }
 
         public WeaponInfo Info { get; private set; }
         public IWeaponPlatform Platform { get { return _platform; } }
@@ -36,9 +41,9 @@ namespace Combat.Component.Systems.Weapons
         {
             if (HasActiveBullet)
             {
-                _platform.Aim(Info);
+                _platform.Aim(Info.BulletSpeed, Info.Range, Info.IsRelativeVelocity);
 
-                if (Active && _platform.EnergyPoints.TryGet(_energyConsumption * elapsedTime))
+                if (Active && _platform.EnergyPoints.TryGet(_energyConsumption * _ship.Stats.WeaponUpgrade.EnergyCostMultiplier * elapsedTime))
                 {
                     _activeBullet.Lifetime.Restore();
                     InvokeTriggers(ConditionType.OnRemainActive);
@@ -60,9 +65,9 @@ namespace Combat.Component.Systems.Weapons
 
         private void Shot()
         {
-            _platform.Aim(Info);
+            _platform.Aim(Info.BulletSpeed, Info.Range, Info.IsRelativeVelocity);
 
-            _activeBullet = _bulletFactory.Create(_platform, _spread, 0, 0);
+            _activeBullet = _bulletFactory.Create(_platform, _spread, 0, 0, Vector2.zero);
             _activeBullet.Lifetime.Restore();
         }
 
@@ -73,5 +78,7 @@ namespace Combat.Component.Systems.Weapons
         private readonly float _energyConsumption;
         private readonly IWeaponPlatform _platform;
         private readonly Factory.IBulletFactory _bulletFactory;
+        private readonly IShip _ship;
+        private readonly WeaponStats _weaponStats;
     }
 }

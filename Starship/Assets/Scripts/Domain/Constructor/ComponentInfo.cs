@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Constructor.Modification;
 using Database.Legacy;
+using DebugLogSetting;
 using Economy.ItemType;
 using GameDatabase;
 using GameDatabase.DataModel;
@@ -13,7 +14,7 @@ using GameDatabase.Extensions;
 using GameDatabase.Model;
 using Services.Localization;
 using UnityEngine;
-using Utils;
+using Model;
 using IComponent = Constructor.Component.IComponent;
 
 namespace Constructor
@@ -44,17 +45,16 @@ namespace Constructor
         {
             _data = data;
             _modificationType = ComponentModType.Empty;
-            _quality = ModificationQuality.N3;
+            _quality = ModificationQuality.N5;
             _level = 0;
         }
 
-        public static ComponentInfo CreateRandom(IDatabase database, int level, Faction faction, System.Random random, bool allowRare, ComponentQuality maxQuality = ComponentQuality.P3)
+        public static ComponentInfo CreateRandom(IDatabase database, int level, Faction faction, System.Random random, bool allowRare, bool blackmarket, ComponentQuality maxQuality = ComponentQuality.P3)
         {
             var maxLevel = 3*level/2;
-            var components = allowRare ? database.ComponentList.CommonAndRare() : database.ComponentList.Common();
+            var components = blackmarket ? (allowRare ? database.ComponentList.CommonAndRareBlackMarket() : database.ComponentList.CommonBlackMarket()) : (allowRare ? database.ComponentList.CommonAndRare() : database.ComponentList.Common());
             var component = components.OfFaction(faction).LevelLessOrEqual(maxLevel).RandomElement(random);
 
-            if (component == null) throw new ValueNotFoundException("There was no components matching given filters");
             var componentLevel = Mathf.Max(10, component.Level);
             var requiredLevel = Mathf.Max(10, level);
             var componentQuality = ComponentQualityExtensions.FromLevel(requiredLevel, componentLevel).Randomize(random);
@@ -92,7 +92,7 @@ namespace Constructor
 
         public bool IsValidModification { get { return _modificationType == ComponentModType.Empty || _data.Create(100).SuitableModifications.Contains(_modificationType); } }
 
-        public static ComponentInfo CreateRandomModification(GameDatabase.DataModel.Component data, System.Random random, ModificationQuality minQuality = ModificationQuality.N3, ModificationQuality maxQuality = ModificationQuality.P3)
+        public static ComponentInfo CreateRandomModification(GameDatabase.DataModel.Component data, System.Random random, ModificationQuality minQuality = ModificationQuality.N5, ModificationQuality maxQuality = ModificationQuality.P5)
         {
             if (minQuality > maxQuality)
                 Generic.Swap(ref minQuality, ref maxQuality);
@@ -102,10 +102,20 @@ namespace Constructor
 
             return new ComponentInfo(data, modification, quality);
         }
-
-        public string GetName(ILocalization localization)
+        public static ComponentInfo CreateNoModification(GameDatabase.DataModel.Component data)
         {
+            return new ComponentInfo(data, ComponentModType.Empty, ModificationQuality.P0);
+        }
+
+        public string GetName(ILocalization localization, bool showquality = false)
+        {
+            if (showquality && ComponentDebugLogSetting.ComponentShowQualityType)
+                return QualityName(localization, ItemQuality).Replace("\n", string.Empty) + (_level <= 0 ? localization.GetString(Data.Name) : localization.GetString(Data.Name) + " +" + _level);
             return _level <= 0 ? localization.GetString(Data.Name) : localization.GetString(Data.Name) + " +" + _level;
+        }
+        public string QualityName(ILocalization localization, ItemQuality quality)
+        {
+            return localization.GetString(quality.Name()) + "  ";
         }
 
         public static ComponentInfo FormString(IDatabase _database, string data)
@@ -124,36 +134,28 @@ namespace Constructor
 
         public override bool Equals(object obj)
         {
-            if (!(obj is ComponentInfo info))
+            if (obj == null || !(obj is ComponentInfo))
                 return false;
-            return Equals(info);
+            return Equals((ComponentInfo)obj);
         }
 
         public override int GetHashCode()
         {
-            unchecked
-            {
-                var hashCode = _data?.GetHashCode() ?? 0;
-                hashCode = (hashCode * 397) ^ (int)_modificationType;
-                hashCode = (hashCode * 397) ^ (int)_quality;
-                hashCode = (hashCode * 397) ^ _level;
-                return hashCode;
-            }
+            return Data.Id.GetHashCode() + (int)_quality + (int)_modificationType;
         }
 
-        
         public int SerializeToInt32Obsolete() // 30 bits used
         {
             #if UNITY_EDITOR
             if (Data.Id.Value < 0 || Data.Id.Value > 0x3fff)
             {
-                OptimizedDebug.LogError("Bad component id - " + Data.Id.Value);
-                OptimizedDebug.Break();
+                Debug.LogError("Bad component id - " + Data.Id.Value);
+                UnityEngine.Debug.Break();
             }
             if ((int)_modificationType < 0 || (int)_modificationType > 0xff)
             {
-                OptimizedDebug.LogError("Bad modification type " + _modificationType);
-                OptimizedDebug.Break();
+                Debug.LogError("Bad modification type " + _modificationType);
+                UnityEngine.Debug.Break();
             }
             #endif
 
@@ -170,11 +172,11 @@ namespace Constructor
         {
 #if UNITY_EDITOR
             if ((int)_modificationType < 0 || (int)_modificationType > 0xff)
-                OptimizedDebug.Break();
+                Debug.Break();
             if ((int)_quality < 0 || (int)_quality > 0xff)
-                OptimizedDebug.Break();
+                Debug.Break();
             if ((int)_level < 0 || (int)_level > 0xff)
-                OptimizedDebug.Break();
+                Debug.Break();
 #endif
 
             long value = Data.Id.Value;
@@ -253,18 +255,31 @@ namespace Constructor
                 if (_modificationType == ComponentModType.Empty)
                     return ItemQuality.Common;
 
+                if (_quality == ModificationQuality.P0)
+                    return ItemQuality.Common;
+
                 switch (_quality)
                 {
                     case ModificationQuality.N1:
+                        return ItemQuality.Low1;
                     case ModificationQuality.N2:
+                        return ItemQuality.Low2;
                     case ModificationQuality.N3:
-                        return ItemQuality.Low;
+                        return ItemQuality.Low3;
+                    case ModificationQuality.N4:
+                        return ItemQuality.Low4;
+                    case ModificationQuality.N5:
+                        return ItemQuality.Low5;
                     case ModificationQuality.P1:
                         return ItemQuality.Medium;
                     case ModificationQuality.P2:
                         return ItemQuality.High;
                     case ModificationQuality.P3:
                         return ItemQuality.Perfect;
+                    case ModificationQuality.P4:
+                        return ItemQuality.Epic;
+                    case ModificationQuality.P5:
+                        return ItemQuality.Legend;
                     default:
                         throw new InvalidEnumArgumentException("_quality", (int)_quality, typeof(ModificationQuality));
                 }
@@ -280,7 +295,7 @@ namespace Constructor
                 if (_modificationType == ComponentModType.Empty)
                     return Economy.Price.ComponentPrice(Data);
 
-                return  Economy.Price.ComponentPrice(Data, _quality.PowerMultiplier(0.5f, 0.75f, 0.9f, 1.5f, 2.0f, 3f));
+                return Economy.Price.ComponentPrice(Data, _quality.PowerMultiplier(0.4f, 0.5f, 0.6f, 0.75f, 0.9f, 1.5f, 2.0f, 3f, 5f, 8f));
             }
         }
 
@@ -291,7 +306,7 @@ namespace Constructor
                 if (_modificationType == ComponentModType.Empty)
                     return Economy.Price.ComponentPremiumPrice(Data);
 
-                return Economy.Price.ComponentPremiumPrice(Data, _quality.PowerMultiplier(0.5f, 0.75f, 0.9f, 1.5f, 2.0f, 3f));
+                return Economy.Price.ComponentPremiumPrice(Data, _quality.PowerMultiplier(0.4f, 0.5f, 0.6f, 0.75f, 0.9f, 1.5f, 2.0f, 3f, 5f, 8f));
             }
         }
 
@@ -307,14 +322,22 @@ namespace Constructor
         {
             switch (itemQuality)
             {
+                case ItemQuality.Legend:
+                    return ModificationQuality.P5;
+                case ItemQuality.Epic:
+                    return ModificationQuality.P4;
                 case ItemQuality.Perfect:
                     return ModificationQuality.P3;
                 case ItemQuality.High:
                     return ModificationQuality.P2;
                 case ItemQuality.Medium:
                     return ModificationQuality.P1;
-                case ItemQuality.Low:
-                    return (ModificationQuality)random.Range((int)ModificationQuality.N3, (int)ModificationQuality.N1);
+                case ItemQuality.Low1:
+                case ItemQuality.Low2:
+                case ItemQuality.Low3:
+                case ItemQuality.Low4:
+                case ItemQuality.Low5:
+                    return (ModificationQuality)(random.Range((int)ModificationQuality.N5, (int)ModificationQuality.N1));
                 default:
                     throw new InvalidEnumArgumentException("itemQuality", (int)itemQuality, typeof(ItemQuality));
             }

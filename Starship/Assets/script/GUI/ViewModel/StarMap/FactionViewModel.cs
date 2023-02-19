@@ -40,9 +40,8 @@ namespace ViewModel
 			Background.color = new Color(color.R, color.G, color.B, 0.5f);
 			Name.text = unlocked ? _localization.GetString(faction.Name) : "???";
 			var researchPoints = _research.GetAvailablePoints(faction);
-			ResearchPointPanel.gameObject.SetActive(researchPoints != 0);
-			ResearchPointText.text = (researchPoints > 0 ? "+" : "") + researchPoints;
-			ResearchPointText.color = researchPoints > 0 ? Color.white : Color.red;
+			ResearchPointPanel.gameObject.SetActive(researchPoints > 0);
+			ResearchPointText.text = "+" + researchPoints;
 		    Toggle.interactable = unlocked;
 		}
 

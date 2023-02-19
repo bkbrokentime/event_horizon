@@ -156,11 +156,8 @@ namespace Domain.Quests
                 totalWeight += content.Items[i].Weight;
 
             if (totalWeight < 0.0001f)
-                foreach (var item in content.Items.RandomUniqueElements(amount, _random))
-                foreach (var lootItem in item.Loot.Create(this))
-                {
-                    yield return lootItem;
-                }
+                foreach (var item in content.Items.RandomUniqueElements(amount, itemCount, _random).SelectMany(item => item.Loot.Create(this)))
+                    yield return item;
 
             var itemsLeft = amount;
             foreach (var item in content.Items)
@@ -204,13 +201,12 @@ namespace Domain.Quests
 
         public IEnumerable<LootItem> Create(LootContent_Ship content)
         {
-            yield return new LootItem(_itemTypeFactory.CreateShipItem(new CommonShip(content.ShipBuild), fuzzy: true));
+            yield return new LootItem(_itemTypeFactory.CreateShipItem(new CommonShip(content.ShipBuild)));
         }
 
         public IEnumerable<LootItem> Create(LootContent_EmptyShip content)
         {
-            yield return new LootItem(_itemTypeFactory.CreateShipItem(
-                new CommonShip(content.Ship, Enumerable.Empty<IntegratedComponent>()), fuzzy: true));
+            yield return new LootItem(_itemTypeFactory.CreateShipItem(new CommonShip(content.Ship, Enumerable.Empty<IntegratedComponent>())));
         }
 
         public IEnumerable<LootItem> Create(LootContent_Component content)

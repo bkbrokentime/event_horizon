@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using Session.Content;
 using GameModel.Serialization;
 using System.Linq;
-using Utils;
 
 namespace Session
 {
     class DatabaseContent
     {
-        public DatabaseContent(ContentFactory factory)
+        public DatabaseContent(ContentFactory factory, InAppPurchasesData purchases = null, AchievementData achievements = null)
         {
             Game = factory.CreateGameData(null);
             Starmap = factory.CreateStarMapData(null);
@@ -19,14 +18,20 @@ namespace Session
             Events = factory.CreateEventData(null);
             Bosses = factory.CreateBossData(null);
             Regions = factory.CreateRegionData(null, 0);
+            Purchases = purchases ?? factory.CreateInAppPurchasesData(null);
             Wormholes = factory.CreateWormholeData(null);
+            Achievements = achievements ?? factory.CreateAchievementData(null);
             CommonObjects = factory.CreateCommonObjectData(null);
             Research = factory.CreateResearchData(null);
             Statistics = factory.CreateStatisticsData(null);
             Resources = factory.CreateResourcesData(null);
             Upgrades = factory.CreateUpgradesData(null);
             Pvp = factory.CreatePvpData(null);
+            Social = factory.CreateSocialData(null);
             Quests = factory.CreateQuestData(null);
+            
+            if (purchases != null)
+                Resources.Stars = purchases.PurchasedStars;
         }
 
         public bool IsChanged { get { return Data.Any(item => item.IsChanged); } }
@@ -38,7 +43,7 @@ namespace Session
 #if UNITY_EDITOR
                 foreach (var item in Data)
                     if (item.IsChanged)
-                        OptimizedDebug.Log("IsChanged: " + item.FileName);
+                        UnityEngine.Debug.Log("IsChanged: " + item.FileName);
 #endif
                 //_version++;
             }
@@ -119,11 +124,20 @@ namespace Session
                     case ResourcesData.Name:
                         content.Resources = factory.CreateResourcesData(GetSubArray(data, ref index));
                         break;
+                    case InAppPurchasesData.Name:
+                        content.Purchases = factory.CreateInAppPurchasesData(GetSubArray(data, ref index));
+                        break;
+                    case AchievementData.Name:
+                        content.Achievements = factory.CreateAchievementData(GetSubArray(data, ref index));
+                        break;
                     case UpgradesData.Name:
                         content.Upgrades = factory.CreateUpgradesData(GetSubArray(data, ref index));
                         break;
                     case PvpData.Name:
                         content.Pvp = factory.CreatePvpData(GetSubArray(data, ref index));
+                        break;
+                    case SocialData.Name:
+                        content.Social = factory.CreateSocialData(GetSubArray(data, ref index));
                         break;
                     case QuestData.Name:
                         content.Quests = factory.CreateQuestData(GetSubArray(data, ref index));
@@ -141,7 +155,7 @@ namespace Session
             }
             catch (Exception e)
             {
-                OptimizedDebug.LogException(e);
+                UnityEngine.Debug.LogException(e);
                 return null;
             }
 
@@ -153,11 +167,12 @@ namespace Session
             switch (key)
             {
                 default:
-                    OptimizedDebug.Log("DatabaseContent: unknown key - " + key);
+                    UnityEngine.Debug.Log("DatabaseContent: unknown key - " + key);
                     break;
             }
         }
 
+        public AchievementData Achievements { get; private set; }
         public GameData Game { get; private set; }
         public StarMapData Starmap { get; private set; }
         public InventoryData Inventory { get; private set; }
@@ -166,6 +181,7 @@ namespace Session
         public EventData Events { get; private set; }
         public BossData Bosses { get; private set; }
         public RegionData Regions { get; private set; }
+        public InAppPurchasesData Purchases { get; private set; }
         public WormholeData Wormholes { get; private set; }
         public CommonObjectData CommonObjects { get; private set; }
         public ResearchData Research { get; private set; }
@@ -173,6 +189,7 @@ namespace Session
         public ResourcesData Resources { get; private set; }
         public UpgradesData Upgrades { get; private set; }
         public PvpData Pvp { get; private set; }
+        public SocialData Social { get; private set; }
         public QuestData Quests { get; private set; }
 
         private IEnumerable<ISerializableData> Data
@@ -187,13 +204,16 @@ namespace Session
                 yield return Events;
                 yield return Bosses;
                 yield return Regions;
+                yield return Purchases;
                 yield return Wormholes;
+                yield return Achievements;
                 yield return CommonObjects;
                 yield return Research;
                 yield return Statistics;
                 yield return Resources;
                 yield return Upgrades;
                 yield return Pvp;
+                yield return Social;
                 yield return Quests;
             }
         }

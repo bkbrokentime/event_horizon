@@ -6,15 +6,16 @@ using Combat.Unit.Auxiliary;
 using UnityEngine;
 
 namespace Combat.Component.Controller
-{
+{ 
     public class RepairBotContoller : IController
     {
-        public RepairBotContoller(IShip ship, IAuxiliaryUnit repairBot, float radius, float repairRate)
+        public RepairBotContoller(IShip ship, IAuxiliaryUnit repairBot, float radius, float repairRate, float toward = 0)
         {
             _ship = ship;
             _radius = radius;
             _repairBot = repairBot;
             _repairRate = repairRate;
+            _toward = toward;
         }
 
         public virtual void UpdatePhysics(float elapsedTime)
@@ -36,13 +37,17 @@ namespace Combat.Component.Controller
 
             var requiredPosition = _ship.Body.WorldPosition();
             if (enabled)
-                requiredPosition += RotationHelpers.Direction(_elapsedTime*_turnRate)*_radius;
+                requiredPosition += RotationHelpers.Direction(_elapsedTime * _turnRate + _toward) * _radius;
 
             _repairBot.MoveTowards(requiredPosition, requiredRotation, _ship.Body.WorldVelocity(), _velocityFactor, _angularVelocityFactor);
 
             _repairBot.Active = active;
             if (active)
-                _ship.Affect(new Impact { Repair = _repairRate*elapsedTime });
+            {
+                var impact = new Impact(new GameDatabase.Model.AllDamageData(), 0, 0, new Impulse(), CollisionEffect.None);
+                impact.AllDamageData.Repair.SetDamage(_repairRate * elapsedTime);
+                _ship.Affect(impact);
+            } 
 
             if (!enabled && _repairBot.Body.WorldPosition().Distance(requiredPosition) < _repairBot.Body.Scale)
                 _repairBot.Vanish();
@@ -50,6 +55,7 @@ namespace Combat.Component.Controller
 
         public void Dispose() { }
 
+        private readonly float _toward;
         private float _elapsedTime;
         private readonly float _radius;
         private readonly float _repairRate;

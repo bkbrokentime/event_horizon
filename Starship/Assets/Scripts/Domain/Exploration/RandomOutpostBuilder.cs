@@ -68,7 +68,17 @@ namespace Game.Exploration
                 foreach (var item in _database.ComponentList.Available().Where(item =>
                     item.Stats.KineticResistance > 0 ||
                     item.Stats.EnergyResistance > 0 ||
-                    item.Stats.ThermalResistance > 0).RandomElements(10, random))
+                    item.Stats.ThermalResistance > 0 ||
+                    item.Stats.QuantumResistance > 0 ||
+                    item.Stats.ShieldKineticResistance > 0 ||
+                    item.Stats.ShieldEnergyResistance > 0 ||
+                    item.Stats.ShieldThermalResistance > 0 ||
+                    item.Stats.ShieldQuantumResistance > 0 ||
+                    item.Stats.EnergyShieldKineticResistance > 0 ||
+                    item.Stats.EnergyShieldEnergyResistance > 0 ||
+                    item.Stats.EnergyShieldEnergyResistance > 0 ||
+                    item.Stats.EnergyShieldQuantumResistance > 0
+                    ).RandomElements(10, random))
                     yield return Create(item);
             }
 
@@ -94,7 +104,7 @@ namespace Game.Exploration
 
         private static IntegratedComponent Create(Component item, int barrelId = -1)
         {
-            return new IntegratedComponent(new ComponentInfo(item), 0, 0, barrelId, 0, 0, false);
+            return new IntegratedComponent(new ComponentInfo(item),0, 0, 0, barrelId, 0, 0, false);
         }
 
         private readonly int _seed;

@@ -11,6 +11,7 @@ using Services.Localization;
 using Services.Messenger;
 using Session;
 using Zenject;
+using DebugLogSetting;
 
 namespace ViewModel.Skills
 {
@@ -38,32 +39,78 @@ namespace ViewModel.Skills
 
         public void ToggleValueChanged(bool enabled)
         {
-			var node = CurrentNode;
-			if (node == null)
-				_informationPanel.Cleanup();
-			else
-			{
-				var id = NodeIds[node];
-				_informationPanel.Initialize(node, _connectedNodes.Contains(node) && _playerSkills.CanAdd(id), _playerSkills.HasSkill(id));
-			}
+            var node = CurrentNode;
+            if (node == null)
+                _informationPanel.Cleanup();
+            else
+            {
+                var id = NodeIds[node];
+                _informationPanel.Initialize(node, _connectedNodes.Contains(node) && node.Conditional() && _playerSkills.CanAdd(id), _playerSkills.HasSkill(id), _playerSkills.AvailablePoints > 0);
+            }
         }
 
         public void UnlockButtonClicked()
         {
             var node = CurrentNode;
-			if (node == null || !_connectedNodes.Contains(node))
+            if (node == null || !_connectedNodes.Contains(node))
                 return;
 
             if (!_playerSkills.TryAdd(NodeIds[node]))
                 return;
 
-			node.State = SkillTreeNode.NodeState.EnabledAndConnected;
+            node.State = SkillTreeNode.NodeState.EnabledAndConnected;
             UpdateLinkedNodes(node);
 
             _soundPlayer.Play(_unlockSound);
-			ToggleValueChanged(true);
+            ToggleValueChanged(true);
 
             UpdateResetPanel();
+        }
+
+        public void TryUnlockAll()
+        {
+            if (OtherDebugLogSetting.SkillDebugLog)
+                Debug.Log("Try Unlock All");
+            var Nodes = _connectedNodes;
+            foreach (var node in Nodes)
+            {
+                if (node == null || !Nodes.Contains(node))
+                {
+                    if (OtherDebugLogSetting.SkillDebugLog)
+                        Debug.Log("node == null || !_connectedNodes.Contains(node) = true");
+                    continue;
+                }
+                if (node.State == SkillTreeNode.NodeState.EnabledAndConnected)
+                    continue;
+                if (!_playerSkills.TryAdd(NodeIds[node]))
+                {
+                    if (OtherDebugLogSetting.SkillDebugLog)
+                        Debug.Log("_playerSkills.TryAdd failed");
+                    continue;
+                }
+
+                if (OtherDebugLogSetting.SkillDebugLog)
+                    Debug.Log("_playerSkills.TryAdd succeed");
+
+                node.State = SkillTreeNode.NodeState.EnabledAndConnected;
+                UpdateLinkedNodes(node);
+
+                _soundPlayer.Play(_unlockSound);
+                return;
+            }
+        }
+        public void TryUnlockAllButtonClicked()
+        {
+            var count = _playerSkills.AvailablePoints;
+            for (int i = 0; i <count; i++)
+                if (_playerSkills.AvailablePoints > 0)
+                {
+                    TryUnlockAll();
+                    ToggleValueChanged(true);
+                    UpdateResetPanel();
+                }
+            if (OtherDebugLogSetting.SkillDebugLog)
+                _playerSkills.DebugGetAllValue();
         }
 
         public void ResetSkills()
@@ -154,7 +201,10 @@ namespace ViewModel.Skills
 				if (_playerSkills.HasSkill(NodeIds[item])) 
 				{
 					item.State = SkillTreeNode.NodeState.EnabledAndConnected;
-					UpdateLinkedNodes(item);
+                    if (item._hide)
+                        item.ResetLinks();
+
+                    UpdateLinkedNodes(item);
 				}
 			}
         }

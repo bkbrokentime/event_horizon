@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading;
-using Utils;
 
 public abstract class BackgroundTask
 {
@@ -16,7 +15,7 @@ public abstract class BackgroundTask
 			var thread = new Thread(ThreadFunc);
 			while (thread.ManagedThreadId == Thread.CurrentThread.ManagedThreadId)
 			{
-				OptimizedDebug.Log("Invalid thread id (" + thread.ManagedThreadId + ")");
+				UnityEngine.Debug.Log("Invalid thread id (" + thread.ManagedThreadId + ")");
 				thread = new Thread(ThreadFunc);
 			}
 			
@@ -33,7 +32,7 @@ public abstract class BackgroundTask
 	{
 		var context = (BackgroundTask)data;
 
-	    OptimizedDebug.Log("background task started: " + GetType() + " (" + Thread.CurrentThread.ManagedThreadId + ")");
+	    UnityEngine.Debug.Log("background task started: " + GetType() + " (" + Thread.CurrentThread.ManagedThreadId + ")");
 		
 		while (!context._cancelled && (context._ownerReference == null || context._ownerReference.IsAlive))
 		{
@@ -51,11 +50,11 @@ public abstract class BackgroundTask
 			}
 			catch (Exception e)
 			{
-                OptimizedDebug.LogException(e);
+                UnityEngine.Debug.LogException(e);
 			}
 		}
 
-	    OptimizedDebug.Log("background task finished: " + GetType());
+	    UnityEngine.Debug.Log("background task finished: " + GetType());
 	}
 	
 	private WeakReference<object> _ownerReference;

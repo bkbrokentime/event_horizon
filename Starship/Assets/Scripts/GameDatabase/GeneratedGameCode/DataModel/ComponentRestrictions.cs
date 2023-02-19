@@ -27,7 +27,11 @@ namespace GameDatabase.DataModel
 			ShipSizes = new ImmutableSet<SizeClass>(serializable.ShipSizes);
 			NotForOrganicShips = serializable.NotForOrganicShips;
 			NotForMechanicShips = serializable.NotForMechanicShips;
-			UniqueComponentTag = serializable.UniqueComponentTag;
+			MinCellAmount = UnityEngine.Mathf.Clamp(serializable.MinCellAmount, 0, 999999999);
+			MaxCellAmount = UnityEngine.Mathf.Clamp(serializable.MaxCellAmount, 0, 999999999);
+			OnlyForShipId = new ImmutableCollection<Ship>(serializable.OnlyForShipId?.Select(item => loader.GetShip(new ItemId<Ship>(item), true)));
+			NotForShipId = new ImmutableCollection<Ship>(serializable.NotForShipId?.Select(item => loader.GetShip(new ItemId<Ship>(item), true)));
+			UniqueComponentTag = new ImmutableCollection<TagList>(serializable.UniqueComponentTag?.Select(item => TagList.Create(item, loader)));
 
 			OnDataDeserialized(serializable, loader);
 		}
@@ -35,7 +39,11 @@ namespace GameDatabase.DataModel
 		public ImmutableSet<SizeClass> ShipSizes { get; private set; }
 		public bool NotForOrganicShips { get; private set; }
 		public bool NotForMechanicShips { get; private set; }
-		public string UniqueComponentTag { get; private set; }
+		public int MinCellAmount { get; private set; }
+		public int MaxCellAmount { get; private set; }
+		public ImmutableCollection<Ship> OnlyForShipId { get; private set; }
+		public ImmutableCollection<Ship> NotForShipId { get; private set; }
+		public ImmutableCollection<TagList> UniqueComponentTag { get; private set; }
 
 		public static ComponentRestrictions DefaultValue { get; private set; }
 	}

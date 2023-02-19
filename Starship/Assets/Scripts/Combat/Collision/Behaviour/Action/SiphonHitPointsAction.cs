@@ -36,7 +36,7 @@ namespace Combat.Collision.Behaviour.Action
             }
 
             if (target.Type.Class == UnitClass.Ship || target.Type.Class == UnitClass.Drone)
-                selfImpact.Repair += damage * _conversionFactor;
+                selfImpact.AllDamageData.Repair.UpDateDamage(damage * _conversionFactor);
         }
 
         public void Dispose() { }

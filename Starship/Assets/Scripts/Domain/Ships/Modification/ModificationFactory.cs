@@ -29,6 +29,27 @@ public class ModificationFactory
                 return new EnergyDefenseModification(seed);
             case ModificationType.KineticDefense:
                 return new KineticDefenseModification(seed);
+            case ModificationType.QuantumDefense:
+                return new QuantumDefenseModification(seed);
+
+            case ModificationType.ShieldHeatDefense:
+                return new ShieldHeatDefenseModification(seed);
+            case ModificationType.ShieldEnergyDefense:
+                return new ShieldEnergyDefenseModification(seed);
+            case ModificationType.ShieldKineticDefense:
+                return new ShieldKineticDefenseModification(seed);
+            case ModificationType.ShieldQuantumDefense:
+                return new ShieldQuantumDefenseModification(seed);
+
+            case ModificationType.EnergyShieldHeatDefense:
+                return new EnergyShieldHeatDefenseModification(seed);
+            case ModificationType.EnergyShieldEnergyDefense:
+                return new EnergyShieldEnergyDefenseModification(seed);
+            case ModificationType.EnergyShieldKineticDefense:
+                return new EnergyShieldKineticDefenseModification(seed);
+            case ModificationType.EnergyShieldQuantumDefense:
+                return new EnergyShieldQuantumDefenseModification(seed);
+
             case ModificationType.ExtraBlueCells:
                 return new ExtraCellsModification(seed);
             case ModificationType.Infected:
@@ -49,6 +70,15 @@ public class ModificationFactory
             yield return Create(ModificationType.HeatDefense);
             yield return Create(ModificationType.KineticDefense);
             yield return Create(ModificationType.EnergyDefense);
+            yield return Create(ModificationType.QuantumDefense);
+            yield return Create(ModificationType.ShieldHeatDefense);
+            yield return Create(ModificationType.ShieldKineticDefense);
+            yield return Create(ModificationType.ShieldEnergyDefense);
+            yield return Create(ModificationType.ShieldQuantumDefense);
+            yield return Create(ModificationType.EnergyShieldHeatDefense);
+            yield return Create(ModificationType.EnergyShieldKineticDefense);
+            yield return Create(ModificationType.EnergyShieldEnergyDefense);
+            yield return Create(ModificationType.EnergyShieldQuantumDefense);
             yield return Create(ModificationType.LightWeight);
             yield return Create(ModificationType.Infected);
         }

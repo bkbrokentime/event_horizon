@@ -9,8 +9,8 @@ namespace Constructor.Modification
 	{
 		public BulletVelocity2(ModificationQuality quality)
 		{
-			_velocityMultiplier = quality.PowerMultiplier(0.7f, 0.8f, 0.9f, 1.2f, 1.5f, 2.0f);
-			_damageMultiplier = quality.PowerMultiplier(0.8f, 0.85f, 0.9f, 0.9f, 0.8f, 0.75f);
+			_velocityMultiplier = quality.PowerMultiplier(0.2f, 0.4f, 0.6f, 0.7f, 0.8f, 1.5f, 2.0f, 2.5f, 3.0f, 4.0f);
+			_damageMultiplier = quality.PowerMultiplier(0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 0.95f, 0.9f, 0.85f, 0.8f, 0.75f);
 			Quality = quality;
 		}
 

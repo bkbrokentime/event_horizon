@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Constructor;
 using Services.Localization;
 using Services.ObjectPool;
@@ -39,12 +40,39 @@ namespace Gui.ComponentList
                 if (_quantityProvider.GetQuantity(item) > 0)
                     _components.Add(item);
 
+            _components.Sort(
+                (item1, item2) =>
+                {
+                    if (item1.Data.Id.Value != item2.Data.Id.Value)
+                        return item1.Data.Id.Value.CompareTo(item2.Data.Id.Value);
+                    else if (item1.ModificationType != item2.ModificationType)
+                        return item1.ModificationType.CompareTo(item2.ModificationType);
+                    else
+                        return item1.ModificationQuality.CompareTo(item2.ModificationQuality);
+                }
+            );
+
             _nodes.Clear();
 
             for (var parent = node.Parent; parent != null; parent = parent.Parent)
-                _nodes.Insert(0,parent);
+                _nodes.Insert(0, parent);
 
             _nodes.AddRange(node.Nodes);
+            if (_nodes.Count != 0)
+                if (_nodes.FirstOrDefault().Components != null)
+                    _nodes.Sort(
+                        (item1, item2) =>
+                        {
+                            var component1 = item1.Components.FirstOrDefault();
+                            var component2 = item2.Components.FirstOrDefault();
+                            if (component1.Data.Id.Value != component2.Data.Id.Value)
+                                return component1.Data.Id.Value.CompareTo(component2.Data.Id.Value);
+                            else if (component1.ModificationType != component2.ModificationType)
+                                return component1.ModificationType.CompareTo(component2.ModificationType);
+                            else
+                                return component1.ModificationQuality.CompareTo(component2.ModificationQuality);
+                        }
+                    );
 
             if (_components.IndexOf(SelectedItem) < 0)
                 SelectedItem = ComponentInfo.Empty;
@@ -106,10 +134,12 @@ namespace Gui.ComponentList
             item.Initialize(node, _node);
         }
 
+
         private ComponentInfo _selectedItem;
         private IComponentTreeNode _node;
         private IComponentQuantityProvider _quantityProvider;
         private readonly List<IComponentTreeNode> _nodes = new List<IComponentTreeNode>();
         private readonly List<ComponentInfo> _components = new List<ComponentInfo>();
+
     }
 }

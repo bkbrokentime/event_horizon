@@ -1,7 +1,5 @@
 ﻿using System;
 using Combat.Component.Body;
-using Combat.Component.Bullet;
-using Combat.Component.Systems.Weapons;
 using Combat.Component.Unit.Classification;
 using Combat.Component.View;
 using Combat.Unit.HitPoints;
@@ -20,7 +18,9 @@ namespace Combat.Component.Platform
 
         bool IsReady { get; }
         float Cooldown { get; }
+        float CooldownTime { get; }
         float AutoAimingAngle { get; }
+        float BaseSpread { get; }
 
         void Aim(float bulletVelocity, float weaponRange, bool relative);
         void OnShot();
@@ -28,21 +28,5 @@ namespace Combat.Component.Platform
 
         void UpdatePhysics(float elapsedTime);
         void UpdateView(float elapsedTime);
-
-        void AddAttachedChild(IBullet bullet);
-    }
-
-    public static class WeaponPlatformExtensions
-    {
-        public static void Aim(this IWeaponPlatform platform, WeaponInfo info)
-        {
-            platform.Aim(
-                info.BulletType == BulletType.Direct || info.BulletType == BulletType.AreaOfEffect
-                    ? 0
-                    : info.BulletSpeed,
-                info.Range,
-                info.IsRelativeVelocity
-            );
-        }
     }
 }

@@ -16,5 +16,6 @@ namespace GameDatabase.Enums
 		Cruiser = 2,
 		Battleship = 3,
 		Titan = 4,
+		Dominate = 5,
 	}
 }

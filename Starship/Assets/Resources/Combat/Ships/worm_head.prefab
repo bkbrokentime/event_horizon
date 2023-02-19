@@ -13,9 +13,11 @@ GameObject:
   - component: {fileID: 50958224572914276}
   - component: {fileID: 114523536288723686}
   - component: {fileID: 114291144668151780}
+  - component: {fileID: 3643059068727982755}
   - component: {fileID: 114528527631898586}
   - component: {fileID: 114772434762378508}
   - component: {fileID: 60465232919237010}
+  - component: {fileID: 114759190736149584}
   m_Layer: 0
   m_Name: worm_head
   m_TagString: Untagged
@@ -63,7 +65,6 @@ SpriteRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -136,6 +137,20 @@ MonoBehaviour:
   DefaultMaterial: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   _extraRenderers:
   - {fileID: 212812737263693578}
+--- !u!114 &3643059068727982755
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1247645519260810}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 880a27b0a77933b47a136b1c42ba10fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ChangeableSprite:
+  - {fileID: 212812737263693578}
 --- !u!114 &114528527631898586
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -202,6 +217,32 @@ PolygonCollider2D:
       - {x: 0.04948759, y: -0.3727646}
       - {x: 0.016833782, y: -0.48647118}
       - {x: -0.12738895, y: -0.4898529}
+--- !u!114 &114759190736149584
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1247645519260810}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f8c6fe8fc912254b83cf553c9281a9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _stats:
+    ArmorPoints: 0
+    EnergyPoints: 0
+    ShieldPoints: 0
+    EnergyShieldPoints: 0
+  __stats:
+    ArmorPoints: 0
+    EnergyPoints: 0
+    ShieldPoints: 0
+    EnergyShieldPoints: 0
+    DamageMultiplier: 0
+    RangeMultiplier: 0
+    FireRateMultiplier: 0
+    EnergyCostMultiplier: 0
 --- !u!1 &1389330753691712
 GameObject:
   m_ObjectHideFlags: 0
@@ -258,7 +299,6 @@ SpriteRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -271,7 +311,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: -2
-  m_Sprite: {fileID: 21300000, guid: 97b0d17cefeb7614390d609b9768bed9, type: 3}
+  m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -279,6 +319,6 @@ SpriteRenderer:
   m_Size: {x: 1.28, y: 1.28}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0

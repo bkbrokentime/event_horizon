@@ -8,7 +8,8 @@ namespace Combat.Component.Body
         {
             var gameobject = new GameObject("Body");
             var transform = gameobject.transform;
-            parent?.AddChild(transform);
+            if (parent != null)
+                parent.AddChild(transform);
 
             var body = gameobject.AddComponent<SimpleBody>();
             body.Initialize(parent, position, rotation, scale, weight, offset);
@@ -32,7 +33,7 @@ namespace Combat.Component.Body
         public void Move(Vector2 position)
         {
             Position = position;
-            transform.localPosition = Parent?.ChildPosition(Position) ?? Position;
+            transform.localPosition = Parent == null ? Position : Parent.ChildPosition(Position);
         }
 
         public void Turn(float rotation)
@@ -61,11 +62,11 @@ namespace Combat.Component.Body
 
         public void ApplyForce(Vector2 position, Vector2 force)
         {
-            Parent?.ApplyForce(position, force);
+            if (Parent != null)
+                Parent.ApplyForce(position, force);
         }
 
         public void SetVelocityLimit(float value) {}
-        public void SetAngularVelocityLimit(float value) { }
 
         public void UpdatePhysics(float elapsedTime) {}
         public void UpdateView(float elapsedTime) {}

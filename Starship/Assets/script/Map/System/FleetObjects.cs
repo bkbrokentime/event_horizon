@@ -13,22 +13,42 @@ namespace StarSystem
 	{
 	    [Inject] private readonly IResourceLocator _resourceLocator;
 
-        public void CreateShips(IEnumerable<IShip> ships, System.Random random, IList<Planet> planets)
+		public void CreateShips(IEnumerable<IShip> ships, System.Random random, IList<Planet> planets)
 		{
+			var count = 0;
+			var orbit = 0;
 			foreach (var ship in ships)
-				CreateShip(ship.Model.OriginalShip, planets[random.Next(planets.Count)].transform.localPosition);
+			{
+				count++;
+				if (count >= 3 * orbit + 3)
+                {
+                    count = 0;
+                    orbit++;
+                }
+                CreateShip(ship.Model.OriginalShip, planets[random.Next(planets.Count)].transform.localPosition, orbit);
+			}
 		}
 
 		public void CreateShips(IEnumerable<IShip> ships, Vector2 position)
 		{
-			foreach (var ship in ships.Where(item => item.Model.Category != ShipCategory.Starbase))
-				CreateShip(ship.Model.OriginalShip, position);
+			var count = 0;
+            var orbit = 0;
+            foreach (var ship in ships.Where(item => item.Model.Category != ShipCategory.Starbase))
+			{
+                count++;
+				if (count >= 3 * orbit + 3)
+				{
+					count = 0;
+					orbit++;
+				}
+                CreateShip(ship.Model.OriginalShip, position, orbit);
+			}
 		}
 		
-		public Ship CreateShip(GameDatabase.DataModel.Ship data, Vector2 position)
+		public Ship CreateShip(GameDatabase.DataModel.Ship data, Vector2 position, int orbit)
 		{
 			var ship = CreateShipObject();
-			ship.Initialize(data, _resourceLocator);
+			ship.Initialize(data, _resourceLocator, orbit);
 			ship.transform.parent = transform;
 			ship.transform.localPosition = position;
 			ship.transform.localScale = Vector3.one;

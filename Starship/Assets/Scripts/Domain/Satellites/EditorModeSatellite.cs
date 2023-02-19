@@ -34,7 +34,7 @@ namespace Constructor.Satellites
 
         private void OnDataChanged()
         {
-            OptimizedDebug.Log("EditorModeSatellite.OnDataChanged");
+            UnityEngine.Debug.Log("EditorModeSatellite.OnDataChanged");
 
             _build.SetComponents(_components.Select(item => new InstalledComponent(item)));
             _database.SaveSatelliteBuild(_build.Id);

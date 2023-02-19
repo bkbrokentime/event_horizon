@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using GameDatabase.Enums;
 using GameServices.Player;
-using Utils;
 
 namespace Constructor.Ships
 {
@@ -118,7 +117,7 @@ namespace Constructor.Ships
                 }
                 else
                 {
-                    OptimizedDebug.Log("Rearrange(): ship removed - " + ship.Name);
+                    UnityEngine.Debug.Log("Rearrange(): ship removed - " + ship.Name);
                 }
             }
 
@@ -175,7 +174,6 @@ namespace Constructor.Ships
             public bool TryTakeBestSlot(SizeClass sizeClass)
             {
                 var size = sizeClass;
-                if (size == SizeClass.Undefined) size = SizeClass.Frigate;
 
                 int count;
                 while (_slots.TryGetValue(size, out count))

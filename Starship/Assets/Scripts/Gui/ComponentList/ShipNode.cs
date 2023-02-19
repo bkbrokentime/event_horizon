@@ -26,6 +26,7 @@ namespace Gui.ComponentList
         public bool IsExpanded { get; set; }
 
         public string Name { get { return "$GroupShip|" + _ship.Name; } }
+        public void ChangeName(string NewName) { }
 
         public SpriteId Icon { get { return _ship.Model.ModelImage; } }
         public UnityEngine.Color Color { get { return _ship.ColorScheme.Color; } }
@@ -58,7 +59,9 @@ namespace Gui.ComponentList
         public bool IsVisible { get { return true; } }
         public bool IsExpanded { get; set; }
 
-        public string Name { get { return "$GroupShips"; ; } }
+        public string Name { get { return "$GroupShips"; } }
+        public void ChangeName(string NewName) { }
+
         public SpriteId Icon { get { return new SpriteId("textures/icons/icon_fleet", SpriteId.Type.Default); } }
         public UnityEngine.Color Color { get { return CommonNode.DefaultColor; } }
         public void Add(ComponentInfo componentInfo) { throw new InvalidOperationException(); }

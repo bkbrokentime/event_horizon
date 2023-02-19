@@ -14,6 +14,8 @@ using GameDatabase.Enums;
 using GameDatabase.Model;
 using UnityEngine.Assertions;
 using Utils;
+using UnityEngine;
+using DebugLogSetting;
 
 namespace GameServices.Player
 {
@@ -54,10 +56,40 @@ namespace GameServices.Player
             set
             {
                 Assert.IsNotNull(value);
-                Assert.IsTrue(value.Model.SizeClass == SizeClass.Frigate);
+
+                switch (_playerSkills.LargeShipExploration)
+                {
+                    case 1:
+                        Assert.IsTrue(value.Model.SizeClass == SizeClass.Frigate || value.Model.SizeClass == SizeClass.Destroyer);
+                        break;
+                    case 2:
+                        Assert.IsTrue(value.Model.SizeClass == SizeClass.Frigate || value.Model.SizeClass == SizeClass.Destroyer || value.Model.SizeClass == SizeClass.Cruiser);
+                        break;
+                    case 3:
+                        Assert.IsTrue(value.Model.SizeClass == SizeClass.Frigate || value.Model.SizeClass == SizeClass.Destroyer || value.Model.SizeClass == SizeClass.Cruiser || value.Model.SizeClass == SizeClass.Battleship);
+                        break;
+                    default:
+                        Assert.IsTrue(value.Model.SizeClass == SizeClass.Frigate);
+                        break;
+                }
+
                 Assert.IsTrue(_ships.Contains(value));
                 _explorationShip = value;
                 DataChanged = true;
+            }
+        }
+        public bool CanExploration(IShip ship)
+        {
+            switch (_playerSkills.LargeShipExploration)
+            {
+                case 1:
+                    return ship.Model.SizeClass == SizeClass.Frigate || ship.Model.SizeClass == SizeClass.Destroyer;
+                case 2:
+                    return ship.Model.SizeClass == SizeClass.Frigate || ship.Model.SizeClass == SizeClass.Destroyer || ship.Model.SizeClass == SizeClass.Cruiser;
+                case 3:
+                    return ship.Model.SizeClass == SizeClass.Frigate || ship.Model.SizeClass == SizeClass.Destroyer || ship.Model.SizeClass == SizeClass.Cruiser || ship.Model.SizeClass == SizeClass.Battleship;
+                default:
+                    return ship.Model.SizeClass == SizeClass.Frigate;
             }
         }
 
@@ -99,39 +131,171 @@ namespace GameServices.Player
             var components = new List<IntegratedComponent>();
             foreach (var ship in _ships)
             {
+                if (ComponentDebugLogSetting.ComponentConstructDebugLog)
+                    UnityEngine.Debug.Log("CheckShipComponents in Ship Layout");
+
                 var debug = _debugManager.CreateLog(ship.Name);
                 CheckShipComponents(ship.Model.Layout, ship.Model.Barrels, ship.Components, components, debug);
                 ship.Components.Assign(components);
 
-                if (ship.FirstSatellite != null)
+                if (ship.Model.SecondLayout.Data != "0")
                 {
-                    CheckShipComponents(ship.FirstSatellite.Information.Layout, ship.FirstSatellite.Information.Barrels, ship.FirstSatellite.Components, components, debug);
-                    ship.FirstSatellite.Components.Assign(components);
+                    if (ComponentDebugLogSetting.ComponentConstructDebugLog)
+                        UnityEngine.Debug.Log("CheckShipComponents in Ship SecondLayout : "+ ship.Model.SecondLayout.Data);
+                    CheckShipComponents(ship.Model.SecondLayout, null, ship.Components, components, debug);
+                    ship.Components.Assign(components);
                 }
 
-                if (ship.SecondSatellite != null)
+                if (ship.Satellite_Left_1 != null)
                 {
-                    CheckShipComponents(ship.SecondSatellite.Information.Layout, ship.SecondSatellite.Information.Barrels, ship.SecondSatellite.Components, components, debug);
-                    ship.SecondSatellite.Components.Assign(components);
+                    if (ComponentDebugLogSetting.ComponentConstructDebugLog)
+                        UnityEngine.Debug.Log("CheckShipComponents in Satellite_Left_1 Layout");
+                    CheckShipComponents(ship.Satellite_Left_1.Information.Layout, ship.Satellite_Left_1.Information.Barrels, ship.Satellite_Left_1.Components, components, debug);
+                    ship.Satellite_Left_1.Components.Assign(components);
+                    if (ship.Satellite_Left_1.Information.SecondLayout.Data != "0")
+                    {
+                        if (ComponentDebugLogSetting.ComponentConstructDebugLog)
+                            UnityEngine.Debug.Log("CheckShipComponents in Satellite_Left_1 SecondLayout");
+                        CheckShipComponents(ship.Satellite_Left_1.Information.SecondLayout, null, ship.Satellite_Left_1.Components, components, debug);
+                        ship.Satellite_Left_1.Components.Assign(components);
+                    }
+                }
+
+                if (ship.Satellite_Right_1 != null)
+                {
+                    if (ComponentDebugLogSetting.ComponentConstructDebugLog)
+                        UnityEngine.Debug.Log("CheckShipComponents in Satellite_Right_1 Layout");
+                    CheckShipComponents(ship.Satellite_Right_1.Information.Layout, ship.Satellite_Right_1.Information.Barrels, ship.Satellite_Right_1.Components, components, debug);
+                    ship.Satellite_Right_1.Components.Assign(components);
+                    if (ship.Satellite_Right_1.Information.SecondLayout.Data != "0")
+                    {
+                        if (ComponentDebugLogSetting.ComponentConstructDebugLog)
+                            UnityEngine.Debug.Log("CheckShipComponents in Satellite_Right_1 SecondLayout");
+                        CheckShipComponents(ship.Satellite_Right_1.Information.SecondLayout, null, ship.Satellite_Right_1.Components, components, debug);
+                        ship.Satellite_Right_1.Components.Assign(components);
+                    }
+                }
+
+                if (ship.Satellite_Left_2 != null)
+                {
+                    if (ComponentDebugLogSetting.ComponentConstructDebugLog)
+                        UnityEngine.Debug.Log("CheckShipComponents in Satellite_Left_2 Layout");
+                    CheckShipComponents(ship.Satellite_Left_2.Information.Layout, ship.Satellite_Left_2.Information.Barrels, ship.Satellite_Left_2.Components, components, debug);
+                    ship.Satellite_Left_2.Components.Assign(components);
+                    if (ship.Satellite_Left_2.Information.SecondLayout.Data != "0")
+                    {
+                        if (ComponentDebugLogSetting.ComponentConstructDebugLog)
+                            UnityEngine.Debug.Log("CheckShipComponents in Satellite_Left_2 SecondLayout");
+                        CheckShipComponents(ship.Satellite_Left_2.Information.SecondLayout, null, ship.Satellite_Left_2.Components, components, debug);
+                        ship.Satellite_Left_2.Components.Assign(components);
+                    }
+                }
+
+                if (ship.Satellite_Right_2 != null)
+                {
+                    if (ComponentDebugLogSetting.ComponentConstructDebugLog)
+                        UnityEngine.Debug.Log("CheckShipComponents in Satellite_Right_2 Layout");
+                    CheckShipComponents(ship.Satellite_Right_2.Information.Layout, ship.Satellite_Right_2.Information.Barrels, ship.Satellite_Right_2.Components, components, debug);
+                    ship.Satellite_Right_2.Components.Assign(components);
+                    if (ship.Satellite_Right_2.Information.SecondLayout.Data != "0")
+                    {
+                        if (ComponentDebugLogSetting.ComponentConstructDebugLog)
+                            UnityEngine.Debug.Log("CheckShipComponents in Satellite_Right_2 SecondLayout");
+                        CheckShipComponents(ship.Satellite_Right_2.Information.SecondLayout, null, ship.Satellite_Right_2.Components, components, debug);
+                        ship.Satellite_Right_2.Components.Assign(components);
+                    }
+                }
+
+                if (ship.Satellite_Left_3 != null)
+                {
+                    if (ComponentDebugLogSetting.ComponentConstructDebugLog)
+                        UnityEngine.Debug.Log("CheckShipComponents in Satellite_Left_3 Layout");
+                    CheckShipComponents(ship.Satellite_Left_3.Information.Layout, ship.Satellite_Left_3.Information.Barrels, ship.Satellite_Left_3.Components, components, debug);
+                    ship.Satellite_Left_3.Components.Assign(components);
+                    if (ship.Satellite_Left_3.Information.SecondLayout.Data != "0")
+                    {
+                        if (ComponentDebugLogSetting.ComponentConstructDebugLog)
+                            UnityEngine.Debug.Log("CheckShipComponents in Satellite_Left_3 SecondLayout");
+                        CheckShipComponents(ship.Satellite_Left_3.Information.SecondLayout, null, ship.Satellite_Left_3.Components, components, debug);
+                        ship.Satellite_Left_3.Components.Assign(components);
+                    }
+                }
+
+                if (ship.Satellite_Right_3 != null)
+                {
+                    if (ComponentDebugLogSetting.ComponentConstructDebugLog)
+                        UnityEngine.Debug.Log("CheckShipComponents in Satellite_Right_3 Layout");
+                    CheckShipComponents(ship.Satellite_Right_3.Information.Layout, ship.Satellite_Right_3.Information.Barrels, ship.Satellite_Right_3.Components, components, debug);
+                    ship.Satellite_Right_3.Components.Assign(components);
+                    if (ship.Satellite_Right_3.Information.SecondLayout.Data != "0")
+                    {
+                        if (ComponentDebugLogSetting.ComponentConstructDebugLog)
+                            UnityEngine.Debug.Log("CheckShipComponents in Satellite_Right_3 SecondLayout");
+                        CheckShipComponents(ship.Satellite_Right_3.Information.SecondLayout, null, ship.Satellite_Right_3.Components, components, debug);
+                        ship.Satellite_Right_3.Components.Assign(components);
+                    }
+                }
+
+                if (ship.Satellite_Left_4 != null)
+                {
+                    if (ComponentDebugLogSetting.ComponentConstructDebugLog)
+                        UnityEngine.Debug.Log("CheckShipComponents in Satellite_Left_4 Layout");
+                    CheckShipComponents(ship.Satellite_Left_4.Information.Layout, ship.Satellite_Left_4.Information.Barrels, ship.Satellite_Left_4.Components, components, debug);
+                    ship.Satellite_Left_4.Components.Assign(components);
+                    if (ship.Satellite_Left_4.Information.SecondLayout.Data != "0")
+                    {
+                        if (ComponentDebugLogSetting.ComponentConstructDebugLog)
+                            UnityEngine.Debug.Log("CheckShipComponents in Satellite_Left_4 SecondLayout");
+                        CheckShipComponents(ship.Satellite_Left_4.Information.SecondLayout, null, ship.Satellite_Left_4.Components, components, debug);
+                        ship.Satellite_Left_4.Components.Assign(components);
+                    }
+                }
+
+                if (ship.Satellite_Right_4 != null)
+                {
+                    if (ComponentDebugLogSetting.ComponentConstructDebugLog)
+                        UnityEngine.Debug.Log("CheckShipComponents in Satellite_Right_4 Layout");
+                    CheckShipComponents(ship.Satellite_Right_4.Information.Layout, ship.Satellite_Right_4.Information.Barrels, ship.Satellite_Right_4.Components, components, debug);
+                    ship.Satellite_Right_4.Components.Assign(components);
+                    if (ship.Satellite_Right_4.Information.SecondLayout.Data != "0")
+                    {
+                        if (ComponentDebugLogSetting.ComponentConstructDebugLog)
+                            UnityEngine.Debug.Log("CheckShipComponents in Satellite_Right_4 SecondLayout");
+                        CheckShipComponents(ship.Satellite_Right_4.Information.SecondLayout, null, ship.Satellite_Right_4.Components, components, debug);
+                        ship.Satellite_Right_4.Components.Assign(components);
+                    }
+                }
+
+                if (ship.Satellite_Left_5 != null)
+                {
+                    if (ComponentDebugLogSetting.ComponentConstructDebugLog)
+                        UnityEngine.Debug.Log("CheckShipComponents in Satellite_Left_5 Layout");
+                    CheckShipComponents(ship.Satellite_Left_5.Information.Layout, ship.Satellite_Left_5.Information.Barrels, ship.Satellite_Left_5.Components, components, debug);
+                    ship.Satellite_Left_5.Components.Assign(components);
+                    if (ship.Satellite_Left_5.Information.SecondLayout.Data != "0")
+                    {
+                        if (ComponentDebugLogSetting.ComponentConstructDebugLog)
+                            UnityEngine.Debug.Log("CheckShipComponents in Satellite_Left_5 SecondLayout");
+                        CheckShipComponents(ship.Satellite_Left_5.Information.SecondLayout, null, ship.Satellite_Left_5.Components, components, debug);
+                        ship.Satellite_Left_5.Components.Assign(components);
+                    }
+                }
+
+                if (ship.Satellite_Right_5 != null)
+                {
+                    if (ComponentDebugLogSetting.ComponentConstructDebugLog)
+                        UnityEngine.Debug.Log("CheckShipComponents in Satellite_Right_5 Layout");
+                    CheckShipComponents(ship.Satellite_Right_5.Information.Layout, ship.Satellite_Right_5.Information.Barrels, ship.Satellite_Right_5.Components, components, debug);
+                    ship.Satellite_Right_5.Components.Assign(components);
+                    if (ship.Satellite_Right_5.Information.SecondLayout.Data != "0")
+                    {
+                        if (ComponentDebugLogSetting.ComponentConstructDebugLog)
+                            UnityEngine.Debug.Log("CheckShipComponents in Satellite_Right_5 SecondLayout");
+                        CheckShipComponents(ship.Satellite_Right_5.Information.SecondLayout, null, ship.Satellite_Right_5.Components, components, debug);
+                        ship.Satellite_Right_5.Components.Assign(components);
+                    }
                 }
             }
-            
-            foreach (var component in _strippedComponents.FromComponentsData(_database))
-            {
-                // Locked components are not stripped
-                if (component.Locked) continue;
-                _inventory.Components.Add(component.Info,1);
-            }
-            
-            foreach (var data in _strippedSatellites)
-            {
-                var satellite = _database.GetSatellite(new ItemId<Satellite>(data.Key));
-                if (satellite == null) continue;
-                _inventory.Satellites.Add(satellite, data.Value);
-            }
-            
-            _strippedComponents.Clear();
-            _strippedSatellites.Clear();
 
             _activeShips.CheckIfValid(_playerSkills, true);
         }
@@ -142,6 +306,8 @@ namespace GameServices.Player
             validComponents.Clear();
             var random = new System.Random(_session.Game.Seed);
 
+            if (ComponentDebugLogSetting.ComponentConstructDebugLog)
+                UnityEngine.Debug.Log("CheckShipComponents : " + components.Count());
             foreach (var item in components)
             {
                 IntegratedComponent component = item;
@@ -150,13 +316,17 @@ namespace GameServices.Player
 
                 if (!item.Info.IsValidModification)
                 {
-                    component = new IntegratedComponent(ComponentInfo.CreateRandomModification(item.Info.Data, random, item.Info.ModificationQuality, item.Info.ModificationQuality), item.X, item.Y, 
+                    component = new IntegratedComponent(ComponentInfo.CreateNoModification(item.Info.Data), item.Layout, item.X, item.Y,
                         item.BarrelId, item.KeyBinding, item.Behaviour, item.Locked);
                 }
 
-                var id = layout.InstallComponent(component.Info, component.X, component.Y);
+                var id = layout.InstallComponent(component.Info,component.Layout, component.X, component.Y);
                 if (id >= 0)
+                {
+                    if (ComponentDebugLogSetting.ComponentConstructDebugLog)
+                        UnityEngine.Debug.Log("validComponents : " + id);
                     validComponents.Add(component);
+                }
                 else
                     _inventory.Components.Add(component.Info);
             }
@@ -174,24 +344,15 @@ namespace GameServices.Player
             var ships = new List<IShip>();
             foreach (var item in _session.Fleet.Ships)
             {
-                bool added = false;
                 try
                 {
-                    var ship = ShipExtensions.FromShipData(_database, item, _strippedComponents);
-                    added = ship != null;
-                    ships.Add(ship);
+                    ships.Add(ShipExtensions.FromShipData(_database, item));
                 }
                 catch (System.Exception e)
                 {
-                    OptimizedDebug.LogException(e);
+                    UnityEngine.Debug.LogException(e);
                     ships.Add(null);
-                    OptimizedDebug.Log("Unknown ship: " + item.Id);
-                }
-
-                if (!added)
-                {
-                    _strippedSatellites.Increment(item.Satellite1.Id);
-                    _strippedSatellites.Increment(item.Satellite2.Id);
+                    UnityEngine.Debug.Log("Unknown ship: " + item.Id);
                 }
             }
 
@@ -206,20 +367,20 @@ namespace GameServices.Player
             _activeShips.Clear();
             foreach (var item in _session.Fleet.Hangar)
             {
-                OptimizedDebug.Log("group:" + item.Index + " ship:" + item.ShipId);
+                UnityEngine.Debug.Log("group:" + item.Index + " ship:" + item.ShipId);
                 _activeShips[item.Index] = ships[item.ShipId];
             }
 
             _explorationShip = _session.Fleet.ExplorationShipId >= 0 ? ships[_session.Fleet.ExplorationShipId] : null;
 
-            OptimizedDebug.Log("PlayerFleet.Load: " + _ships.Count + " ships");
+            UnityEngine.Debug.Log("PlayerFleet.Load: " + _ships.Count + " ships");
 
             DataChanged = false;
         }
 
         private void SaveShips()
         {
-            OptimizedDebug.Log("PlayerFleet.SaveShips - " + _ships.Count);
+            UnityEngine.Debug.Log("PlayerFleet.SaveShips - " + _ships.Count);
 
             _session.Fleet.Ships.Clear();
 
@@ -274,6 +435,12 @@ namespace GameServices.Player
                 ActiveShipGroup.Add(ship);
             }
 
+            if (_session.Purchases.SupporterPack)
+            {
+                _ships.Add(new CommonShip(_database.GetShipBuild(LegacyShipBuildNames.GetId("fns2"))));
+                ActiveShipGroup.Add(_ships.Last());
+            }
+
             _explorationShip = _ships.FirstOrDefault(ship => ship.Model.SizeClass == SizeClass.Frigate);
 
             foreach (var ship in _ships)
@@ -283,7 +450,7 @@ namespace GameServices.Player
 
         private void OnSessionAboutToSave()
         {
-            OptimizedDebug.Log("PlayerFleet.OnSessionAboutToSave");
+            UnityEngine.Debug.Log("PlayerFleet.OnSessionAboutToSave");
 
             if (DataChanged)
                 SaveShips();
@@ -293,9 +460,13 @@ namespace GameServices.Player
         {
             _ships.Clear();
             _activeShips.Clear();
-            _strippedComponents.Clear();
-            _strippedSatellites.Clear();
         }
+
+        public void ShipClear()
+        {
+            _ships.Clear();
+        }
+        public bool RemoveShip(IShip ship) { return _ships.Remove(ship); }
 
         private bool DataChanged
         {
@@ -321,8 +492,6 @@ namespace GameServices.Player
         private readonly ShipSquad _activeShips = new ShipSquad();
         private readonly ObservableCollection<IShip> _ships = new ObservableCollection<IShip>();
 
-        private readonly List<ShipComponentsData.Component> _strippedComponents = new List<ShipComponentsData.Component>();
-        private readonly Dictionary<int, int> _strippedSatellites = new Dictionary<int, int>();
         private readonly ISessionData _session;
         private readonly IDebugManager _debugManager;
         private readonly SessionAboutToSaveSignal _sessionAboutToSaveSignal;

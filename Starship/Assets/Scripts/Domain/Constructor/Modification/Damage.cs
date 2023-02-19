@@ -9,7 +9,7 @@ namespace Constructor.Modification
     {
         public Damage(ModificationQuality quality)
         {
-            _multiplier = quality.PowerMultiplier(0.5f, 0.7f, 0.8f, 1.2f, 1.5f, 2.0f);
+            _multiplier = quality.PowerMultiplier(0.2f, 0.4f, 0.6f, 0.7f, 0.8f, 1.2f, 1.5f, 2.0f, 2.5f, 3.0f);
             Quality = quality;
         }
 

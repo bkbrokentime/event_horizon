@@ -11,6 +11,7 @@ namespace Combat.Component.View
         float Rotation { get; set; }
         float Size { get; set; }
         Color Color { get; set; }
+        bool ChangeableColor { get; set; }
         float Life { get; set; }
 
         void UpdateView(float elapsedTime);

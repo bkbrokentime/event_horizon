@@ -51,15 +51,23 @@ namespace Combat.Unit.HitPoints
 
 	public class Energy : IResourcePoints
 	{
-		public Energy(float max, float rechargeRate, float rechargeDelay)
+		public Energy(float max, float rechargeRate, float rechargeDelay, float MaxrechargecapacityRate, bool Attenuatable, float AttenuatableRate, bool capacityAttenuatable, float capacityAttenuatableRate)
 		{
 			_rechargeRate = rechargeRate;
 			MaxValue = max;
 			_rechargeDelay = rechargeDelay;
 			_value = 1.0f;
 			_delay = 0.0f;
+
+			_MaxrechargecapacityRate = MaxrechargecapacityRate;
+
+			_Attenuatable = Attenuatable;
+			_AttenuatableRate = AttenuatableRate;
+
+            _capacityAttenuatable = capacityAttenuatable;
+            _capacityAttenuatableRate = capacityAttenuatableRate;
 		}
-		
+
 		public float Value { get { return MaxValue*_value; } }
 		public float Percentage { get { return _value; } }
 		public float MaxValue { get; private set; }
@@ -67,20 +75,32 @@ namespace Combat.Unit.HitPoints
 
 		public void Update(float elapsedTime)
 		{
+			if(_capacityAttenuatable)
+			{
+                _MaxrechargecapacityRate *= 1 - _capacityAttenuatableRate * elapsedTime;
+				if (_value > _MaxrechargecapacityRate)
+					_value = _MaxrechargecapacityRate;
+            }
+
 			if (_delay > elapsedTime)
 			{
 				_delay -= elapsedTime;
 				return;
 			}
 
-            if (MaxValue > 0)
-			    ThreadSafe.AddClamp(ref _value, (elapsedTime - _delay)*_rechargeRate/MaxValue, 0, 1);
+			if (MaxValue > 0)
+			{
+				ThreadSafe.AddClamp(ref _value, (elapsedTime - _delay) * _rechargeRate / MaxValue, 0, _MaxrechargecapacityRate);
+				if(_Attenuatable)
+				{
+					_rechargeRate *= 1 - _AttenuatableRate * elapsedTime;
+                }
+			}
 			_delay = 0;
 		}
 		
 		public bool TryGet(float how)
 		{
-			if (how == 0) return true;
 			ThreadSafe.Function<float> func = (ref float value) =>
 			{
 				if (value > 0 && value*MaxValue >= how && MaxValue > 0)
@@ -102,7 +122,6 @@ namespace Combat.Unit.HitPoints
 
 		public void Get(float how)
 		{
-			if (how == 0) return;
             if (MaxValue > 0)
 			    ThreadSafe.AddClamp(ref _value, -how/MaxValue, 0, 1);
 
@@ -110,7 +129,7 @@ namespace Combat.Unit.HitPoints
 				_delay = _rechargeDelay;
 		}
 		
-		public readonly static Energy Zero = new Energy(0,1,1);
+		public readonly static Energy Zero = new Energy(0,1,1, 1, false, 0f, false, 0f);
 
 		//public IEnumerable<byte> Serialize()
 		//{
@@ -133,8 +152,13 @@ namespace Combat.Unit.HitPoints
 		private float _value;
 		private float _delay;
 		
-		private readonly float _rechargeRate;
+		private float _rechargeRate;
 		private readonly float _rechargeDelay;
+		private float _MaxrechargecapacityRate;
+		private readonly bool _Attenuatable;
+		private readonly float _AttenuatableRate;
+		private readonly bool _capacityAttenuatable;
+		private readonly float _capacityAttenuatableRate;
 	}
 
 	public class HitPoints : IResourcePoints
@@ -159,18 +183,7 @@ namespace Combat.Unit.HitPoints
 		
 		public bool TryGet(float how)
 		{
-			if (how == 0) return true;
-			ThreadSafe.Function<float> func = (ref float value) =>
-			{
-				if (value > 0 && value*MaxValue >= how && MaxValue > 0)
-				{
-					value -= how/MaxValue;
-					return true;
-				}
-				return false;
-			};
-
-			return ThreadSafe.ChangeValue(ref _value, func);
+			throw new System.NotImplementedException();
 		}
 
 		//public IEnumerable<byte> Serialize() { return Helpers.Serialize(_value); }

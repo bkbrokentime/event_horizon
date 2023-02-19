@@ -8,6 +8,7 @@ namespace ViewModel
 	public class SelectShipPanelItemViewModel : ShipInfoViewModel
 	{
 		public RectTransform DisabledIcon;
+		public RectTransform ActiveIcon;
 		public Text ConditionText;
 	}
 }

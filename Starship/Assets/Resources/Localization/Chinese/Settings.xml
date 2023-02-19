@@ -9,6 +9,8 @@
     <string name="MenuNewGame">新游戏</string>
     <string name="MenuContinueGame">继续游戏</string>
     <string name="MenuCombat">快速战斗</string>
+    <string name="MenuEndlessCombat">无尽战斗</string>
+	
     <string name="MenuSettings">设置</string>
     <string name="Settings">设置</string>
     <string name="DeleteSavedGameText">如果你想删除存档就点击这个按钮</string>
@@ -46,6 +48,10 @@
     <string name="ControlsAction3">按键4</string>
     <string name="ControlsAction4">按键5</string>
     <string name="ControlsAction5">按键6</string>
+    <string name="ControlsAction6">按键7</string>
+    <string name="ControlsAction7">按键8</string>
+    <string name="ControlsAction8">按键9</string>
+    <string name="ControlsAction9">按键10</string>
     <string name="ControlEnabled">启用</string>
     <string name="LoadPreset">载入预设键位:</string>
     <string name="Test">测试键位</string>

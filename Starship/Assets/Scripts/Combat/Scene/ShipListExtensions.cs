@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Combat.Component.Body;
 using Combat.Component.Features;
 using Combat.Component.Ship;
 using Combat.Component.Unit;
@@ -151,7 +153,6 @@ namespace Combat.Scene
             float minRange = float.MaxValue;
             float minDeviation = 360f;
             bool isMatch = false;
-
             lock (shipList.LockObject)
             {
                 foreach (var ship in shipList.Items)
@@ -228,14 +229,29 @@ namespace Combat.Scene
                 }
             }
         }
+        public static void GetNearestEnemyShip(this IUnitList<IShip> shipList,out IShip neartarget, UnitSide side,Vector2 center)
+        {
+            lock (shipList.LockObject)
+            {
+                var ships = shipList.Items;
+                var count = ships.Count;
+                float dis = float.MaxValue;
+                neartarget = null;
+                for (var i = 0; i < count; ++i)
+                {
+                    var ship = ships[i];
+                    if (ship.Type.Class == UnitClass.Limb)
+                        continue;
+                    if (ship.Type.Side.IsEnemy(side))
+                        if(ship.Body.WorldPosition().Distance(center)<dis)
+                        {
+                            dis = ship.Body.WorldPosition().Distance(center);
+                            neartarget=ship;
+                        }
+                }
+            }
+        }
 
-        /// <summary>
-        /// Returns list of all objects WITHOUT PARENTS within a specified radius around the center point
-        /// </summary>
-        /// <param name="unitList">list to fetch units from</param>
-        /// <param name="targetList">list to write targets to</param>
-        /// <param name="center">center point</param>
-        /// <param name="radius">max radius around the center point</param>
         public static void GetObjectsInRange(this IUnitList<IUnit> unitList, IList<IUnit> targetList, Vector2 center, float radius)
         {
             lock (unitList.LockObject)
@@ -250,41 +266,6 @@ namespace Combat.Scene
                     var unit = units[i];
                     if (unit.Body.Parent != null)
                         continue;
-                    if (unit.Body.Position.SqrDistance(center) < sqrRadius)
-                        targetList.Add(unit);
-                }
-            }
-        }
-        
-        /// <summary>
-        /// Functionally identical to GetObjectsInRange, but also returns objects with parents as a separate list and
-        /// with its separate max tracking range
-        /// </summary>
-        /// <param name="unitList">list to fetch units from</param>
-        /// <param name="targetList">list to write targets without parents to</param>
-        /// <param name="parentedTargetsList">list to write targets with parents to</param>
-        /// <param name="center">center point</param>
-        /// <param name="radius">max radius around the center point</param>
-        /// <param name="parentedRadius">max radius around the center point for objects with parents</param>
-        public static void GetObjectsInRange(this IUnitList<IUnit> unitList, IList<IUnit> targetList, IList<IUnit> parentedTargetsList, Vector2 center, float radius, float parentedRadius)
-        {
-            lock (unitList.LockObject)
-            {
-                var units = unitList.Items;
-                var count = units.Count;
-                targetList.Clear();
-                var sqrRadius = radius*radius;
-                var sqrParRadius = parentedRadius*parentedRadius;
-
-                for (var i = 0; i < count; ++i)
-                {
-                    var unit = units[i];
-                    if (unit.Body.Parent != null)
-                    {
-                        if (unit.Body.Position.SqrDistance(center) < sqrParRadius)
-                            parentedTargetsList?.Add(unit);
-                        continue;
-                    }
                     if (unit.Body.Position.SqrDistance(center) < sqrRadius)
                         targetList.Add(unit);
                 }

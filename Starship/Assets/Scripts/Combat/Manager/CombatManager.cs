@@ -20,14 +20,23 @@ using Maths;
 using Model.Military;
 using Services.ObjectPool;
 using Services.Reources;
-using Utils;
 using Zenject;
-
+using Combat.Component.Body;
+using Combat.Unit.Object;
 
 namespace Combat.Manager
 {
     public class CombatManager : IInitializable, ITickable
     {
+        private enum Asteroidtype
+        {
+            small = 1,
+            middle,
+            large,
+            huge,
+        };
+
+
         [Inject]
         private CombatManager(
             GameFlow gameFlow,
@@ -64,38 +73,64 @@ namespace Combat.Manager
         [Inject] private readonly CombatMenu _combatMenu;
         [Inject] private readonly Settings _settings;
         [Inject] private readonly RadarPanel _radarPanel;
+        [Inject] private readonly RadarMapPanel _radarMapPanel;
         [Inject] private readonly IKeyboard _lKeyboard;
         [Inject] private readonly ICombatModel _combatModel;
 
         public void Initialize()
         {
-            OptimizedDebug.Log("OnCombatStarted");
+            UnityEngine.Debug.Log("OnCombatStarted");
 
-            var random = new System.Random();
+            var random = new System.Random(System.DateTime.Now.Second * System.DateTime.Now.Minute * System.DateTime.Now.Hour);
 
             //if (_combatData.Rules.PlanetEnabled)
             //{
             //    objectFactory.CreatePlanet(_config.PlanetPrefab, _config.AtmospherePrefab, Position.Random(random), Random.Range(0, 360), Vector2.zero, Random.Range(16, 25));
             //}
 
-            var level = Maths.Distance.ToShipLevel(_motherShip.CurrentStar.Level);
+            var level = Maths.Distance.ToShipNoLimitedLevel(_motherShip.CurrentStar.Level);
             var powerMultiplier = Experience.LevelToPowerMultiplier(Distance.ToShipLevel(level));
 
+            var AsteroidsPoint = 10 + level / 10;
+            //int num_level =50;
+            //int max_num = random.Range(num_level * num_level, (num_level + 1) * (num_level + 1));
             if (_combatModel.Rules.AsteroidsEnabled)
             {
-                for (int i = 0; i < 10; ++i)
-                {
-                    var size = Random.Range(2f, 5f);
-                    var position = _scene.FindFreePlace(20f, UnitSide.Undefined);
+                int smallAsteroid = 2;
+                int middleAsteroid = 5;
+                int largeAsteroid = 10;
+                int hugeAsteroid = 20;
+                int lastAsteroidsPoint = AsteroidsPoint;
+                int smallAsteroidcount = Random.Range(0, lastAsteroidsPoint / smallAsteroid);
+                lastAsteroidsPoint -= smallAsteroidcount * smallAsteroid;
+                int middleAsteroidcount = Random.Range(0, lastAsteroidsPoint / middleAsteroid);
+                lastAsteroidsPoint -= middleAsteroidcount * middleAsteroid;
+                int largeAsteroidcount = Random.Range(0, lastAsteroidsPoint / largeAsteroid);
+                lastAsteroidsPoint -= largeAsteroidcount * largeAsteroid;
+                int hugeAsteroidcount = Random.Range(0, lastAsteroidsPoint / hugeAsteroid);
+                lastAsteroidsPoint -= hugeAsteroidcount * hugeAsteroid;
 
-                    var weight = size * size * 5f;
-                    var powerMult = _combatModel.Rules.DisableBonusses ? 1 : powerMultiplier;
-                    var hitPoints = size * size * 100 * powerMult;
-                    var damageMultiplier = powerMult;
+                if (lastAsteroidsPoint >= 2)
+                    smallAsteroidcount += lastAsteroidsPoint / smallAsteroid;
+                
+                SummonAsteroid(Asteroidtype.small, smallAsteroidcount, powerMultiplier);
+                SummonAsteroid(Asteroidtype.middle, middleAsteroidcount, powerMultiplier);
+                SummonAsteroid(Asteroidtype.large, largeAsteroidcount, powerMultiplier);
+                SummonAsteroid(Asteroidtype.huge, hugeAsteroidcount, powerMultiplier);
+            
 
-                    var velocity = Random.insideUnitCircle * 10 / size;
-                    _spaceObjectFactory.CreateAsteroid(position, velocity, size, weight, hitPoints, damageMultiplier);
-                }
+                //for (int i = 0; i < max_num; ++i)
+                //{
+                //    var size = Random.Range(1f, 5f + num_level * 5f);
+                //    var position = _scene.FindFreePlace(80f, UnitSide.Undefined);
+
+                //    var weight = size * size * size * 500f;
+                //    var hitPoints = size * size * size * 10000 * powerMultiplier;
+                //    var damageMultiplier = powerMultiplier * 100;
+
+                //    var velocity = Random.insideUnitCircle * 100 / size;
+                //    _spaceObjectFactory.CreateAsteroid(position, velocity, size, weight, hitPoints, damageMultiplier);
+                //}
             }
 
             if (_combatModel.Rules.PlanetEnabled)
@@ -105,36 +140,90 @@ namespace Combat.Manager
                 var b = random.NextFloat();
                 var color = Color.Lerp(new Color(r, g, b), Color.gray, 0.5f);
 
-                var position = new Vector2(_scene.Settings.AreaWidth * random.NextFloat(),
-                    _scene.Settings.AreaHeight * random.NextFloat());
-                var size = 30 + random.NextFloat() * 10;
+                var position = new Vector2(_scene.Settings.AreaWidth * random.NextFloat(), _scene.Settings.AreaHeight * random.NextFloat());
+                var size = 100 + random.NextFloat() * 30;
                 _spaceObjectFactory.CreatePlanet(position, size, color);
             }
 
             if (_combatModel.Rules.InitialEnemies > 1)
-                foreach (var ship in _combatModel.EnemyFleet.Ships.Where(item => item.Status == ShipStatus.Ready)
-                             .Skip(1).Take(_combatModel.Rules.InitialEnemies - 1))
+                foreach (var ship in _combatModel.EnemyFleet.Ships.Where(item => item.Status == ShipStatus.Ready).Skip(1).Take(_combatModel.Rules.InitialEnemies - 1))
                     CreateShip(ship);
+
+            _radarMapPanel.IsHide = false;
         }
+
+        private void SummonAsteroid(Asteroidtype asteroidtype, int count, float powerMultiplier)
+        {
+            for (int i = 0; i < count; ++i)
+            {
+                float size;
+                switch(asteroidtype)
+                {
+                    case Asteroidtype.small:
+                        size = Random.Range(0.5f, 3f);
+                        break;
+                    case Asteroidtype.middle:
+                        size = Random.Range(3f, 8f);
+                        break;
+                    case Asteroidtype.large:
+                        size = Random.Range(8f, 15f);
+                        break;
+                    case Asteroidtype.huge:
+                        size = Random.Range(15f, 25f);
+                        break;
+                    default:
+                        size = Random.Range(0.5f, 3f);
+                        break;
+                }
+                var position = _scene.FindFreePlace(size * 2f, UnitSide.Undefined);
+
+                var weight = 10 * size * size * size;
+                var hitPoints = 500 * size * size  * powerMultiplier;
+                var damageMultiplier = 0.2f * size * powerMultiplier;
+
+                var velocity = Random.insideUnitCircle * 10 / Mathf.Pow(size, 0.75f) * Random.value;
+                _spaceObjectFactory.CreateAsteroid(position, velocity, size, weight, hitPoints, damageMultiplier);
+            }
+        }
+
 
         public void OnShipCreated(IShip ship)
         {
-            if (ship.Type.Class != UnitClass.Ship)
+            if (ship.Type.Class != UnitClass.Ship && ship.Type.Class != UnitClass.Drone)
                 return;
 
             CheckIfCanCallNextEnemy();
-
+            CheckIfCanCallNextAlly();
             switch (ship.Type.Side)
             {
                 case UnitSide.Player:
+                    if (ship.Type.Class == UnitClass.Drone)
+                    {
+                        _radarMapPanel.Add(ship);
+                        break;
+                    }
                     _shipControlsPanel.Load(ship);
+                    _radarMapPanel.Add(ship);
                     _messenger.Broadcast(EventType.PlayerShipCountChanged,
-                        _combatModel.PlayerFleet.CountStatus(ShipStatus.Ready));
+                        _combatModel.PlayerFleet.Ships.Count(item => item.Status == ShipStatus.Ready));
                     break;
                 case UnitSide.Enemy:
-                    _radarPanel.Add(ship);
-                    _messenger.Broadcast(EventType.EnemyShipCountChanged,
-                        _combatModel.EnemyFleet.CountStatus(ShipStatus.Ready));
+                    _radarMapPanel.Add(ship);
+                    if (ship.Type.Class == UnitClass.Ship)
+                    {
+                        _radarPanel.Add(ship);
+                        _messenger.Broadcast(EventType.EnemyShipCountChanged,
+                            _combatModel.EnemyFleet.Ships.Count(item => item.Status == ShipStatus.Ready));
+                    }
+                    break;
+                case UnitSide.Ally:
+                    _radarMapPanel.Add(ship);
+                    if (ship.Type.Class == UnitClass.Ship)
+                    {
+                        _radarPanel.Add(ship);
+                        _messenger.Broadcast(EventType.PlayerShipCountChanged,
+                            _combatModel.PlayerFleet.Ships.Count(item => item.Status == ShipStatus.Ready));
+                    }
                     break;
             }
         }
@@ -143,27 +232,30 @@ namespace Combat.Manager
         {
             if (ship.Type.Class != UnitClass.Ship)
                 return;
-
+            
             CheckIfCanCallNextEnemy();
+            CheckIfCanCallNextAlly();
         }
 
         public void CreateShip(IShipInfo ship)
         {
-            var position = _scene.FindFreePlace(40, ship.Side);
+            var position = _scene.FindFreePlace(80, ship.Side);
 
-            var controllerFactory = ship.Side == UnitSide.Player
-                ? (IControllerFactory)new KeyboardController.Factory(_lKeyboard)
-                : new Computer.Factory(_scene, _combatModel.EnemyFleet.Level);
-
-            ship.Create(_shipFactory, controllerFactory, position);
-            //OptimizedDebug.Log("CreateShip.start - " + ship.Name);
+            var controllerFactory = ship.Side == UnitSide.Player ? (IControllerFactory)new KeyboardController.Factory(_lKeyboard) 
+                : ship.Side == UnitSide.Enemy ? new Computer.Factory(_scene, _combatModel.EnemyFleet.Level) 
+                : new Computer.Factory(_scene, _combatModel.PlayerFleet.Level);
+            if (ship.Side == UnitSide.Ally)
+                ship.Create(_shipFactory, controllerFactory, _scene.PlayerShip.Body.Position + Random.insideUnitCircle * 3 * (ship.ShipData.Model.ModelScale + _scene.PlayerShip.Body.Scale));
+            else
+                ship.Create(_shipFactory, controllerFactory, position);
+            //UnityEngine.Debug.Log("CreateShip.start - " + ship.Name);
             //var context = new FactoryContext(_scene, _bindingManager, _soundPlayer, _objectPool, _resourceLocator, _settings);
             //var shipModel = fleet.ActivateShip(ship, position, Random.Range(0, 360), _gameSettings.ShowDamage, _playerSkills, _messenger, context, _aiManager, _database);
-            ////OptimizedDebug.Log("CreateShip.end");
+            ////UnityEngine.Debug.Log("CreateShip.end");
             //return shipModel;
         }
 
-        public bool IsGamePaused { get; private set; }
+        public bool IsGamePaused { get { return _pausedCount > 0; } }
 
         public void OnEscapeKeyPressed()
         {
@@ -185,8 +277,7 @@ namespace Combat.Manager
 
         public bool CanChangeShip()
         {
-            return _combatModel.Rules.CanSelectShips && _playerSkills.HasRescueUnit &&
-                   _combatModel.PlayerFleet.IsAnyShipLeft();
+            return _combatModel.Rules.CanSelectShips && _playerSkills.HasRescueUnit && _combatModel.PlayerFleet.IsAnyShipLeft();
         }
 
         public void ChangeShip()
@@ -195,12 +286,9 @@ namespace Combat.Manager
             if (player.Effects.All.OfType<ShipRetreatEffect>().Any())
                 return;
 
-            var chargeEffect = new ShipRetreatingEffect(player, _effectFactory, ConditionType.OnActivate,
-                ConditionType.OnDeactivate);
-            var warpEffect = new ShipWarpEffect(player, _effectFactory, _soundPlayer, _settings.ShipWarpSound,
-                ConditionType.OnDeactivate);
-            var soundEffect = new SoundLoopEffect(_soundPlayer, _settings.ShipRetreatSound, ConditionType.OnActivate,
-                ConditionType.OnDeactivate);
+            var chargeEffect = new ShipRetreatingEffect(player, _effectFactory, ConditionType.OnActivate, ConditionType.OnDeactivate);
+            var warpEffect = new ShipWarpEffect(player, _effectFactory, _soundPlayer, _settings.ShipWarpSound, ConditionType.OnDeactivate);
+            var soundEffect = new SoundLoopEffect(_soundPlayer, _settings.ShipRetreatSound, ConditionType.OnActivate, ConditionType.OnDeactivate);
             player.AddEffect(new ShipRetreatEffect(7.0f, soundEffect, warpEffect, chargeEffect));
         }
 
@@ -209,16 +297,13 @@ namespace Combat.Manager
             _combatModel.EnemyFleet.DestroyAllShips();
         }
 
-        public bool CanCallNextEnemy()
-        {
-            return _canCallNextEnemy;
-        }
+        public bool CanCallNextEnemy() { return _canCallNextEnemy; }
+        public bool CanCallNextAlly() { return _canCallNextAlly; }
 
         public void CallNextEnemy()
         {
             if (!CanCallNextEnemy())
                 return;
-            _nextShipCooldown = 0;
 
             var shipInfo = _combatModel.EnemyFleet.Ships.FirstOrDefault(item => item.Status == ShipStatus.Ready);
             if (shipInfo == null)
@@ -227,26 +312,47 @@ namespace Combat.Manager
             CreateShip(shipInfo);
             _soundPlayer.Play(_settings.ReinforcementSound);
         }
+        public void CallNextAlly()
+        {
+            if (!CanCallNextAlly())
+                return;
+
+            var shipInfo = _combatModel.PlayerFleet.Ships.FirstOrDefault(item => item.Status == ShipStatus.Ready);
+            if (shipInfo == null)
+                return;
+            shipInfo.ChangeSide(UnitSide.Ally);
+
+            CreateShip(shipInfo);
+            //_soundPlayer.Play(_settings.ReinforcementSound);
+        }
 
         private void CheckIfCanCallNextEnemy()
         {
             var rules = _combatModel.Rules;
-            if (rules.TimeoutBehaviour != TimeoutBehaviour.NextEnemy &&
-                rules.TimeoutBehaviour != TimeoutBehaviour.AllEnemiesThenDraw)
+            if (rules.TimeoutBehaviour != TimeoutBehaviour.NextEnemy && rules.TimeoutBehaviour != TimeoutBehaviour.AllEnemiesThenDraw)
             {
                 _canCallNextEnemy = false;
                 return;
             }
 
-            if (rules.TimeLimit <= 0)
+            if (rules.TimeLimit <= 0 && !rules.NoLimitSet)
             {
                 _canCallNextEnemy = false;
                 return;
             }
 
-            _canCallNextEnemy =
-                _combatModel.EnemyFleet.Ships.CountIsBetween(item => item.Status == ShipStatus.Active, 0, 11) &&
-                _combatModel.EnemyFleet.IsAnyShipLeft();
+            if (!rules.NoLimitSet)
+                _canCallNextEnemy = _combatModel.EnemyFleet.Ships.Count(item => item.Status == ShipStatus.Active) < 3 + _playerSkills.MaxEmery && _combatModel.EnemyFleet.IsAnyShipLeft();
+            else
+                _canCallNextEnemy = _combatModel.EnemyFleet.Ships.Count(item => item.Status == ShipStatus.Active) < rules.NoLimitMaxEnemies && _combatModel.EnemyFleet.IsAnyShipLeft();
+        }
+        private void CheckIfCanCallNextAlly()
+        {
+            var rules = _combatModel.Rules;
+            if (!rules.NoLimitSet)
+                _canCallNextAlly = _combatModel.PlayerFleet.Ships.Count(item => item.Status == ShipStatus.Active) < 1 + _playerSkills.MaxAlly && _combatModel.PlayerFleet.IsAnyShipLeft();
+            else
+                _canCallNextAlly = _combatModel.PlayerFleet.Ships.Count(item => item.Status == ShipStatus.Active) < 1 + rules.NoLimitMaxAllies && _combatModel.PlayerFleet.IsAnyShipLeft();
         }
 
         public void Tick()
@@ -261,19 +367,19 @@ namespace Combat.Manager
         {
             var player = _scene.PlayerShip;
             var enemy = _scene.EnemyShip;
+            var ally = _scene.AllyShip;
 
             if (!enemy.IsActive())
             {
                 _nextShipCooldown += Time.deltaTime;
-                if (_nextShipCooldown > NextShipMaxCooldown)
+                if (_nextShipCooldown > _nextShipMaxCooldown)
                 {
                     _nextShipCooldown = 0;
 
-                    var shipInfo =
-                        _combatModel.EnemyFleet.Ships.FirstOrDefault(item => item.Status == ShipStatus.Ready);
+                    var shipInfo = _combatModel.EnemyFleet.Ships.FirstOrDefault(item => item.Status == ShipStatus.Ready);
                     if (shipInfo == null)
                     {
-                        OptimizedDebug.Log("No more ships");
+                        UnityEngine.Debug.Log("No more ships");
                         Exit();
                         return;
                     }
@@ -281,16 +387,19 @@ namespace Combat.Manager
                     CreateShip(shipInfo);
                 }
             }
-            else if (!player.IsActive())
+
+            if (!player.IsActive())
             {
+                if (!_radarMapPanel.IsHide)
+                    _radarMapPanel.Close();
                 _nextPlayerShipCooldown += Time.deltaTime;
-                if (_nextPlayerShipCooldown > NextShipMaxCooldown)
+                if (_nextPlayerShipCooldown > _nextShipMaxCooldown)
                 {
                     _nextPlayerShipCooldown = 0;
 
                     if (!_combatModel.PlayerFleet.IsAnyShipLeft())
                     {
-                        OptimizedDebug.Log("No more ships");
+                        UnityEngine.Debug.Log("No more ships");
                         Exit();
                     }
                     else if (_combatModel.Rules.CanSelectShips)
@@ -304,19 +413,46 @@ namespace Combat.Manager
                     }
                 }
             }
-            else if (!IsGamePaused)
+            /*
+            if (!ally.IsActive() && player.IsActive())
             {
+                _nextAllyShipCooldown += Time.deltaTime;
+                if (_nextAllyShipCooldown > _nextShipMaxCooldown)
+                {
+                    _nextAllyShipCooldown = 0;
+
+                    if (!_combatModel.PlayerFleet.IsAnyShipLeft())
+                    {
+                        UnityEngine.Debug.Log("No more ships");
+                        //Exit();
+                    }
+                    else
+                    {
+                        var shipInfo = _combatModel.PlayerFleet.AnyAvailableShip();
+                        shipInfo.ChangeSide(UnitSide.Ally);
+                        CreateShip(shipInfo);
+                    }
+                }
+            }
+            */
+            if (player.IsActive() && !IsGamePaused)
+            {
+                if (!_radarMapPanel.IsHide)
+                    _radarMapPanel.Open();
                 _playerStatsPanel.Open(player);
                 _enemyStatsPanel.Open(enemy);
             }
         }
 
         private bool _canCallNextEnemy;
+        private bool _canCallNextAlly;
 
-        private float _nextShipCooldown = NextShipMaxCooldown;
-        private float _nextPlayerShipCooldown = NextShipMaxCooldown;
-        private const float NextShipMaxCooldown = 3.0f;
+        private float _nextShipCooldown = _nextShipMaxCooldown;
+        private float _nextAllyShipCooldown = 0f;
+        private float _nextPlayerShipCooldown = _nextShipMaxCooldown;
+        private const float _nextShipMaxCooldown = 3.0f;
 
+        private int _pausedCount;
         private readonly GameFlow _gameFlow;
         private readonly ISoundPlayer _soundPlayer;
         private readonly PlayerSkills _playerSkills;

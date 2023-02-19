@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Linq;
 using GameDatabase.DataModel;
 using GameDatabase.Enums;
 using Utils;
@@ -10,17 +10,15 @@ namespace Constructor.Ships
         public EnemyShip(ShipBuild data) 
             : base(new ShipModel(data.Ship, data.BuildFaction))
         {
-
-            var components = new List<IntegratedComponent>(data.Components.Count);
-            foreach (var installedComponent in data.Components)
-            {
-                components.Add(ComponentExtensions.FromDatabase(installedComponent));
-            }
-            _components.Assign(components);
+            
+            _components.Assign(data.Components.Select<InstalledComponent,IntegratedComponent>(ComponentExtensions.FromDatabase));
             _extraThreatLevel = data.DifficultyClass;
+            //ship.NoEnhancementLevel? ship.DefaultEnhancementLevel: (EnhancementLevel)UnityEngine.Random.Range((int)EnhancementLevel.Level1, (int)EnhancementLevel.Level100)
+            //_extraEnhanceLevel = data.NoEnhancementLevel ? data.DefaultEnhancementLevel : (EnhancementLevel)UnityEngine.Random.Range((int)EnhancementLevel.Level1, (int)EnhancementLevel.Level100);
         }
 
         public override DifficultyClass ExtraThreatLevel { get { return _extraThreatLevel; } }
+        //public override EnhancementLevel ExtraEnhanceLevel { get { return _extraEnhanceLevel; } }
 
         public override IItemCollection<IntegratedComponent> Components { get { return _components.AsReadOnly(); } }
 
@@ -28,7 +26,7 @@ namespace Constructor.Ships
         {
             var builder = base.CreateBuilder();
 
-            if (ExtraThreatLevel != DifficultyClass.Default)
+            if (ExtraThreatLevel != DifficultyClass.Default || ExtraEnhanceLevel != EnhancementLevel.Default)
                 builder.Converter = new EnemyComponentConverter(Experience.Level, new System.Random((int)Experience));
 
             return builder;
@@ -36,5 +34,6 @@ namespace Constructor.Ships
 
         private readonly ObservableCollection<IntegratedComponent> _components = new ObservableCollection<IntegratedComponent>();
         private readonly DifficultyClass _extraThreatLevel;
+        //private readonly EnhancementLevel _extraEnhanceLevel;
     }
 }

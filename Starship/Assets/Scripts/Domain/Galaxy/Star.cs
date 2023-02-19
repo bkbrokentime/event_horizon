@@ -30,12 +30,16 @@ namespace Galaxy
         public bool IsQuestObjective => _starData.IsQuestObjective(_id);
 
         public StarContent.Occupants.Facade Occupant => _starData.GetOccupant(_id);
-        public StarContent.Boss.Facade Boss => _starData.GetBoss(_id);
+
+        public int boss_level => _starData.GetBoss_level();
+        public StarContent.Boss.Facade Boss => _starData.GetBoss(_id, boss_level);
         public StarContent.Ruins.Facade Ruins => _starData.GetRuins(_id);
+        public StarContent.Fortification.Facade Fortification => _starData.GetFortification(_id);
         public StarContent.XmasTree.Facade Xmas => _starData.GetXmasTree(_id);
         public StarContent.Challenge.Facade Challenge => _starData.GetChallenge(_id);
         public StarContent.LocalEvent.Facade LocalEvent => _starData.GetLocalEvent(_id);
         public StarContent.Survival.Facade Survival => _starData.GetSurvival(_id);
+        public StarContent.Endlessness.Facade Endlessness => _starData.GetEndlessness(_id);
         public StarContent.Wormhole.Facade Wormhole => _starData.GetWormhole(_id);
         public StarContent.Hive.Facade Pandemic => _starData.GetPandemic(_id);
 

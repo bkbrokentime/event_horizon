@@ -20,7 +20,7 @@ namespace Constructor.Ships
             if (sizeClass == SizeClass.Undefined)
                 return 0.5f;
 
-            return 0.4f + 0.15f*(int)sizeClass;
+            return 0.4f + 0.12f*(int)sizeClass;
         }
 
         public static string ToString(this SizeClass sizeClass, ILocalization localization)

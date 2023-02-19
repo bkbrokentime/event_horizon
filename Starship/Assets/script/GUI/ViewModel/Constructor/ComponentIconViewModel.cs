@@ -32,6 +32,15 @@ namespace ViewModel
 
 			_icon.SetDisplayRect(x, y, x+1, y+1);
 		}
+		public void SetGIFIcon(Sprite[] icon, int num, string layout, int size, Color color)
+		{
+
+            //UnityEngine.Debug.Log("icon num = " + icon.Length);
+
+			_gificon = icon;
+			gif = true;
+			this.SetIcon(_gificon[0], layout, size, color);
+        }
 
 		public RectTransform RectTransform 
 		{
@@ -43,8 +52,30 @@ namespace ViewModel
 			}
 		}
 
+		private void Update()
+		{
+			if (gif && _gificon.Length > 0)
+			{
+				if (_lasttime < 0)
+				{
+					_lasttime = _time;
+					_icon.sprite = _gificon[_count++];
+					if (_count >= _gificon.Length)
+						_count = 0;
+				}
+				else
+					_lasttime -= Time.deltaTime;
+			}
+		}
+
 		private RectTransform _rectTransform;
 
-		[SerializeField] ComponentImage _icon;
+		[SerializeField] private ComponentImage _icon;
+		[SerializeField] private bool gif;
+		[SerializeField] private Sprite[] _gificon;
+
+		private float _time = 0.2f;
+		private float _lasttime = 0.2f;
+		private int _count = 0;
 	}
 }

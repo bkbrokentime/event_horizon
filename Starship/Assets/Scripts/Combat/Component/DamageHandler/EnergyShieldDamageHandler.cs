@@ -17,20 +17,21 @@ namespace Combat.Component.DamageHandler
             impact.RemoveImpulse();
 
             var parent = _shield.Type.Owner;
+            var resistance = parent.Stats.Resistance;
             if (parent == null)
                 return CollisionEffect.None;
 
-            var damage = impact.GetTotalDamage(Resistance.Empty);
+            var damage = impact.EnergyShieldGetTotalDamage(resistance);
 
-            if (parent.Stats.Energy.TryGet(damage*_energyConsumption))
+            if (parent.Stats.EnergyShield.TryGet(damage*_energyConsumption))
             {
-                impact.RemoveDamage();
+                impact.EnergyShieldRemoveDamage();
             }
             else
             {
-                var energy = parent.Stats.Energy.Value;
-                parent.Stats.Energy.Get(energy);
-                impact.RemoveDamage(energy / _energyConsumption, Resistance.Empty);
+                var energy = parent.Stats.EnergyShield.Value;
+                parent.Stats.EnergyShield.Get(energy);
+                impact.EnergyShieldRemoveDamage(energy / _energyConsumption, resistance);
                 _shield.Enabled = false;
             }
 

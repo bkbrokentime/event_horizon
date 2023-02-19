@@ -15,6 +15,7 @@ namespace GameDatabase.DataModel
             }
 
             Barrels = new ImmutableCollection<Barrel>(BarrelConverter.Convert(Layout, serializable.Barrels));
+            UAVLaunchPlatforms = new ImmutableCollection<UAVLaunchPlatform>(UAVPlatformConverter.Convert(Layout, serializable.UAVLaunchPlatforms));
         }
     }
 }

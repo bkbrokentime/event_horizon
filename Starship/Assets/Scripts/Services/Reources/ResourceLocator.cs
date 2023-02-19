@@ -62,12 +62,13 @@ namespace Services.Reources
                     sprite = GetSprite("Textures/Effects/" + spriteId.Id);
                     break;
                 default:
-                    sprite = GetSprite(spriteId.Id);
-                    break;
+                    return GetSprite(spriteId.Id);
             }
 
             if (sprite == null && _database != null)
                 sprite = _database.GetImage(spriteId.Id).Sprite;
+            else if (sprite == null && _database == null)
+                sprite = GetSprite(spriteId.Id);
 
             return sprite;
         }
@@ -77,7 +78,7 @@ namespace Services.Reources
             AudioClip audioClip;
             if (!id) return null;
 
-            return _audio.TryGetValue(id.Id, out audioClip) ? audioClip : _database.GetAudioClip(id.Id)?.AudioClip;
+            return _audio.TryGetValue(id.Id, out audioClip) ? audioClip : _database.GetAudioClip(id.Id).AudioClip;
         }
 
         public Texture2D GetNebulaTexture(int seed)
@@ -89,6 +90,15 @@ namespace Services.Reources
         {
             var sprite = Resources.Load<Sprite>(name);
             return sprite;
+        }
+        public Sprite[] GetGIFSprite(SpriteId spriteId)
+        {
+            if (!spriteId) return null;
+
+            if (_database != null)
+                return _database.GetImage(spriteId.Id).GIFImageData.Sprite;
+            else
+                return null;
         }
 
         [Inject]

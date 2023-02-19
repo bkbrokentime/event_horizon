@@ -13,7 +13,7 @@ namespace Combat.Component.Systems.DroneBays
     public class DroneReplicator : SystemBase, IDroneReplicator
     {
         public DroneReplicator(IShip ship, float replicationSpeed)
-            : base(-1, SpriteId.Empty)
+            : base(-1, SpriteId.Empty, ship)
         {
             _ship = ship;
             _speed = replicationSpeed;

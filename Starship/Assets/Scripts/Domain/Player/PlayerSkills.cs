@@ -5,8 +5,8 @@ using Session;
 using GameServices.Database;
 using Services.Messenger;
 using GameModel.Skills;
-using Utils;
 using Zenject;
+using UnityEngine;
 
 namespace GameServices.Player
 {
@@ -72,7 +72,7 @@ namespace GameServices.Player
                 return false;
 
             var level = GetSkillLevels()[info.Type];
-            OptimizedDebug.Log(info.Type + ": " + level + " -> " + (level + info.Multilpler));
+            UnityEngine.Debug.Log(info.Type + ": " + level + " -> " + (level + info.Multilpler));
             GetSkillLevels()[info.Type] = level + info.Multilpler;
 
             _session.Upgrades.AddSkill(id);
@@ -88,6 +88,15 @@ namespace GameServices.Player
             _skillLevels = null;
             _pointsSpent = 0;
             _session.Upgrades.ResetSkills();
+        }
+
+        public void DebugGetAllValue()
+        {
+            var skill = GetSkillLevels();
+            for(int i=0;i<skill.Count();i++)
+            {
+                Debug.Log(((SkillType)i).ToString() + ":  " + skill[(SkillType)i]);
+            }
         }
 
         public Experience Experience
@@ -106,6 +115,8 @@ namespace GameServices.Player
         public float DefenseMultiplier { get { return 1.0f + GetSkillLevels()[SkillType.ShipDefense] * 0.1f; } }
         public float ShieldStrengthBonus { get { return GetSkillLevels()[SkillType.ShieldStrength] * 0.1f; } }
         public float ShieldRechargeMultiplier { get { return 1.0f + GetSkillLevels()[SkillType.ShieldRecharge] * 0.1f; } }
+        public float EnergyShieldStrengthBonus { get { return GetSkillLevels()[SkillType.EnergyShieldStrength] * 0.1f; } }
+        public float EnergyShieldRechargeMultiplier { get { return 1.0f + GetSkillLevels()[SkillType.EnergyShieldRecharge] * 0.1f; } }
         public int MainFuelCapacity { get { return 100 + 50 * GetSkillLevels()[SkillType.MainFuelCapacity]; } }
         public float MainEnginePower { get { return 1f + 0.4f * GetSkillLevels()[SkillType.MainEnginePower]; } }
         public float MainFilghtRange { get { return 1.5f + 0.09f * GetSkillLevels()[SkillType.MainEnginePower]; } }
@@ -116,6 +127,15 @@ namespace GameServices.Player
         public float HeatResistance { get { return GetSkillLevels()[SkillType.HeatDefense] * 0.1f; } }
         public float EnergyResistance { get { return GetSkillLevels()[SkillType.EnergyDefense] * 0.1f; } }
         public float KineticResistance { get { return GetSkillLevels()[SkillType.KineticDefense] * 0.1f; } }
+        public float QuantumResistance { get { return GetSkillLevels()[SkillType.QuantumDefense] * 0.1f; } }
+        public float ShieldHeatResistance { get { return GetSkillLevels()[SkillType.ShieldHeatDefense] * 0.1f; } }
+        public float ShieldEnergyResistance { get { return GetSkillLevels()[SkillType.ShieldEnergyDefense] * 0.1f; } }
+        public float ShieldKineticResistance { get { return GetSkillLevels()[SkillType.ShieldKineticDefense] * 0.1f; } }
+        public float ShieldQuantumResistance { get { return GetSkillLevels()[SkillType.ShieldQuantumDefense] * 0.1f; } }
+        public float EnergyShieldHeatResistance { get { return GetSkillLevels()[SkillType.EnergyShieldHeatDefense] * 0.1f; } }
+        public float EnergyShieldEnergyResistance { get { return GetSkillLevels()[SkillType.EnergyShieldEnergyDefense] * 0.1f; } }
+        public float EnergyShieldKineticResistance { get { return GetSkillLevels()[SkillType.EnergyShieldKineticDefense] * 0.1f; } }
+        public float EnergyShieldQuantumResistance { get { return GetSkillLevels()[SkillType.EnergyShieldQuantumDefense] * 0.1f; } }
 
         public bool HasMasterTrader { get { return GetSkillLevels()[SkillType.MasterTrader] > 0; } }
         public float PriceScale { get { return 1f - GetSkillLevels()[SkillType.Trading]*0.05f; } }
@@ -124,12 +144,17 @@ namespace GameServices.Player
         public float CraftingPriceScale { get { return 1f - GetSkillLevels()[SkillType.CraftingPrice] * 0.05f; } }
 
         public long MaxShipExperience { get { return GetSkillLevels()[SkillType.ExceedTheLimits] > 0 ? Maths.Experience.MaxPlayerExperience2 : Maths.Experience.MaxPlayerExperience; } }
+        public int MaxEmery { get { return GetSkillLevels()[SkillType.MoreEmery]; } }
+        public int MaxAlly { get { return GetSkillLevels()[SkillType.MoreAlly]; } }
+        public float StealthRadar { get { return GetSkillLevels()[SkillType.StealthRadar] * 0.05f; } }
+        public float JammingRadar { get { return GetSkillLevels()[SkillType.JammingRadar] * 0.05f; } }
+        public int LargeShipExploration { get { return GetSkillLevels()[SkillType.LargeShipExploration]; } }
 
         public int GetAvailableHangarSlots(GameDatabase.Enums.SizeClass size)
         {
             if (size <= GameDatabase.Enums.SizeClass.Undefined)
                 return 0;
-            if (size == GameDatabase.Enums.SizeClass.Titan)
+            if (size == GameDatabase.Enums.SizeClass.Dominate)
                 return AvailableHangarSlots(size);
 
             return AvailableHangarSlots(size) - AvailableHangarSlots(size + 1);
@@ -140,15 +165,17 @@ namespace GameServices.Player
             switch (size)
             {
                 case GameDatabase.Enums.SizeClass.Frigate:
-                    return 3 + GetSkillLevels()[SkillType.HangarSlot1];
+                    return 1 + GetSkillLevels()[SkillType.HangarSlot1];
                 case GameDatabase.Enums.SizeClass.Destroyer:
-                    return 1 + GetSkillLevels()[SkillType.HangarSlot2];
+                    return GetSkillLevels()[SkillType.HangarSlot2];
                 case GameDatabase.Enums.SizeClass.Cruiser:
                     return GetSkillLevels()[SkillType.HangarSlot3];
                 case GameDatabase.Enums.SizeClass.Battleship:
                     return GetSkillLevels()[SkillType.HangarSlot4];
                 case GameDatabase.Enums.SizeClass.Titan:
                     return GetSkillLevels()[SkillType.HangarSlot5];
+                case GameDatabase.Enums.SizeClass.Dominate:
+                    return GetSkillLevels()[SkillType.HangarSlot6];
                 default:
                     return 0;
             }

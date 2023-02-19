@@ -10,7 +10,7 @@ namespace Constructor.Modification
 	{
 		public RechargeRate(ModificationQuality quality)
 		{
-			_multiplier = quality.PowerMultiplier(0.5f, 0.7f, 0.8f, 1.1f, 1.25f, 1.5f);
+			_multiplier = quality.PowerMultiplier(0.2f, 0.4f, 0.6f, 0.7f, 0.8f, 1.1f, 1.25f, 1.5f, 1.75f, 2.0f);
 			Quality = quality;
 		}
 

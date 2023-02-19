@@ -22,7 +22,7 @@ namespace GameModel
 			{
 				get
 				{
-				    if (CurrencyExtensions.PremiumCurrencyAllowed)
+				    if (CurrencyExtensions.PremiumCurrencyAllowed && CurrencyExtensions.PremiumCurrencySell)
 				    {
 				        var itemType = _itemTypeFactory.CreateCurrencyItem(Currency.Stars);
                         if (_playerResources.Stars > 0)

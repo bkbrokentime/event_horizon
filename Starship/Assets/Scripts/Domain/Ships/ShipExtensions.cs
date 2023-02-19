@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Constructor.Satellites;
 using Constructor.Ships.Modification;
@@ -11,9 +12,6 @@ using GameDatabase.Model;
 using GameServices.Player;
 using Maths;
 using Session.Content;
-using UnityEngine;
-using Utils;
-using Random = System.Random;
 
 namespace Constructor.Ships
 {
@@ -21,17 +19,20 @@ namespace Constructor.Ships
     {
         public static bool IsSuitableSatelliteSize(this IShip ship, Satellite satellite)
         {
-            return satellite.IsSuitable(ship.Model.SizeClass, ship.Model.ModelScale);
+            if (satellite.SizeClass != SizeClass.Undefined)
+                return ship.Model.SizeClass >= satellite.SizeClass;
+
+            return ship.Model.ModelScale >= satellite.ModelScale * 2;
         }
 
         public static int Price(this IShip ship)
         {
-            return ship.Model.Layout.CellCount*ship.Model.Layout.CellCount;
+            return ship.Model.Layout.CellCount * ship.Model.Layout.CellCount + ship.Model.SecondLayout.CellCount * ship.Model.SecondLayout.CellCount;
         }
 
         public static int Scraps(this IShip ship)
         {
-            return ship.Model.Layout.CellCount / 5;
+            return ship.Model.Layout.CellCount / 5 + ship.Model.SecondLayout.CellCount / 3;
         }
 
         public static IShip RandomizeColor(this IShip ship, System.Random random)
@@ -46,8 +47,16 @@ namespace Constructor.Ships
         {
             return new CommonShip(ship.Model, ship.Components)
             {
-                FirstSatellite = ship.FirstSatellite.CreateCopy(),
-                SecondSatellite = ship.SecondSatellite.CreateCopy(),
+                Satellite_Left_1 = ship.Satellite_Left_1.CreateCopy(),
+                Satellite_Right_1 = ship.Satellite_Right_1.CreateCopy(),
+                Satellite_Left_2 = ship.Satellite_Left_2.CreateCopy(),
+                Satellite_Right_2 = ship.Satellite_Right_2.CreateCopy(),
+                Satellite_Left_3 = ship.Satellite_Left_3.CreateCopy(),
+                Satellite_Right_3 = ship.Satellite_Right_3.CreateCopy(),
+                Satellite_Left_4 = ship.Satellite_Left_4.CreateCopy(),
+                Satellite_Right_4 = ship.Satellite_Right_4.CreateCopy(),
+                Satellite_Left_5 = ship.Satellite_Left_5.CreateCopy(),
+                Satellite_Right_5 = ship.Satellite_Right_5.CreateCopy(),
                 Name = ship.Name
             };
         }
@@ -66,24 +75,32 @@ namespace Constructor.Ships
             builder.Bonuses.ShieldPointsMultiplier *= skills.DefenseMultiplier + skills.ShieldStrengthBonus;
             builder.Bonuses.ShieldRechargeMultiplier *= skills.ShieldRechargeMultiplier;
 
+            builder.Bonuses.EnergyShieldPointsMultiplier *= skills.DefenseMultiplier + skills.EnergyShieldStrengthBonus;
+            builder.Bonuses.EnergyShieldRechargeMultiplier *= skills.EnergyShieldRechargeMultiplier;
+
             builder.Bonuses.ExtraHeatResistance = skills.HeatResistance;
             builder.Bonuses.ExtraEnergyResistance = skills.EnergyResistance;
             builder.Bonuses.ExtraKineticResistance = skills.KineticResistance;
+            builder.Bonuses.ExtraQuantumResistance = skills.QuantumResistance;
+
+            builder.Bonuses.ExtraShieldHeatResistance = skills.ShieldHeatResistance;
+            builder.Bonuses.ExtraShieldEnergyResistance = skills.ShieldEnergyResistance;
+            builder.Bonuses.ExtraShieldKineticResistance = skills.ShieldKineticResistance;
+            builder.Bonuses.ExtraShieldQuantumResistance = skills.ShieldQuantumResistance;
+
+            builder.Bonuses.ExtraEnergyShieldHeatResistance = skills.EnergyShieldHeatResistance;
+            builder.Bonuses.ExtraEnergyShieldEnergyResistance = skills.EnergyShieldEnergyResistance;
+            builder.Bonuses.ExtraEnergyShieldKineticResistance = skills.EnergyShieldKineticResistance;
+            builder.Bonuses.ExtraEnergyShieldQuantumResistance = skills.EnergyShieldQuantumResistance;
 
             return builder.Build(settings);
         }
 
-        public static IShip FromShipData(IDatabase database, ShipData shipData, List<ShipComponentsData.Component> orphanedComponents = null)
+        public static IShip FromShipData(IDatabase database, ShipData shipData)
         {
             var shipWrapper = database.GetShip(new ItemId<Ship>(shipData.Id));
             if (shipWrapper == null)
-            {
-                OptimizedDebug.LogError($"Ship with id {shipData.Id} is not found");
-                orphanedComponents?.AddRange(shipData.Components.Components);
-                orphanedComponents?.AddRange(shipData.Satellite1.Components.Components);
-                orphanedComponents?.AddRange(shipData.Satellite2.Components.Components);
                 return null;
-            }
 
             var shipModel = new ShipModel(shipWrapper);
             var factory = new ModificationFactory(database);
@@ -92,8 +109,16 @@ namespace Constructor.Ships
             var components = shipData.Components.FromShipComponentsData(database);
             var ship = new CommonShip(shipModel, components);
 
-            ship.FirstSatellite = SatelliteExtensions.FromSatelliteData(database, shipData.Satellite1, orphanedComponents);
-            ship.SecondSatellite = SatelliteExtensions.FromSatelliteData(database, shipData.Satellite2, orphanedComponents);
+            ship.Satellite_Left_1 = SatelliteExtensions.FromSatelliteData(database, shipData.Satellite_Left_1);
+            ship.Satellite_Right_1 = SatelliteExtensions.FromSatelliteData(database, shipData.Satellite_Right_1);
+            ship.Satellite_Left_2 = SatelliteExtensions.FromSatelliteData(database, shipData.Satellite_Left_2);
+            ship.Satellite_Right_2 = SatelliteExtensions.FromSatelliteData(database, shipData.Satellite_Right_2);
+            ship.Satellite_Left_3 = SatelliteExtensions.FromSatelliteData(database, shipData.Satellite_Left_3);
+            ship.Satellite_Right_3 = SatelliteExtensions.FromSatelliteData(database, shipData.Satellite_Right_3);
+            ship.Satellite_Left_4 = SatelliteExtensions.FromSatelliteData(database, shipData.Satellite_Left_4);
+            ship.Satellite_Right_4 = SatelliteExtensions.FromSatelliteData(database, shipData.Satellite_Right_4);
+            ship.Satellite_Left_5 = SatelliteExtensions.FromSatelliteData(database, shipData.Satellite_Left_5);
+            ship.Satellite_Right_5 = SatelliteExtensions.FromSatelliteData(database, shipData.Satellite_Right_5);
             ship.Name = shipData.Name;
             ship.ColorScheme.Value = shipData.ColorScheme;
             ship.Experience = (long)shipData.Experience;
@@ -115,8 +140,16 @@ namespace Constructor.Ships
                     Layout = ship.Model.LayoutModifications.Serialize(),
                     Modifications = ship.Model.Modifications.Select<IShipModification, long>(ShipModificationExtensions.Serialize)
                 },
-                Satellite1 = ship.FirstSatellite.ToSatelliteData(),
-                Satellite2 = ship.SecondSatellite.ToSatelliteData(),
+                Satellite_Left_1 = ship.Satellite_Left_1.ToSatelliteData(),
+                Satellite_Right_1 = ship.Satellite_Right_1.ToSatelliteData(),
+                Satellite_Left_2 = ship.Satellite_Left_2.ToSatelliteData(),
+                Satellite_Right_2 = ship.Satellite_Right_2.ToSatelliteData(),
+                Satellite_Left_3 = ship.Satellite_Left_3.ToSatelliteData(),
+                Satellite_Right_3 = ship.Satellite_Right_3.ToSatelliteData(),
+                Satellite_Left_4 = ship.Satellite_Left_4.ToSatelliteData(),
+                Satellite_Right_4 = ship.Satellite_Right_4.ToSatelliteData(),
+                Satellite_Left_5 = ship.Satellite_Left_5.ToSatelliteData(),
+                Satellite_Right_5 = ship.Satellite_Right_5.ToSatelliteData(),
             };
         }
 
@@ -143,8 +176,16 @@ namespace Constructor.Ships
             var components = shipInfo.Components.Select(item => ComponentExtensions.Deserialize(database, item));
             var ship = new CommonShip(shipModel, components);
 
-            ship.FirstSatellite = SatelliteExtensions.FromSatelliteInfo(database, shipInfo.FirstSatellite);
-            ship.SecondSatellite = SatelliteExtensions.FromSatelliteInfo(database, shipInfo.SecondSatellite);
+            ship.Satellite_Left_1 = SatelliteExtensions.FromSatelliteInfo(database, shipInfo.Satellite_Left_1);
+            ship.Satellite_Right_1 = SatelliteExtensions.FromSatelliteInfo(database, shipInfo.Satellite_Right_1);
+            ship.Satellite_Left_2 = SatelliteExtensions.FromSatelliteInfo(database, shipInfo.Satellite_Left_2);
+            ship.Satellite_Right_2 = SatelliteExtensions.FromSatelliteInfo(database, shipInfo.Satellite_Right_2);
+            ship.Satellite_Left_3 = SatelliteExtensions.FromSatelliteInfo(database, shipInfo.Satellite_Left_3);
+            ship.Satellite_Right_3 = SatelliteExtensions.FromSatelliteInfo(database, shipInfo.Satellite_Right_3);
+            ship.Satellite_Left_4 = SatelliteExtensions.FromSatelliteInfo(database, shipInfo.Satellite_Left_4);
+            ship.Satellite_Right_4 = SatelliteExtensions.FromSatelliteInfo(database, shipInfo.Satellite_Right_4);
+            ship.Satellite_Left_5 = SatelliteExtensions.FromSatelliteInfo(database, shipInfo.Satellite_Left_5);
+            ship.Satellite_Right_5 = SatelliteExtensions.FromSatelliteInfo(database, shipInfo.Satellite_Right_5);
             ship.Name = shipInfo.Name;
             ship.Experience = (long)shipInfo.Experience;
             ship.DataChanged = false;
@@ -156,6 +197,10 @@ namespace Constructor.Ships
         public static ItemQuality Quality(this IShipModel shipModel)
         {
             var modsCount = shipModel.Modifications.Count;
+            if (modsCount >= 5)
+                return ItemQuality.Legend;
+            if (modsCount >= 4)
+                return ItemQuality.Epic;
             if (modsCount >= 3)
                 return ItemQuality.Perfect;
             if (modsCount >= 2)
@@ -164,25 +209,6 @@ namespace Constructor.Ships
                 return ItemQuality.Medium;
 
             return ItemQuality.Common;
-        }
-
-        public static IDictionary<ComponentInfo, int> ComponentCounts(this IShip ship, bool unlockedOnly = false)
-        {
-            var dict = new Dictionary<ComponentInfo, int>();
-            foreach (var component in ship.Components)
-            {
-                if (unlockedOnly && component.Locked) continue;
-                if (dict.TryGetValue(component.Info, out var count))
-                {
-                    dict[component.Info] = count + 1;
-                }
-                else
-                {
-                    dict[component.Info] = 1;
-                }
-            }
-
-            return dict;
         }
 
         public static IShip Unlocked(this IShip ship)
@@ -201,8 +227,7 @@ namespace Constructor.Ships
 
         public static IEnumerable<IShip> Create(this IEnumerable<ShipBuild> ships, int requiredLevel, Random random, IDatabase database)
         {
-            return ships.Select((item, id) =>
-                global::Model.Factories.Ship.Create(item, requiredLevel, random, database, id > 12));
+            return ships.Select(item => global::Model.Factories.Ship.Create(item, requiredLevel, random, database));
         }
     }
 }

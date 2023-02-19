@@ -2,29 +2,16 @@
 
 namespace GameDatabase.Model
 {
-    public class AudioClipData
+    public struct AudioClipData
     {
-        private readonly byte[] bytes;
-        private bool gotValue;
-        private AudioClip audioClip;
         public AudioClipData(byte[] data)
         {
-            bytes = data;
-            gotValue = bytes == null;
-            audioClip = null;
+            AudioClip = OpenWavParser.ByteArrayToAudioClip(data);
+            Bytes = data;
         }
+        public byte[] Bytes { get; }
+        public AudioClip AudioClip { get; }
 
-        public AudioClip AudioClip
-        {
-            get
-            {
-                if (gotValue) return audioClip;
-                audioClip = OpenWavParser.ByteArrayToAudioClip(bytes);
-                gotValue = true;
-                return audioClip;
-            }
-        }
-
-        public static AudioClipData Empty = new AudioClipData(null);
+        public static AudioClipData Empty = new AudioClipData();
     }
 }

@@ -118,9 +118,13 @@ namespace GameDatabase.DataModel
 			Quantity = UnityEngine.Mathf.Clamp(serializable.Quantity, 0, 1000);
 			Size = UnityEngine.Mathf.Clamp(serializable.Size, 0f, 100f);
 			Cooldown = UnityEngine.Mathf.Clamp(serializable.Cooldown, 0f, 1000f);
-			RandomFactor = UnityEngine.Mathf.Clamp(serializable.RandomFactor, 0f, 3.402823E+38f);
-			PowerMultiplier = UnityEngine.Mathf.Clamp(serializable.PowerMultiplier, 0f, 3.402823E+38f);
+			RandomFactor = UnityEngine.Mathf.Clamp(serializable.RandomFactor, 0f, 1f);
+			PowerMultiplier = UnityEngine.Mathf.Clamp(serializable.PowerMultiplier, 0f, 1000f);
 			MaxNestingLevel = UnityEngine.Mathf.Clamp(serializable.MaxNestingLevel, 0, 100);
+			Offset = UnityEngine.Mathf.Clamp(serializable.Offset, 0f, 1000f);
+			OffsetRandomFactor = UnityEngine.Mathf.Clamp(serializable.OffsetRandomFactor, 0f, 1f);
+			OffsetSpread = UnityEngine.Mathf.Clamp(serializable.OffsetSpread, 0f, 360f);
+			isShareOut = serializable.isShareOut;
 
             OnDataDeserialized(serializable, loader);
         }
@@ -140,6 +144,10 @@ namespace GameDatabase.DataModel
 		public float RandomFactor { get; private set; }
 		public float PowerMultiplier { get; private set; }
 		public int MaxNestingLevel { get; private set; }
+		public float Offset { get; private set; }
+		public float OffsetRandomFactor { get; private set; }
+		public float OffsetSpread { get; private set; }
+		public bool isShareOut { get; private set; }
     }
     public partial class BulletTrigger_Detonate : BulletTrigger
     {

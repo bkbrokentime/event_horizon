@@ -6,6 +6,7 @@
         public static readonly string DebugLogWindow = "DebugLogWindow";
         public static readonly string MessageBoxWindow = "MessageBoxWindow";
         public static readonly string LootWindow = "LootWindow";
+        public static readonly string IapErrorWindow = "IapErrorWindow";
         public static readonly string ItemInfoWindow = "ItemInfoWindow";
     }
 }

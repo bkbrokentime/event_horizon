@@ -51,12 +51,12 @@ namespace Constructor
             var quality = _random.SquareRange(minQuality, maxQuality);
 
             ComponentInfo info;
-            if (quality <= 0 || component.Info.ModificationQuality >= ModificationQuality.N1 + quality)
+            if (quality <= 0 || component.Info.ModificationQuality >= ModificationQuality.N3 + quality)
                 info = component.Info;
             else if (component.Info.ModificationType != ComponentModType.Empty)
-                info = new ComponentInfo(component.Info.Data, component.Info.ModificationType, ModificationQuality.N1 + quality);
+                info = new ComponentInfo(component.Info.Data, component.Info.ModificationType, ModificationQuality.N3 + quality);
             else
-                info = ComponentInfo.CreateRandomModification(component.Info.Data, _random, ModificationQuality.N1 + quality, ModificationQuality.N1 + quality);
+                info = ComponentInfo.CreateRandomModification(component.Info.Data, _random, ModificationQuality.N3 + quality, ModificationQuality.N3 + quality);
 
             return new ComponentSpec(info, barrelId, component.KeyBinding, component.Behaviour);
         }

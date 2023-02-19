@@ -1,33 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Text;
 using GameServices.Player;
 using Services.Localization;
 using Constructor.Ships;
 using Services.Reources;
 using UnityEngine;
 using Zenject;
+using System.Linq;
 
 namespace Economy.ItemType
 {
     public class ShipItem : IItemType
     {
         [Inject]
-        public ShipItem(PlayerFleet playerFleet, ILocalization localization, ItemTypeFactory itemTypeFactory, IShip ship, bool premium = false,
-            bool fuzzy = false)
+        public ShipItem(PlayerFleet playerFleet, ILocalization localization, IShip ship, bool premium = false)
         {
             _localization = localization;
             _playerFleet = playerFleet;
             _ship = ship;
             _premium = premium;
-            _fuzzy = fuzzy;
-            _itemTypeFactory = itemTypeFactory;
         }
 
-        public int Rank => _ship.Experience.Level;
+        public int Rank { get { return _ship.Experience.Level; } }
 
-        public string Id => "sh" + _ship.Id;
+        public string Id { get { return "sh" + _ship.Id; } }
 
         public string Name
         {
@@ -63,19 +58,44 @@ namespace Economy.ItemType
             }
         }
 
-        public Sprite GetIcon(IResourceLocator resourceLocator)
-        {
-            return resourceLocator.GetSprite(_ship.Model.ModelImage);
+        public Sprite GetIcon(IResourceLocator resourceLocator) { return resourceLocator.GetSprite(_ship.Model.ModelImage); }
+        public Price Price 
+        { get 
+            {
+                if (!_premium)
+                    return Price.Common(_ship.Price());
+
+                int mul = _ship.Model.Layout.CellCount + _ship.Model.SecondLayout.CellCount;
+                switch(_ship.Model.Category)
+                {
+                    case GameDatabase.Enums.ShipCategory.Common:
+                        mul *= 2;
+                        break;
+                    case GameDatabase.Enums.ShipCategory.Rare:
+                        mul *= 3;
+                        break;
+                    case GameDatabase.Enums.ShipCategory.Special:
+                    case GameDatabase.Enums.ShipCategory.Hidden:
+                        mul *= 4;
+                        break;
+                    case GameDatabase.Enums.ShipCategory.Flagship:
+                        mul *= 5;
+                        break;
+                    case GameDatabase.Enums.ShipCategory.SuperFlagship:
+                        mul *= 15;
+                        break;
+                    case GameDatabase.Enums.ShipCategory.Starbase:
+                        mul *= 8;
+                        break;
+                    case GameDatabase.Enums.ShipCategory.Drone:
+                    default:
+                        break; ;
+                }
+                return Price.Premium(mul / 5); 
+            } 
         }
-
-        public Price Price =>
-            _premium
-                ? Price.Premium(((int)_ship.Model.Category + 1) * _ship.Model.Layout.CellCount / 5)
-                : Price.Common(_ship.Price());
-
-        public Color Color => Color.white;
-
-        public ItemQuality Quality => _ship.Model.Quality();
+        public Color Color { get { return Color.white; } }
+        public ItemQuality Quality { get { return _ship.Model.Quality(); } }
 
         public void Consume(int amount)
         {
@@ -85,70 +105,30 @@ namespace Economy.ItemType
 
         public void Withdraw(int amount)
         {
-            if (!_fuzzy)
+            var ship = _playerFleet.Ships.Where(item => item.Id == _ship.Id).First();
+            if (ship != null)
             {
-                Strip(_ship);
-                _playerFleet.Ships.Remove(_ship);
+                Debug.Log("Find Ship");
+                if (_playerFleet.RemoveShip(ship))
+                    Debug.Log("Remove Ship Succeed");
+                else
+                    Debug.Log("Remove Ship Failed");
             }
             else
             {
-                var ships = new List<IShip>();
-                foreach (var ship in _playerFleet.Ships)
-                {
-                    if (ship.Id == _ship.Id) ships.Add(ship);
-                }
-
-                // Removing ships with lower XP level first
-                ships.Sort((a, b) => Math.Sign(a.Experience - b.Experience));
-                for (var i = 0; i < amount && i < ships.Count; i++)
-                {
-                    Strip(ships[i]);
-                    _playerFleet.Ships.Remove(ships[i]);
-                }
+                Debug.Log("Can not Find Ship");
             }
         }
 
-        private void Strip(IShip ship)
-        {
-            foreach (var component in ship.ComponentCounts(true))
-            {
-                _itemTypeFactory.CreateComponentItem(component.Key).Consume(component.Value);
-            }
-            
-            for (var i = 0; i < ship.Components.Count; i++)
-            {
-                var component = ship.Components[i];
-                if (!component.Locked) ship.Components.RemoveAt(i);
-                i--;
-            }
-        }
+        public int MaxItemsToConsume { get { return int.MaxValue; } }
+        public int MaxItemsToWithdraw { get { return 0; } }
 
-        public int MaxItemsToConsume => int.MaxValue;
-
-        public int MaxItemsToWithdraw
-        {
-            get
-            {
-                if (!_fuzzy) return 0;
-                var count = 0;
-                var id = _ship.Id;
-                foreach (var ship in _playerFleet.Ships)
-                {
-                    if (ship.Id == id) count++;
-                }
-
-                return count;
-            }
-        }
-
-        public IShip Ship => _ship;
+        public IShip Ship { get { return _ship; } }
 
         private string _name;
         private string _description;
         private readonly IShip _ship;
         private readonly bool _premium;
-        private readonly bool _fuzzy;
-        private readonly ItemTypeFactory _itemTypeFactory;
         private readonly PlayerFleet _playerFleet;
         private readonly ILocalization _localization;
     }

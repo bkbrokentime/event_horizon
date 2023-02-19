@@ -32,6 +32,10 @@ namespace GameDatabase.DataModel
 			    throw new DatabaseException(this.GetType().Name + ".Ship cannot be null - " + serializable.ShipId);
 			NotAvailableInGame = serializable.NotAvailableInGame;
 			DifficultyClass = serializable.DifficultyClass;
+			NoEnhancementLevel = serializable.NoEnhancementLevel;
+			DefaultEnhancementLevel = serializable.DefaultEnhancementLevel;
+			MinEnhancementLevel = serializable.MinEnhancementLevel;
+			MaxEnhancementLevel = serializable.MaxEnhancementLevel;
 			BuildFaction = loader.GetFaction(new ItemId<Faction>(serializable.BuildFaction));
 			Components = new ImmutableCollection<InstalledComponent>(serializable.Components?.Select(item => InstalledComponent.Create(item, loader)));
 
@@ -43,6 +47,10 @@ namespace GameDatabase.DataModel
 		public Ship Ship { get; private set; }
 		public bool NotAvailableInGame { get; private set; }
 		public DifficultyClass DifficultyClass { get; private set; }
+		public bool NoEnhancementLevel { get; private set; }
+		public EnhancementLevel DefaultEnhancementLevel { get; private set; }
+		public EnhancementLevel MinEnhancementLevel { get; private set; }
+		public EnhancementLevel MaxEnhancementLevel { get; private set; }
 		public Faction BuildFaction { get; private set; }
 		public ImmutableCollection<InstalledComponent> Components { get; private set; }
 

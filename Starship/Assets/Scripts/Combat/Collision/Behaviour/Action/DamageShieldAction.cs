@@ -16,7 +16,7 @@ namespace Combat.Collision.Behaviour.Action
             if (!collisionData.IsNew || !_isAlive)
                 return;
 
-            targetImpact.ShieldDamage += _damage;
+            targetImpact.AllDamageData.ShieldDamage.UpDateDamage(_damage);
             _isAlive = _multipleTargets;
         }
 

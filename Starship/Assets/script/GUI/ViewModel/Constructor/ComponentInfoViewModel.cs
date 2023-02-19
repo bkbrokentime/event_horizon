@@ -39,9 +39,31 @@ namespace ViewModel
         public ComponentViewModel ComponentViewModel;
 		public DragAndDropComponent ComponentPanel;
 		public ShipLayoutViewModel ShipLayout;
-		public ShipLayoutViewModel LeftPlatformLayout;
-		public ShipLayoutViewModel RightPlatformLayout;
-		public ConstructorViewModel ConstructorViewModel;
+		public ShipLayoutViewModel Second_ShipLayout;
+        //public ShipLayoutViewModel LeftPlatformLayout;
+        //public ShipLayoutViewModel RightPlatformLayout;
+        public ShipLayoutViewModel PlatformLayoutViewModel_Left_1;
+        public ShipLayoutViewModel PlatformLayoutViewModel_Right_1;
+        public ShipLayoutViewModel PlatformLayoutViewModel_Left_2;
+        public ShipLayoutViewModel PlatformLayoutViewModel_Right_2;
+        public ShipLayoutViewModel PlatformLayoutViewModel_Left_3;
+        public ShipLayoutViewModel PlatformLayoutViewModel_Right_3;
+        public ShipLayoutViewModel PlatformLayoutViewModel_Left_4;
+        public ShipLayoutViewModel PlatformLayoutViewModel_Right_4;
+        public ShipLayoutViewModel PlatformLayoutViewModel_Left_5;
+        public ShipLayoutViewModel PlatformLayoutViewModel_Right_5;
+
+        public ShipLayoutViewModel Second_PlatformLayoutViewModel_Left_1;
+        public ShipLayoutViewModel Second_PlatformLayoutViewModel_Right_1;
+        public ShipLayoutViewModel Second_PlatformLayoutViewModel_Left_2;
+        public ShipLayoutViewModel Second_PlatformLayoutViewModel_Right_2;
+        public ShipLayoutViewModel Second_PlatformLayoutViewModel_Left_3;
+        public ShipLayoutViewModel Second_PlatformLayoutViewModel_Right_3;
+        public ShipLayoutViewModel Second_PlatformLayoutViewModel_Left_4;
+        public ShipLayoutViewModel Second_PlatformLayoutViewModel_Right_4;
+        public ShipLayoutViewModel Second_PlatformLayoutViewModel_Left_5;
+        public ShipLayoutViewModel Second_PlatformLayoutViewModel_Right_5;
+        public ConstructorViewModel ConstructorViewModel;
 		public GameObject InstallPanel;
 		public GameObject InstallLabel;
 		public GameObject AlreadyInstalledLabel;
@@ -57,6 +79,8 @@ namespace ViewModel
 		public Text RequiredCellText;
 		public Color[] ColorList;
 
+		public int layoutnum;
+
 		public void OnKeyBindingChanged()
 		{
 		    if (_componentId >= 0 && _activeLayout != null)
@@ -69,19 +93,90 @@ namespace ViewModel
 
 		public void OnComponentPositionChanged(Vector2 position)
 		{
-			ShipLayout.PreviewComponent(position, _component);
-			LeftPlatformLayout.PreviewComponent(position, _component);
-			RightPlatformLayout.PreviewComponent(position, _component);
+			if (layoutnum == 0)
+			{
+				ShipLayout.PreviewComponent(position, _component);
+				PlatformLayoutViewModel_Left_1.PreviewComponent(position, _component);
+				PlatformLayoutViewModel_Right_1.PreviewComponent(position, _component);
+				PlatformLayoutViewModel_Left_2.PreviewComponent(position, _component);
+				PlatformLayoutViewModel_Right_2.PreviewComponent(position, _component);
+				PlatformLayoutViewModel_Left_3.PreviewComponent(position, _component);
+				PlatformLayoutViewModel_Right_3.PreviewComponent(position, _component);
+				PlatformLayoutViewModel_Left_4.PreviewComponent(position, _component);
+				PlatformLayoutViewModel_Right_4.PreviewComponent(position, _component);
+				PlatformLayoutViewModel_Left_5.PreviewComponent(position, _component);
+				PlatformLayoutViewModel_Right_5.PreviewComponent(position, _component);
+			}
+			else if (layoutnum == 1)
+			{
+				Second_ShipLayout.PreviewComponent(position, _component);
+				Second_PlatformLayoutViewModel_Left_1.PreviewComponent(position, _component);
+				Second_PlatformLayoutViewModel_Right_1.PreviewComponent(position, _component);
+				Second_PlatformLayoutViewModel_Left_2.PreviewComponent(position, _component);
+				Second_PlatformLayoutViewModel_Right_2.PreviewComponent(position, _component);
+				Second_PlatformLayoutViewModel_Left_3.PreviewComponent(position, _component);
+				Second_PlatformLayoutViewModel_Right_3.PreviewComponent(position, _component);
+				Second_PlatformLayoutViewModel_Left_4.PreviewComponent(position, _component);
+				Second_PlatformLayoutViewModel_Right_4.PreviewComponent(position, _component);
+				Second_PlatformLayoutViewModel_Left_5.PreviewComponent(position, _component);
+				Second_PlatformLayoutViewModel_Right_5.PreviewComponent(position, _component);
+			}
 		}
 
 		public void OnComponentReleased(Vector2 position)
 		{
-            if (InstallComponentCommand.TryExecuteCommand(ShipLayout, position, _component, Controls.KeyBinding, Controls.ComponentMode, _onCommandExecutedEvent))
-                return;
-            if (InstallComponentCommand.TryExecuteCommand(LeftPlatformLayout, position, _component, Controls.KeyBinding, Controls.ComponentMode, _onCommandExecutedEvent))
-                return;
-            if (InstallComponentCommand.TryExecuteCommand(RightPlatformLayout, position, _component, Controls.KeyBinding, Controls.ComponentMode, _onCommandExecutedEvent))
-                return;
+			if (layoutnum == 0)
+			{
+				if (InstallComponentCommand.TryExecuteCommand(ShipLayout, layoutnum, position, _component, Controls.KeyBinding, Controls.ComponentMode, _onCommandExecutedEvent))
+					return;
+				if (InstallComponentCommand.TryExecuteCommand(PlatformLayoutViewModel_Left_1, layoutnum, position, _component, Controls.KeyBinding, Controls.ComponentMode, _onCommandExecutedEvent))
+					return;
+				if (InstallComponentCommand.TryExecuteCommand(PlatformLayoutViewModel_Right_1, layoutnum, position, _component, Controls.KeyBinding, Controls.ComponentMode, _onCommandExecutedEvent))
+					return;
+				if (InstallComponentCommand.TryExecuteCommand(PlatformLayoutViewModel_Left_2, layoutnum, position, _component, Controls.KeyBinding, Controls.ComponentMode, _onCommandExecutedEvent))
+					return;
+				if (InstallComponentCommand.TryExecuteCommand(PlatformLayoutViewModel_Right_2, layoutnum, position, _component, Controls.KeyBinding, Controls.ComponentMode, _onCommandExecutedEvent))
+					return;
+				if (InstallComponentCommand.TryExecuteCommand(PlatformLayoutViewModel_Left_3, layoutnum, position, _component, Controls.KeyBinding, Controls.ComponentMode, _onCommandExecutedEvent))
+					return;
+				if (InstallComponentCommand.TryExecuteCommand(PlatformLayoutViewModel_Right_3, layoutnum, position, _component, Controls.KeyBinding, Controls.ComponentMode, _onCommandExecutedEvent))
+					return;
+				if (InstallComponentCommand.TryExecuteCommand(PlatformLayoutViewModel_Left_4, layoutnum, position, _component, Controls.KeyBinding, Controls.ComponentMode, _onCommandExecutedEvent))
+					return;
+				if (InstallComponentCommand.TryExecuteCommand(PlatformLayoutViewModel_Right_4, layoutnum, position, _component, Controls.KeyBinding, Controls.ComponentMode, _onCommandExecutedEvent))
+					return;
+				if (InstallComponentCommand.TryExecuteCommand(PlatformLayoutViewModel_Left_5, layoutnum, position, _component, Controls.KeyBinding, Controls.ComponentMode, _onCommandExecutedEvent))
+					return;
+				if (InstallComponentCommand.TryExecuteCommand(PlatformLayoutViewModel_Right_5, layoutnum, position, _component, Controls.KeyBinding, Controls.ComponentMode, _onCommandExecutedEvent))
+					return;
+			}
+			else if (layoutnum == 1)
+			{
+				if (InstallComponentCommand.TryExecuteCommand(Second_ShipLayout, layoutnum, position, _component, Controls.KeyBinding, Controls.ComponentMode, _onCommandExecutedEvent))
+					return;
+				if (InstallComponentCommand.TryExecuteCommand(Second_PlatformLayoutViewModel_Left_1, layoutnum, position, _component, Controls.KeyBinding, Controls.ComponentMode, _onCommandExecutedEvent))
+					return;
+				if (InstallComponentCommand.TryExecuteCommand(Second_PlatformLayoutViewModel_Right_1, layoutnum, position, _component, Controls.KeyBinding, Controls.ComponentMode, _onCommandExecutedEvent))
+					return;
+				if (InstallComponentCommand.TryExecuteCommand(Second_PlatformLayoutViewModel_Left_2, layoutnum, position, _component, Controls.KeyBinding, Controls.ComponentMode, _onCommandExecutedEvent))
+					return;
+				if (InstallComponentCommand.TryExecuteCommand(Second_PlatformLayoutViewModel_Right_2, layoutnum, position, _component, Controls.KeyBinding, Controls.ComponentMode, _onCommandExecutedEvent))
+					return;
+				if (InstallComponentCommand.TryExecuteCommand(Second_PlatformLayoutViewModel_Left_3, layoutnum, position, _component, Controls.KeyBinding, Controls.ComponentMode, _onCommandExecutedEvent))
+					return;
+				if (InstallComponentCommand.TryExecuteCommand(Second_PlatformLayoutViewModel_Right_3, layoutnum, position, _component, Controls.KeyBinding, Controls.ComponentMode, _onCommandExecutedEvent))
+					return;
+				if (InstallComponentCommand.TryExecuteCommand(Second_PlatformLayoutViewModel_Left_4, layoutnum, position, _component, Controls.KeyBinding, Controls.ComponentMode, _onCommandExecutedEvent))
+					return;
+				if (InstallComponentCommand.TryExecuteCommand(Second_PlatformLayoutViewModel_Right_4, layoutnum, position, _component, Controls.KeyBinding, Controls.ComponentMode, _onCommandExecutedEvent))
+					return;
+				if (InstallComponentCommand.TryExecuteCommand(Second_PlatformLayoutViewModel_Left_5, layoutnum, position, _component, Controls.KeyBinding, Controls.ComponentMode, _onCommandExecutedEvent))
+					return;
+				if (InstallComponentCommand.TryExecuteCommand(Second_PlatformLayoutViewModel_Right_5, layoutnum, position, _component, Controls.KeyBinding, Controls.ComponentMode, _onCommandExecutedEvent))
+					return;
+			}
+			else
+				return;
 		}
         
 		public void Clear()
@@ -113,8 +208,7 @@ namespace ViewModel
 
 			if (_activeLayout == null)
 				throw new System.InvalidOperationException("layout not selected");
-			var id = _componentId;
-			var component = _activeLayout.Ship.GetComponent(id);
+			var component = _activeLayout.Ship.GetComponent(_componentId);
 			var price = component.Info.Price*2;
             _guiHelper.ShowConfirmation(_localization.GetString("$UnlockConfirmation"), price, () => 
             {
@@ -123,8 +217,8 @@ namespace ViewModel
 
 			    if (!price.TryWithdraw(_playerResources))
                     return;
-				_activeLayout.UnlockComponent(id);
-				SetComponent(_activeLayout, id);
+				_activeLayout.UnlockComponent(_componentId);
+				SetComponent(_activeLayout, _componentId);
 			});
 		}
 
@@ -133,7 +227,29 @@ namespace ViewModel
             if (_playerResources == null)
                 return;
 
-            var lockedItems = ShipLayout.Components.Concat(LeftPlatformLayout.Components).Concat(RightPlatformLayout.Components).Where(CanBeUnlocked);
+            var lockedItems = ShipLayout.Components.
+				Concat(PlatformLayoutViewModel_Left_1.Components).
+				Concat(PlatformLayoutViewModel_Right_1.Components).
+				Concat(PlatformLayoutViewModel_Left_2.Components).
+				Concat(PlatformLayoutViewModel_Right_2.Components).
+				Concat(PlatformLayoutViewModel_Left_3.Components).
+				Concat(PlatformLayoutViewModel_Right_3.Components).
+				Concat(PlatformLayoutViewModel_Left_4.Components).
+				Concat(PlatformLayoutViewModel_Right_4.Components).
+				Concat(PlatformLayoutViewModel_Left_5.Components).
+				Concat(PlatformLayoutViewModel_Right_5.Components).
+				Concat(Second_ShipLayout.Components).
+				Concat(Second_PlatformLayoutViewModel_Left_1.Components).
+				Concat(Second_PlatformLayoutViewModel_Right_1.Components).
+				Concat(Second_PlatformLayoutViewModel_Left_2.Components).
+				Concat(Second_PlatformLayoutViewModel_Right_2.Components).
+				Concat(Second_PlatformLayoutViewModel_Left_3.Components).
+				Concat(Second_PlatformLayoutViewModel_Right_3.Components).
+				Concat(Second_PlatformLayoutViewModel_Left_4.Components).
+				Concat(Second_PlatformLayoutViewModel_Right_4.Components).
+				Concat(Second_PlatformLayoutViewModel_Left_5.Components).
+				Concat(Second_PlatformLayoutViewModel_Right_5.Components).
+				Where(CanBeUnlocked);
 
             var price = Price.Common(lockedItems.Sum(item => item.Info.Price.Amount*2));
             _guiHelper.ShowConfirmation(_localization.GetString("$UnlockAllConfirmation"), price, () => 
@@ -141,9 +257,29 @@ namespace ViewModel
                 if (!price.TryWithdraw(_playerResources))
                     return;
 
-                ShipLayout.Layout?.ComponentsIndex.Where(item => CanBeUnlocked(item.Value)).Select(item => item.Key).ToList().ForEach(ShipLayout.UnlockComponent);
-                LeftPlatformLayout.Layout?.ComponentsIndex.Where(item => CanBeUnlocked(item.Value)).Select(item => item.Key).ToList().ForEach(LeftPlatformLayout.UnlockComponent);
-                RightPlatformLayout.Layout?.ComponentsIndex.Where(item => CanBeUnlocked(item.Value)).Select(item => item.Key).ToList().ForEach(RightPlatformLayout.UnlockComponent);
+                ShipLayout.Layout?.ComponentsIndex.Where(item => CanBeUnlocked(item.Value) && item.Value.Layout == 0).Select(item => item.Key).ToList().ForEach(ShipLayout.UnlockComponent);
+                PlatformLayoutViewModel_Left_1.Layout?.ComponentsIndex.Where(item => CanBeUnlocked(item.Value) && item.Value.Layout == 0).Select(item => item.Key).ToList().ForEach(PlatformLayoutViewModel_Left_1.UnlockComponent);
+                PlatformLayoutViewModel_Right_1.Layout?.ComponentsIndex.Where(item => CanBeUnlocked(item.Value) && item.Value.Layout == 0).Select(item => item.Key).ToList().ForEach(PlatformLayoutViewModel_Right_1.UnlockComponent);
+                PlatformLayoutViewModel_Left_2.Layout?.ComponentsIndex.Where(item => CanBeUnlocked(item.Value) && item.Value.Layout == 0).Select(item => item.Key).ToList().ForEach(PlatformLayoutViewModel_Left_2.UnlockComponent);
+                PlatformLayoutViewModel_Right_2.Layout?.ComponentsIndex.Where(item => CanBeUnlocked(item.Value) && item.Value.Layout == 0).Select(item => item.Key).ToList().ForEach(PlatformLayoutViewModel_Right_2.UnlockComponent);
+                PlatformLayoutViewModel_Left_3.Layout?.ComponentsIndex.Where(item => CanBeUnlocked(item.Value) && item.Value.Layout == 0).Select(item => item.Key).ToList().ForEach(PlatformLayoutViewModel_Left_3.UnlockComponent);
+                PlatformLayoutViewModel_Right_3.Layout?.ComponentsIndex.Where(item => CanBeUnlocked(item.Value) && item.Value.Layout == 0).Select(item => item.Key).ToList().ForEach(PlatformLayoutViewModel_Right_3.UnlockComponent);
+                PlatformLayoutViewModel_Left_4.Layout?.ComponentsIndex.Where(item => CanBeUnlocked(item.Value) && item.Value.Layout == 0).Select(item => item.Key).ToList().ForEach(PlatformLayoutViewModel_Left_4.UnlockComponent);
+                PlatformLayoutViewModel_Right_4.Layout?.ComponentsIndex.Where(item => CanBeUnlocked(item.Value) && item.Value.Layout == 0).Select(item => item.Key).ToList().ForEach(PlatformLayoutViewModel_Right_4.UnlockComponent);
+                PlatformLayoutViewModel_Left_5.Layout?.ComponentsIndex.Where(item => CanBeUnlocked(item.Value) && item.Value.Layout == 0).Select(item => item.Key).ToList().ForEach(PlatformLayoutViewModel_Left_5.UnlockComponent);
+                PlatformLayoutViewModel_Right_5.Layout?.ComponentsIndex.Where(item => CanBeUnlocked(item.Value) && item.Value.Layout == 0).Select(item => item.Key).ToList().ForEach(PlatformLayoutViewModel_Right_5.UnlockComponent);
+
+                Second_ShipLayout.Layout?.ComponentsIndex.Where(item => CanBeUnlocked(item.Value) && item.Value.Layout == 1).Select(item => item.Key).ToList().ForEach(Second_ShipLayout.UnlockComponent);
+                Second_PlatformLayoutViewModel_Left_1.Layout?.ComponentsIndex.Where(item => CanBeUnlocked(item.Value) && item.Value.Layout == 1).Select(item => item.Key).ToList().ForEach(Second_PlatformLayoutViewModel_Left_1.UnlockComponent);
+                Second_PlatformLayoutViewModel_Right_1.Layout?.ComponentsIndex.Where(item => CanBeUnlocked(item.Value) && item.Value.Layout == 1).Select(item => item.Key).ToList().ForEach(Second_PlatformLayoutViewModel_Right_1.UnlockComponent);
+                Second_PlatformLayoutViewModel_Left_2.Layout?.ComponentsIndex.Where(item => CanBeUnlocked(item.Value) && item.Value.Layout == 1).Select(item => item.Key).ToList().ForEach(Second_PlatformLayoutViewModel_Left_2.UnlockComponent);
+                Second_PlatformLayoutViewModel_Right_2.Layout?.ComponentsIndex.Where(item => CanBeUnlocked(item.Value) && item.Value.Layout == 1).Select(item => item.Key).ToList().ForEach(Second_PlatformLayoutViewModel_Right_2.UnlockComponent);
+                Second_PlatformLayoutViewModel_Left_3.Layout?.ComponentsIndex.Where(item => CanBeUnlocked(item.Value) && item.Value.Layout == 1).Select(item => item.Key).ToList().ForEach(Second_PlatformLayoutViewModel_Left_3.UnlockComponent);
+                Second_PlatformLayoutViewModel_Right_3.Layout?.ComponentsIndex.Where(item => CanBeUnlocked(item.Value) && item.Value.Layout == 1).Select(item => item.Key).ToList().ForEach(Second_PlatformLayoutViewModel_Right_3.UnlockComponent);
+                Second_PlatformLayoutViewModel_Left_4.Layout?.ComponentsIndex.Where(item => CanBeUnlocked(item.Value) && item.Value.Layout == 1).Select(item => item.Key).ToList().ForEach(Second_PlatformLayoutViewModel_Left_4.UnlockComponent);
+                Second_PlatformLayoutViewModel_Right_4.Layout?.ComponentsIndex.Where(item => CanBeUnlocked(item.Value) && item.Value.Layout == 1).Select(item => item.Key).ToList().ForEach(Second_PlatformLayoutViewModel_Right_4.UnlockComponent);
+                Second_PlatformLayoutViewModel_Left_5.Layout?.ComponentsIndex.Where(item => CanBeUnlocked(item.Value) && item.Value.Layout == 1).Select(item => item.Key).ToList().ForEach(Second_PlatformLayoutViewModel_Left_5.UnlockComponent);
+                Second_PlatformLayoutViewModel_Right_5.Layout?.ComponentsIndex.Where(item => CanBeUnlocked(item.Value) && item.Value.Layout == 1).Select(item => item.Key).ToList().ForEach(Second_PlatformLayoutViewModel_Right_5.UnlockComponent);
 
                 SetComponent(_activeLayout, _componentId);
             });
@@ -218,7 +354,16 @@ namespace ViewModel
 			ComponentPanel.gameObject.SetActive(true);
 			ComponentPanel.Interactable = status == Status.Ok;
 			ComponentPanel.RectSize = _component.Data.Layout.Size*ShipLayout.BlockSize;
-			ComponentPanel.GetComponent<ComponentIconViewModel>().SetIcon(_resourceLocator.GetSprite(_component.Data.Icon), _component.Data.Layout.Data, _component.Data.Layout.Size, _component.Data.Color);
+			if (_component.Data.GIFIcon)
+			{
+                Sprite[] spr = _resourceLocator.GetGIFSprite(_component.Data.Icon);
+
+				//UnityEngine.Debug.Log("componentinfospr = " + spr.Length);
+
+                ComponentPanel.GetComponent<ComponentIconViewModel>().SetGIFIcon(spr, spr.Length, _component.Data.Layout.Data, _component.Data.Layout.Size, _component.Data.Color);
+			}
+			else
+				ComponentPanel.GetComponent<ComponentIconViewModel>().SetIcon(_resourceLocator.GetSprite(_component.Data.Icon), _component.Data.Layout.Data, _component.Data.Layout.Size, _component.Data.Color);
 
 			UpdateDescription(componentInfo);
 		}
@@ -244,12 +389,22 @@ namespace ViewModel
 			case CellType.InnerOuter:
 				RequiredCellIcon.color = ColorList[4];
 				break;
-			case CellType.Engine:
-				RequiredCellIcon.color = ColorList[5];
+			case CellType.Special:
+				RequiredCellIcon.color = ColorList[6];
+				break;
+			case CellType.UAVPlatform:
+				RequiredCellIcon.color = ColorList[7];
+				break;
+			case CellType.InnerSpecial:
+				RequiredCellIcon.color = ColorList[8];
+				break;
+			case CellType.OuterUAVPlatform:
+				RequiredCellIcon.color = ColorList[9];
 				break;
 			}
 
-			RequiredCellText.text = _component.Data.CellType == CellType.Weapon ? _component.Data.WeaponSlotType.ToString() : string.Empty;
+			RequiredCellText.text = _component.Data.CellType == CellType.Weapon ? ((char)_component.Data.WeaponSlotType).ToString() : string.Empty;
+			//RequiredCellText.text = _component.Data.CellType == CellType.Weapon ? _component.Data.WeaponSlotType.ToString() : string.Empty;
 
 			var stats = new ShipEquipmentStats();
 			component.UpdateStats(ref stats);

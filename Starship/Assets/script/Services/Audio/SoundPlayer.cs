@@ -42,9 +42,7 @@ namespace Services.Audio
             if (Volume <= 0f)
                 return;
 
-            var audio = _resourceLocator.GetAudioClip(audioClip);
-            if ((object) audio == null) return;
-            Enqueue(new AudioData { AudioClip = audio, Loop = audioClip.Loop, Id = soundId });
+            Enqueue(new AudioData { AudioClip = _resourceLocator.GetAudioClip(audioClip), Loop = audioClip.Loop, Id = soundId });
         }
 
         public void Play(AudioClip audioClip, int soundId = 0, bool loop = false)

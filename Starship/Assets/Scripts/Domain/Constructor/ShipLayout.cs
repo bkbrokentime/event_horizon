@@ -5,7 +5,7 @@ using Diagnostics;
 using GameDatabase.DataModel;
 using GameDatabase.Enums;
 using GameDatabase.Model;
-using Utils;
+using DebugLogSetting;
 
 namespace Constructor
 {
@@ -17,6 +17,7 @@ namespace Constructor
 		    Size = layout.Size;
 		    CellCount = layout.CellCount;
 
+			if(barrels!=null)
 			UpdateBarrelData(barrels);
 
 			UsedSpace = 0;
@@ -26,7 +27,7 @@ namespace Constructor
 
 				try
 				{
-					var id = InstallComponent(component.Info, component.X, component.Y);
+					var id = InstallComponent(component.Info,component.Layout, component.X, component.Y);
 					if (id < 0)
 					{
 					    var moduleId = component.Info.Data != null ? component.Info.Data.Id.ToString() : "invalid ID";
@@ -40,13 +41,14 @@ namespace Constructor
                         continue;
 					}
 
+					_components[id].Layout = component.Layout;
 					_components[id].KeyBinding = component.KeyBinding;
 				    _components[id].Behaviour = component.Behaviour;
 					_components[id].Locked = component.Locked;
 				}
 				catch (Exception e)
 				{
-					OptimizedDebug.LogException(e);
+				    UnityEngine.Debug.LogException(e);
                 }
 			}
 		}
@@ -88,10 +90,10 @@ namespace Constructor
 			} 
 		}
 
-		public int InstallComponent(ComponentInfo info, int x, int y, int desiredComponentId = -1)
+		public int InstallComponent(ComponentInfo info, int layout, int x, int y, int desiredComponentId = -1)
 		{
-		    if (info.Data == null)
-		        return -1;
+			if (info.Data == null)
+				return -1;
 
 			var componentSize = info.Data.Layout.Size;
 			foreach (int index in LayoutIndices(info.Data.Layout, componentSize, x, y))
@@ -101,13 +103,13 @@ namespace Constructor
 			}
 
 			var barrelId = -1;
-		    var componentId = _components.Count;
-		    if (desiredComponentId < 0 || desiredComponentId >= _components.Count || _components[desiredComponentId] != null)
-                _components.Add(null);
-            else
-                componentId = desiredComponentId;
+			var componentId = _components.Count;
+			if (desiredComponentId < 0 || desiredComponentId >= _components.Count || _components[desiredComponentId] != null)
+				_components.Add(null);
+			else
+				componentId = desiredComponentId;
 
-            foreach (int index in LayoutIndices(info.Data.Layout, componentSize, x, y))
+			foreach (int index in LayoutIndices(info.Data.Layout, componentSize, x, y))
 			{
 				var element = _layout[index];
 				element.ComponentId = componentId;
@@ -118,7 +120,10 @@ namespace Constructor
 					barrelId = element.BarrelId;
 			}
 
-			_components[componentId] = new IntegratedComponent(info, x, y, barrelId, 0, 0, false);
+			_components[componentId] = new IntegratedComponent(info, layout, x, y, barrelId, 0, 0, false);
+
+			if (ComponentDebugLogSetting.ComponentConstructDebugLog)
+				UnityEngine.Debug.Log("_components[" + componentId + "] : layout : " + layout);
 
 			return componentId;
 		}
@@ -168,7 +173,7 @@ namespace Constructor
 				return false;
 			
 			if (element.Type == CellType.Weapon && component.CellType == CellType.Weapon)
-				return string.IsNullOrEmpty(element.WeaponClass) || component.WeaponSlotType == (char) WeaponSlotType.Default || element.WeaponClass.Contains(component.WeaponSlotType);
+				return string.IsNullOrEmpty(element.WeaponClass) || component.WeaponSlotType == GameDatabase.Enums.WeaponSlotType.Default || element.WeaponClass.Contains((char)component.WeaponSlotType);
 			
 			return component.CellType.CompatibleWith(element.Type);
 		}
@@ -218,7 +223,6 @@ namespace Constructor
 	            if (!shoulContinue) break;
 	        }
         }
-
         private bool CheckCell(int x, int y)
         {
             var index = y * Size + x;
@@ -242,7 +246,6 @@ namespace Constructor
 
             return dataChanged;
         }
-
 		private static bool TryAssignBarrelId(ref LayoutElement item, LayoutElement other)
 		{
 			if (other.Type == CellType.Weapon && other.BarrelId >= 0)

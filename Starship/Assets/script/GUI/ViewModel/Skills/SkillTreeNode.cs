@@ -18,18 +18,45 @@ namespace ViewModel.Skills
 			EnabledAndConnected,
 		}
 
+        public enum SkillClass
+        {
+            Mothership,
+            Ship,
+            Shield,
+            EnergyShield,
+            HangerSlot,
+            Lock,
+        }
+
+
+
         [Inject] private readonly ILocalization _localization;
 		
         [SerializeField] SkillType _type;
+        [SerializeField] SkillClass _class;
+
+        [SerializeField] NodeColor _ndoecolor;
+        [SerializeField] bool _freeposition;
+
+
         [SerializeField] int _multiplier = 1;
         [SerializeField] SkillTreeNode[] _linkedNodes;
+
+        public bool _conditional;
+        [SerializeField] SkillTreeNode[] _requireNodes;
+        public bool _hide;
+
         [SerializeField] UiLine _linkPrefab;
         [SerializeField] Image _icon;
         [SerializeField] float _sizeScale = 0.85f;
-        [SerializeField] Color _lockedColor = new Color(0.3125f, 0.75f, 1f);
-        [SerializeField] Color _unlockedColor = new Color(1f, 1f, 0.75f);
-        [SerializeField] Color _lockedIconColor = new Color(0.5f, 1f, 1f);
-        [SerializeField] Color _unlockedIconColor = new Color(1f, 1f, 0.75f);
+
+        [SerializeField] Image _icon_lock;
+
+
+        private Color _lockedColor;
+        private Color _unlockedColor;
+        private Color _lockedIconColor;
+        private Color _unlockedIconColor;
 
         public float Size { get { return _sizeScale*GetComponent<RectTransform>().rect.width/2f; } }
         public IEnumerable<SkillTreeNode> LinkedNodes { get { return _linkedNodes; } }
@@ -40,6 +67,7 @@ namespace ViewModel.Skills
 
 		public NodeState State
         {
+            get { return _state; }
             set
             {
                 if (_state == value)
@@ -79,16 +107,70 @@ namespace ViewModel.Skills
         {
             CreateLines();
             UpdateState();
+            if (_hide && _state == NodeState.Disabled)
+            {
+                gameObject.SetActive(false);
+                foreach(var item in _links)
+                    item.Value.color = new Color(0, 0, 0, 0);
+            }
+            else
+                gameObject.SetActive(true);
+        }
+
+
+        public void GetColor(NodeColor nodecolor)
+        {
+            _lockedColor = nodecolor._lockedColor[(int)_class];
+            _unlockedColor = nodecolor._unlockedColor[(int)_class];
+            _lockedIconColor = nodecolor._lockedIconColor[(int)_class];
+            _unlockedIconColor = nodecolor._unlockedIconColor[(int)_class];
         }
 
         private void UpdateState()
         {
+
+            GetColor(_ndoecolor);
+
             var image = GetComponent<Image>();
             if (image)
 				image.color = _state == NodeState.Disabled ? _lockedColor : _unlockedColor;
 
+            if (_icon_lock)
+                _icon_lock.color = _state == NodeState.Disabled ? _ndoecolor._lockedimageColor : _ndoecolor._unlockedimageColor;
+
             if (_icon)
 				_icon.color = _state == NodeState.Disabled ? _lockedIconColor : _unlockedIconColor;
+
+            bool enable = true;
+            if (_hide)
+            {
+                foreach (var item in _requireNodes)
+                {
+                    if (item._state == NodeState.Disabled)
+                    {
+                        enable = false;
+                        break;
+                    }
+                }
+                if(!enable)
+                {
+                    if (image)
+                        image.color = new Color(0, 0, 0, 0);
+
+                    if (_icon_lock)
+                        _icon_lock.color = new Color(0, 0, 0, 0);
+
+                    if (_icon)
+                        _icon.color = new Color(0, 0, 0, 0);
+                    gameObject.SetActive(false);
+                }
+                else
+                {
+                    gameObject.SetActive(true);
+                    //_hide = false;
+                    //UpdateHideLinks();
+                }
+            }
         }
 
         private void CreateLines()
@@ -101,13 +183,33 @@ namespace ViewModel.Skills
                 var link = CreateLink(item);
                 AddLink(item, link);
                 item.AddLink(this, link);
+                if (item._hide)
+                    link.color = new Color(0, 0, 0, 0);
             }
         }
 
         private void UpdateLinks()
         {
             foreach (var link in _links)
-                link.Value.color = IsLinkEnabled(link.Key) ? _unlockedColor : _lockedColor;
+            {
+                if (!link.Key._hide && !_hide)
+                    link.Value.color = IsLinkEnabled(link.Key) ? _ndoecolor._unlockedLinkLineColor : _ndoecolor._lockedLinkLineColor;
+                else
+                    link.Value.color = new Color(0, 0, 0, 0);
+                link.Key.UpdateState();
+            }
+        }
+
+        public void ResetLinks()
+        {
+            UpdateLinks();
+        }
+        private void UpdateHideLinks()
+        {
+            foreach (var link in _links)
+            {
+                link.Value.color = IsLinkEnabled(link.Key) ? _ndoecolor._unlockedLinkLineColor : _ndoecolor._lockedLinkLineColor;
+            }
         }
 
         private void OnValidate()
@@ -116,6 +218,27 @@ namespace ViewModel.Skills
                 _icon.sprite = CommonSpriteTable.SkillIcon(_type);
             if (_type != SkillType.Undefined)
                 name = _type.ToString();
+
+            Transform[] Transform_ = gameObject.GetComponentsInChildren<Transform>();
+            foreach(Transform obj in Transform_)
+            {
+                if (obj.gameObject.name == "Icon_lock")
+                    _icon_lock = obj.gameObject.GetComponent<Image>();
+            }
+
+            _icon_lock.gameObject.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(0, 0, 0);
+            _icon_lock.gameObject.GetComponent<RectTransform>().sizeDelta = gameObject.GetComponent<RectTransform>().sizeDelta;
+            _icon_lock.gameObject.GetComponent<RectTransform>().localScale = new Vector3(1.2f, 1.2f, 1);
+            _icon_lock.gameObject.GetComponent<Image>().sprite = CommonSpriteTable.Lock_Icon;
+
+            var position = gameObject.GetComponent<RectTransform>().anchoredPosition3D;
+
+            if (!_freeposition)
+            {
+                position.x = position.x / 64 - Mathf.FloorToInt(position.x / 64) < 0.5 ? Mathf.FloorToInt(position.x / 64) * 64 : Mathf.FloorToInt(position.x / 64) * 64 + 64;
+                position.y = position.y / 64 - Mathf.FloorToInt(position.y / 64) < 0.5 ? Mathf.FloorToInt(position.y / 64) * 64 : Mathf.FloorToInt(position.y / 64) * 64 + 64;
+                gameObject.GetComponent<RectTransform>().anchoredPosition3D = position;
+            }
         }
 
         private void AddLink(SkillTreeNode node, UiLine link)
@@ -134,7 +257,8 @@ namespace ViewModel.Skills
             link.transform.SetParent(transform.parent);
             link.transform.localScale = Vector3.one;
 
-            link.color = IsLinkEnabled(node) ? _unlockedColor : _lockedColor;
+            //GetColor(_ndoecolor);
+            link.color = IsLinkEnabled(node) ? _ndoecolor._unlockedLinkLineColor : _ndoecolor._lockedLinkLineColor;
 
             var begin = transform.localPosition;
             var end = node.transform.localPosition;
@@ -145,7 +269,22 @@ namespace ViewModel.Skills
             return link;
         }
 
-		private NodeState _state = NodeState.Disabled;
+        public bool Conditional()
+        {
+            if (!_conditional && !_hide)
+                return true;
+
+            foreach(var node in _requireNodes)
+            {
+                if (node.State == NodeState.Disabled)
+                    return false;
+            }
+
+            return true;
+        }
+
+
+        private NodeState _state = NodeState.Disabled;
         private readonly Dictionary<SkillTreeNode, UiLine> _links = new Dictionary<SkillTreeNode, UiLine>();
     }
 }

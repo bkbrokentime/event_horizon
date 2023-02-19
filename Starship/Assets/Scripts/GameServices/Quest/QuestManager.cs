@@ -28,7 +28,7 @@ namespace GameServices.Quests
             QuestListChangedSignal.Trigger questListChangedTrigger,
             QuestEventSignal questEventSignal,
             StarContentChangedSignal.Trigger starContentChangedTrigger,
-            SessionDataLoadedSignal dataLoadedSignal,
+            SessionDataLoadedSignal dataLoadedSignal, 
             SessionCreatedSignal sessionCreatedSignal)
             : base(dataLoadedSignal, sessionCreatedSignal)
 	    {
@@ -66,9 +66,9 @@ namespace GameServices.Quests
                 if (--counter == 0)
                 {
                     var currentQuest = _recentlyUpdatedQuests.Last();
-                    OptimizedDebug.LogException(new InvalidOperationException(
+                    UnityEngine.Debug.LogException(new InvalidOperationException(
                         "QuestManager - infinite loop. Quest:" + currentQuest.Id + " Node:" + currentQuest.NodeId));
-                    OptimizedDebug.Break();
+                    UnityEngine.Debug.Break();
                     break;
                 }
 
@@ -136,25 +136,23 @@ namespace GameServices.Quests
 	    public void StartQuest(QuestModel questModel)
 	    {
 	        var starId = _session.StarMap.PlayerPosition;
-
-            // TODO, make option to mod this.
-            var seed = new System.Random().Next();
+	        var seed = _session.Game.Seed + starId;
 
 	        if (questModel.StartCondition != StartCondition.Manual)
 	        {
-	            OptimizedDebug.LogException(new ArgumentException("QuestManager.StartQuest: Wrong start condition - " + questModel.StartCondition));
+	            UnityEngine.Debug.LogException(new ArgumentException("QuestManager.StartQuest: Wrong start condition - " + questModel.StartCondition));
 	            return;
 	        }
 
             if (!questModel.CanBeStarted(_session.Quests, starId))
 	        {
-	            OptimizedDebug.LogError(new ArgumentException("QuestManager.StartQuest: Quest can't be started - " + questModel.Id.Value));
+	            UnityEngine.Debug.LogError(new ArgumentException("QuestManager.StartQuest: Quest can't be started - " + questModel.Id.Value));
                 return;
 	        }
 
 	        if (!_requirementsFactory.CreateForQuest(questModel.Requirement, seed).CanStart(starId, seed))
 	        {
-	            OptimizedDebug.LogError(new ArgumentException("QuestManager.StartQuest: Requirements are not met - " + questModel.Id.Value));
+	            UnityEngine.Debug.LogError(new ArgumentException("QuestManager.StartQuest: Requirements are not met - " + questModel.Id.Value));
 	            return;
 	        }
 
@@ -165,11 +163,11 @@ namespace GameServices.Quests
 	    {
 	        if (quest == null)
 	        {
-	            //OptimizedDebug.LogException(new ArgumentException("QuestManager: quest is null"));
+	            //UnityEngine.Debug.LogException(new ArgumentException("QuestManager: quest is null"));
                 return;
 	        }
 
-	        OptimizedDebug.Log("new quest: " + quest.Model.Name);
+	        UnityEngine.Debug.Log("new quest: " + quest.Model.Name);
 
 	        _quests.Add(quest);
             _recentlyUpdatedQuests.Add(quest);
@@ -258,7 +256,7 @@ namespace GameServices.Quests
 	                break;
                 case QuestStatus.Error:
                 default:
-                    OptimizedDebug.LogException(new InvalidOperationException("QuestManager: Error has occured - " + quest.Model.Name));
+                    UnityEngine.Debug.LogException(new InvalidOperationException("QuestManager: Error has occured - " + quest.Model.Name));
                     _session.Quests.CancelQuest(quest.Id, quest.StarId);
                     break;
             }
@@ -358,7 +356,7 @@ namespace GameServices.Quests
                 _quests.AddRange(quests.Select(item => new QuestInfo
                 {
 					QuestGiver = factory.CreateQuestGiver(item.Origin),
-                    Requirements = factory.CreateForQuest(item.Requirement, seed + item.Id.Value),
+                    Requirements = factory.CreateForQuest(item.Requirement, seed + item.Id.Value), 
                     Quest = item
                 }));
             }

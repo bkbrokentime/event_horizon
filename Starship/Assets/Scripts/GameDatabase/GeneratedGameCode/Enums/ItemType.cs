@@ -33,6 +33,7 @@ namespace GameDatabase.Enums
 		Ammunition = 25,
 		VisualEffect = 26,
 		BulletPrefab = 27,
+		EquipmentStats = 30,
 		ShipSettings = 100,
 		GalaxySettings = 101,
 		DatabaseSettings = 102,

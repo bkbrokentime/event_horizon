@@ -9,7 +9,7 @@ namespace GameDatabase
         void LoadDefault();
         bool TryLoad(string id, out string error);
         IEnumerable<ModInfo> AvailableMods { get; }
-
+        void Changemods(List<ModInfo> mods);
         string Id { get; }
         string Name { get; }
         bool IsEditable { get; }

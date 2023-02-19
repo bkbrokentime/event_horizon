@@ -34,7 +34,7 @@ namespace Economy.ItemType
         public string Description { get { return string.Empty; } }
         public UnityEngine.Sprite GetIcon(IResourceLocator resourceLocator) { return resourceLocator.GetSprite("Textures/GUI/InAppPurchases/xmasbox"); }
         public UnityEngine.Color Color { get { return UnityEngine.Color.white; } }
-        public Price Price { get { return Price.Premium(3); } }
+        public Price Price { get { return Price.Premium(30); } }
         public ItemQuality Quality { get { return ItemQuality.Perfect; } }
 
         public bool IsEqual(IItemType other) { return false; }
@@ -82,10 +82,10 @@ namespace Economy.ItemType
             else if (value < 60)
                 items.Add(_database.GetComponent(new ItemId<Component>(fireworkId)));
 
-            items.AddRange(_database.ComponentList.CommonAndRare().RandomUniqueElements(value / 25, random));
+            items.AddRange(_database.ComponentList.Xmas().RandomUniqueElements(value / 25, random));
 
             foreach (var item in items)
-                yield return new Product(_itemTypeFactory.CreateComponentItem(ComponentInfo.CreateRandomModification(item, random, ModificationQuality.P2)));
+                yield return new Product(_itemTypeFactory.CreateComponentItem(ComponentInfo.CreateRandomModification(item, random, ModificationQuality.P0, ModificationQuality.P3)));
 
             yield return new Product(_itemTypeFactory.CreateCurrencyItem(Currency.Snowflakes), random.Range(15, 25));
         }

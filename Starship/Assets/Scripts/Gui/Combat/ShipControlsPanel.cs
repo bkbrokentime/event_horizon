@@ -7,7 +7,6 @@ using Gui.Windows;
 using Services.Gui;
 using Services.Reources;
 using UnityEngine;
-using Utils;
 using ViewModel;
 using Zenject;
 
@@ -159,7 +158,7 @@ namespace Gui.Combat
 
 #if UNITY_STANDALONE
             _navigationPanel.gameObject.SetActive(false);
-            UpdateLayout(buttons, "Action0,1470,70,90 Action1,1370,70,90 Action2,1270,70,90 Action3,1170,70,90 Action4,1070,70,90 Action5,970,70,90");
+            UpdateLayout(buttons, "Action0,1400,70,90 Action1,1300,70,90 Action2,1200,70,90 Action3,1100,70,90 Action4,1000,70,90 Action5,1400,170,90 Action6,1300,170,90 Action7,1200,170,90 Action8,1100,170,90 Action9,1000,170,90");
 #else
             _navigationPanel.gameObject.SetActive(_slideToMove);
             _navigationPanel.Initialize(ship);
@@ -182,7 +181,7 @@ namespace Gui.Combat
                 RectTransform item;
                 if (!items.TryGetValue(id, out item))
                 {
-                    OptimizedDebug.Log("Button not found: " + id);
+                    UnityEngine.Debug.Log("Button not found: " + id);
                     continue;
                 }
 
@@ -228,7 +227,10 @@ namespace Gui.Combat
                 var rotation = RotationHelpers.Angle(_joystickDirection);
                 _ship.Controls.Course = rotation;
                 if (_thrustWithJoystick && !(_stopWhenWeaponActive && _activeButtons > 0))
+                {
                     _ship.Controls.Throttle = Mathf.Abs(Mathf.DeltaAngle(_ship.Body.Rotation, rotation)) < 30 ? Mathf.Clamp01(_joystickDirection.magnitude * 2) : 0f;
+                    Debug.Log("Controls.Throttle : " + Mathf.Clamp01(_joystickDirection.magnitude * 2));
+                } 
             }
 
             if (_leftPressed)

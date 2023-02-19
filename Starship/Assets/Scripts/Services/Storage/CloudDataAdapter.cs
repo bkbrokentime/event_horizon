@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using GameModel.Serialization;
-using Utils;
 
 namespace Services.Storage
 {
@@ -37,23 +36,23 @@ namespace Services.Storage
 
                 if (!LocalStorage.IsModsEqual(mod, modId))
                 {
-                    OptimizedDebug.LogException(new Exception("CloudDataAdapter.TryLoad: Invalid mod id"));
+                    UnityEngine.Debug.LogException(new Exception("CloudDataAdapter.TryLoad: Invalid mod id"));
                     return false;
                 }
 
                 if (!gameData.TryDeserialize(gameId, time, version, modId, _data, index))
                 {
-                    OptimizedDebug.Log("Game load failed");
+                    UnityEngine.Debug.Log("Game load failed");
                     return false;
                 }
 
-                OptimizedDebug.Log("Game loaded: " + gameData.GameId);
+                UnityEngine.Debug.Log("Game loaded: " + gameData.GameId);
 
                 return true;
             }
             catch (System.Exception e)
             {
-                OptimizedDebug.Log(e.Message);
+                UnityEngine.Debug.Log(e.Message);
                 return false;
             }
         }
@@ -70,11 +69,11 @@ namespace Services.Storage
             int index = 0;
             if (!gameData.TryDeserialize(System.DateTime.UtcNow.Ticks, 0, 0, string.Empty, data, index))
             {
-                OptimizedDebug.Log("Legacy game loading failed");
+                UnityEngine.Debug.Log("Legacy game loading failed");
                 throw new ArgumentException("Legacy game loading failed");
             }
 
-            OptimizedDebug.Log("Legacy game loaded: " + gameData.GameId);
+            UnityEngine.Debug.Log("Legacy game loaded: " + gameData.GameId);
         }
 
         private byte[] ConvertFromLegacyGameData()

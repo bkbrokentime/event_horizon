@@ -18,6 +18,7 @@ using Combat.Component.Unit.Classification;
 using Combat.Component.View;
 using Combat.Unit;
 using Constructor;
+using Constructor.Modification;
 using UnityEngine;
 
 namespace Combat.Component.Unit
@@ -136,7 +137,11 @@ namespace Combat.Component.Unit
             var damage = impact.GetTotalDamage(Resistance.Empty);
 
             if (_damageIndicator != null)
-                _damageIndicator.ApplyDamage(new Impact { ShieldDamage = damage });
+            {
+                var newimpact = new Impact(new GameDatabase.Model.AllDamageData(), 0, 0, new Impulse(), CollisionEffect.None);
+                newimpact.AllDamageData.ShieldDamage.SetDamage(damage);
+                _damageIndicator.ApplyDamage(newimpact);
+            }
 
             _hitPoints -= damage;
             if (_hitPoints < 0)

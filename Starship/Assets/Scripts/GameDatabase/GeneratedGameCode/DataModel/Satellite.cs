@@ -32,7 +32,10 @@ namespace GameDatabase.DataModel
 			ModelScale = UnityEngine.Mathf.Clamp(serializable.ModelScale, 0.1f, 100f);
 			SizeClass = serializable.SizeClass;
 			Layout = new Layout(serializable.Layout);
+			SecondLayout = new Layout(serializable.SecondLayout);
+			UAVLaunchPlatforms = new ImmutableCollection<UAVLaunchPlatform>(serializable.UAVLaunchPlatforms?.Select(item => UAVLaunchPlatform.Create(item, loader)));
 			Barrels = new ImmutableCollection<Barrel>(serializable.Barrels?.Select(item => Barrel.Create(item, loader)));
+			Formations = new ImmutableCollection<SatelliteFormation>(serializable.Formations?.Select(item => SatelliteFormation.Create(item, loader)));
 
 			OnDataDeserialized(serializable, loader);
 		}
@@ -44,7 +47,10 @@ namespace GameDatabase.DataModel
 		public float ModelScale { get; private set; }
 		public SizeClass SizeClass { get; private set; }
 		public Layout Layout { get; private set; }
+		public Layout SecondLayout { get; private set; }
+		public ImmutableCollection<UAVLaunchPlatform> UAVLaunchPlatforms { get; private set; }
 		public ImmutableCollection<Barrel> Barrels { get; private set; }
+		public ImmutableCollection<SatelliteFormation> Formations { get; private set; }
 
 		public static Satellite DefaultValue { get; private set; }
 	}

@@ -40,6 +40,8 @@ namespace Combat.Unit.Ship.Effects.Special
         public IFeaturesModification FeaturesModification { get { return null; } }
         public ISystemsModification SystemsModification { get { return null; } }
         public IStatsModification StatsModification { get { return null; } }
+        public IStatsWeaponModification StatsWeaponModification { get { return null; } }
+        public IStatsAttenuationModification StatsAttenuationModifications { get { return null; } }
         public IUnitAction UnitAction { get { return null; } }
 
         private readonly float _maxDistance;

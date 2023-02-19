@@ -34,18 +34,31 @@ namespace Combat.Factory
         [Inject] private readonly PrefabCache _prefabCache;
         [Inject] private readonly IResourceLocator _resourceLocator;
 
-        public Satellite CreateSatellite(IShip ship, IWeaponPlatformData data, float cooldown)
+        public IUnit CreateSatellite(IShip ship, IWeaponPlatformData data, float cooldown)
         {
             var satelliteData = data.Companion;
-            var custom = false;
-
-            var prefab = _prefabCache.LoadResourcePrefab("Combat/Satellites/" + satelliteData.Satellite.ModelImage.Id,true);
-            if (ReferenceEquals(prefab, null))
+            var offset = Vector2.zero;
+            var rotation = 0f;
+            if (satelliteData.Formation != null)
             {
-                prefab = _prefabCache.LoadResourcePrefab("Combat/Satellites/satellite1", true);
-                custom = true;
+                offset = satelliteData.Formation.Position;
+                rotation = satelliteData.Formation.Rotation;
             }
-            var gameObject = new GameObjectHolder(prefab, _objectPool);
+            GameObjectHolder gameObject;
+
+            var prefab = _prefabCache.LoadResourcePrefab("Combat/Satellites/" + satelliteData.Satellite.ModelImage.Id);
+
+            if (prefab != null)
+            {
+                gameObject = new GameObjectHolder(prefab, _objectPool);
+            }
+            else
+            {
+                prefab = _prefabCache.LoadResourcePrefab("Combat/Satellites/Default");
+                gameObject = new GameObjectHolder(prefab, _objectPool);
+                var sprite = _resourceLocator.GetSprite(satelliteData.Satellite.ModelImage);
+                gameObject.GetComponent<SpriteRenderer>().sprite = sprite;
+            }
 
             var body = gameObject.GetComponent<IBodyComponent>();
             body.Initialize(null, ship.Body.WorldPosition(), ship.Body.WorldRotation(), satelliteData.Satellite.ModelScale, Vector2.zero, 0, satelliteData.Weight);
@@ -53,30 +66,103 @@ namespace Combat.Factory
             var view = gameObject.GetComponent<IView>();
             var collider = gameObject.GetComponent<ICollider>();
 
-            if (custom)
-            {
-                gameObject.GetComponent<SpriteRenderer>().sprite =
-                    _resourceLocator.GetSprite(satelliteData.Satellite.ModelImage);
-            }
-            
             var satellite = new Satellite(new UnitType(UnitClass.Drone, ship.Type.Side, ship), body, view, collider);
             satellite.AddResource(gameObject);
 
-            Vector2 position;
+            Vector2[] position=new Vector2[4];
             float minAngle;
             float maxAngle;
 
+            var satellitescale = satelliteData.Satellite.ModelScale;
+            var shipscale = ship.Body.Scale;
+
             if (satelliteData.Location == CompanionLocation.Left)
             {
-                position = new Vector2(-0.5f, 0.5f)*ship.Body.Scale;
-                position.y += 1.5f*satelliteData.Satellite.ModelScale;
+                position[0] = new Vector2(0, 0.75f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[1] = new Vector2(-0.5f, 0.5f) * shipscale * (1 + satellitescale / shipscale) + offset * satellitescale;
+                position[2] = new Vector2(1f, 0.3f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[3] = new Vector2(1.2f, 0.1f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                minAngle = -10;
+                maxAngle = 190;
+            }
+            else if (satelliteData.Location == CompanionLocation.Right)
+            {
+                position[0] = new Vector2(0, -0.75f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[1] = new Vector2(-0.5f, -0.5f) * shipscale * (1 + satellitescale / shipscale) + offset * satellitescale;
+                position[2] = new Vector2(1f, -0.3f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[3] = new Vector2(1.2f, -0.1f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                minAngle = -190;
+                maxAngle = 10;
+            }
+            else if (satelliteData.Location == CompanionLocation.Left_2)
+            {
+                position[0] = new Vector2(0.44f, 0.61f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[1] = new Vector2(-0.6f, 0.6f) * shipscale * (1 + 3 * satellitescale / shipscale) + offset * satellitescale;
+                position[2] = new Vector2(0, 0.5f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[3] = new Vector2(0.6f, 0.3f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                minAngle = -10;
+                maxAngle = 190;
+            }
+            else if (satelliteData.Location == CompanionLocation.Right_2)
+            {
+                position[0] = new Vector2(-0.44f, -0.61f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[1] = new Vector2(-0.6f, -0.6f) * shipscale * (1 + 3 * satellitescale / shipscale) + offset * satellitescale;
+                position[2] = new Vector2(0f, -0.5f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[3] = new Vector2(0.6f, -0.3f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                minAngle = -190;
+                maxAngle = 10;
+            }
+            else if (satelliteData.Location == CompanionLocation.Left_3)
+            {
+                position[0] = new Vector2(-0.44f, 0.61f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[1] = new Vector2(-0.7f, 0.7f) * shipscale * (1 + 5 * satellitescale / shipscale) + offset * satellitescale;
+                position[2] = new Vector2(-1f, 0.7f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[3] = new Vector2(0, 0.5f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                minAngle = -10;
+                maxAngle = 190;
+            }
+            else if (satelliteData.Location == CompanionLocation.Right_3)
+            {
+                position[0] = new Vector2(0.44f, -0.61f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[1] = new Vector2(-0.7f, -0.7f) * shipscale * (1 + 5 * satellitescale / shipscale) + offset * satellitescale;
+                position[2] = new Vector2(-1f, -0.7f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[3] = new Vector2(0f, -0.5f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                minAngle = -190;
+                maxAngle = 10;
+            }
+            else if (satelliteData.Location == CompanionLocation.Left_4)
+            {
+                position[0] = new Vector2(0.71f, 0.23f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[1] = new Vector2(-0.8f, 0.8f) * shipscale * (1 + 7 * satellitescale / shipscale) + offset * satellitescale;
+                position[2] = new Vector2(0.5f, 0.4f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[3] = new Vector2(0.9f, 0.2f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                minAngle = -10;
+                maxAngle = 190;
+            }
+            else if (satelliteData.Location == CompanionLocation.Right_4)
+            {
+                position[0] = new Vector2(-0.71f, -0.23f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[1] = new Vector2(-0.8f, -0.8f) * shipscale * (1 + 7 * satellitescale / shipscale) + offset * satellitescale;
+                position[2] = new Vector2(0.5f, -0.4f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[3] = new Vector2(0.9f, -0.2f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                minAngle = -190;
+                maxAngle = 10;
+            }
+            else if (satelliteData.Location == CompanionLocation.Left_5)
+            {
+                position[0] = new Vector2(-0.71f, 0.23f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[1] = new Vector2(-0.9f, 0.9f) * shipscale * (1 + 9 * satellitescale / shipscale) + offset * satellitescale;
+                position[2] = new Vector2(-0.5f, 0.6f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[3] = new Vector2(0.3f, 0.4f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
                 minAngle = -10;
                 maxAngle = 190;
             }
             else
             {
-                position = new Vector2(-0.5f, -0.5f) * ship.Body.Scale;
-                position.y -= 1.5f * satelliteData.Satellite.ModelScale;
+                position[0] = new Vector2(0.71f, -0.23f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[1] = new Vector2(-0.9f, -0.9f) * shipscale * (1 + 9 * satellitescale / shipscale) + offset * satellitescale;
+                position[2] = new Vector2(-0.5f, -0.6f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[3] = new Vector2(0.3f, -0.4f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
                 minAngle = -190;
                 maxAngle = 10;
             }
@@ -84,9 +170,148 @@ namespace Combat.Factory
             var isTurret = (bool)data.Image;
 
             if (data.AutoAimingArc < 10 || isTurret)
-                satellite.Controller = new SatelliteControllser(ship, satellite, position, data.Rotation);
+                satellite.Controller = new SatelliteControllser(ship, satellite, gameObject ,position, rotation);
             else
-                satellite.Controller = new AutoAimingSatelliteController(ship, satellite, position, data.Rotation, minAngle, maxAngle, _scene);
+                satellite.Controller = new AutoAimingSatelliteController(ship, satellite, gameObject, position, rotation, minAngle, maxAngle, _scene);
+
+            satellite.AddTrigger(new DroneExplosionAction(satellite, _effectFactory, _soundPlayer));
+
+            gameObject.IsActive = false;
+            _scene.AddUnit(satellite);
+
+            return satellite;
+        }
+
+        public IUnit CreateUAVSatellite(IShip ship, IUAVPlatformData data, float cooldown)
+        {
+            var satelliteData = data.Companion;
+            var offset = data.Position;
+            var rotation = data.Rotation;
+
+            GameObjectHolder gameObject;
+
+            var prefab = _prefabCache.LoadResourcePrefab("Combat/Satellites/" + satelliteData.Satellite.ModelImage.Id);
+
+            if (prefab != null)
+            {
+                gameObject = new GameObjectHolder(prefab, _objectPool);
+            }
+            else
+            {
+                prefab = _prefabCache.LoadResourcePrefab("Combat/Satellites/Default");
+                gameObject = new GameObjectHolder(prefab, _objectPool);
+                var sprite = _resourceLocator.GetSprite(satelliteData.Satellite.ModelImage);
+                gameObject.GetComponent<SpriteRenderer>().sprite = sprite;
+            }
+
+            var body = gameObject.GetComponent<IBodyComponent>();
+            body.Initialize(null, ship.Body.WorldPosition(), ship.Body.WorldRotation(), satelliteData.Satellite.ModelScale, Vector2.zero, 0, satelliteData.Weight);
+
+            var view = gameObject.GetComponent<IView>();
+            var collider = gameObject.GetComponent<ICollider>();
+
+            var satellite = new Satellite(new UnitType(UnitClass.Drone, ship.Type.Side, ship), body, view, collider);
+            satellite.AddResource(gameObject);
+
+            Vector2[] position = new Vector2[4];
+            float minAngle;
+            float maxAngle;
+
+            var satellitescale = satelliteData.Satellite.ModelScale;
+            var shipscale = ship.Body.Scale;
+
+            if (satelliteData.Location == CompanionLocation.Left)
+            {
+                position[0] = new Vector2(0, 0.75f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[1] = new Vector2(-0.5f, 0.5f) * shipscale * (1 + satellitescale / shipscale) + offset * satellitescale;
+                position[2] = new Vector2(1f, 0.3f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[3] = new Vector2(1.2f, 0.1f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                minAngle = -10;
+                maxAngle = 190;
+            }
+            else if (satelliteData.Location == CompanionLocation.Right)
+            {
+                position[0] = new Vector2(0, -0.75f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[1] = new Vector2(-0.5f, -0.5f) * shipscale * (1 + satellitescale / shipscale) + offset * satellitescale;
+                position[2] = new Vector2(1f, -0.3f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[3] = new Vector2(1.2f, -0.1f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                minAngle = -190;
+                maxAngle = 10;
+            }
+            else if (satelliteData.Location == CompanionLocation.Left_2)
+            {
+                position[0] = new Vector2(0.44f, 0.61f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[1] = new Vector2(-0.6f, 0.6f) * shipscale * (1 + 3 * satellitescale / shipscale) + offset * satellitescale;
+                position[2] = new Vector2(0, 0.5f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[3] = new Vector2(0.6f, 0.3f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                minAngle = -10;
+                maxAngle = 190;
+            }
+            else if (satelliteData.Location == CompanionLocation.Right_2)
+            {
+                position[0] = new Vector2(-0.44f, -0.61f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[1] = new Vector2(-0.6f, -0.6f) * shipscale * (1 + 3 * satellitescale / shipscale) + offset * satellitescale;
+                position[2] = new Vector2(0f, -0.5f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[3] = new Vector2(0.6f, -0.3f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                minAngle = -190;
+                maxAngle = 10;
+            }
+            else if (satelliteData.Location == CompanionLocation.Left_3)
+            {
+                position[0] = new Vector2(-0.44f, 0.61f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[1] = new Vector2(-0.7f, 0.7f) * shipscale * (1 + 5 * satellitescale / shipscale) + offset * satellitescale;
+                position[2] = new Vector2(-1f, 0.7f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[3] = new Vector2(0, 0.5f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                minAngle = -10;
+                maxAngle = 190;
+            }
+            else if (satelliteData.Location == CompanionLocation.Right_3)
+            {
+                position[0] = new Vector2(0.44f, -0.61f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[1] = new Vector2(-0.7f, -0.7f) * shipscale * (1 + 5 * satellitescale / shipscale) + offset * satellitescale;
+                position[2] = new Vector2(-1f, -0.7f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[3] = new Vector2(0f, -0.5f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                minAngle = -190;
+                maxAngle = 10;
+            }
+            else if (satelliteData.Location == CompanionLocation.Left_4)
+            {
+                position[0] = new Vector2(0.71f, 0.23f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[1] = new Vector2(-0.8f, 0.8f) * shipscale * (1 + 7 * satellitescale / shipscale) + offset * satellitescale;
+                position[2] = new Vector2(0.5f, 0.4f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[3] = new Vector2(0.9f, 0.2f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                minAngle = -10;
+                maxAngle = 190;
+            }
+            else if (satelliteData.Location == CompanionLocation.Right_4)
+            {
+                position[0] = new Vector2(-0.71f, -0.23f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[1] = new Vector2(-0.8f, -0.8f) * shipscale * (1 + 7 * satellitescale / shipscale) + offset * satellitescale;
+                position[2] = new Vector2(0.5f, -0.4f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[3] = new Vector2(0.9f, -0.2f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                minAngle = -190;
+                maxAngle = 10;
+            }
+            else if (satelliteData.Location == CompanionLocation.Left_5)
+            {
+                position[0] = new Vector2(-0.71f, 0.23f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[1] = new Vector2(-0.9f, 0.9f) * shipscale * (1 + 9 * satellitescale / shipscale) + offset * satellitescale;
+                position[2] = new Vector2(-0.5f, 0.6f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[3] = new Vector2(0.3f, 0.4f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                minAngle = -10;
+                maxAngle = 190;
+            }
+            else
+            {
+                position[0] = new Vector2(0.71f, -0.23f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[1] = new Vector2(-0.9f, -0.9f) * shipscale * (1 + 9 * satellitescale / shipscale) + offset * satellitescale;
+                position[2] = new Vector2(-0.5f, -0.6f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                position[3] = new Vector2(0.3f, -0.4f) * shipscale * (1 + 2 * satellitescale / shipscale) + offset * satellitescale;
+                minAngle = -190;
+                maxAngle = 10;
+            }
+
+            satellite.Controller = new SatelliteControllser(ship, satellite, gameObject, position, rotation);
 
             satellite.AddTrigger(new DroneExplosionAction(satellite, _effectFactory, _soundPlayer));
 
@@ -96,7 +321,7 @@ namespace Combat.Factory
             return satellite;
         }
 
-        public IAuxiliaryUnit CreateRepairBot(IShip ship, float repairRate, float size, float weight, float hitPoints, Color color, AudioClipId activationSound)
+        public IAuxiliaryUnit CreateRepairBot(IShip ship, float repairRate, float size, float weight, float hitPoints, Color color, AudioClipId activationSound, float toward = 0)
         {
             var prefab = _prefabCache.LoadResourcePrefab("Combat/Objects/RepairBot");
             var gameObject = new GameObjectHolder(prefab, _objectPool);
@@ -110,13 +335,13 @@ namespace Combat.Factory
             var repairBot = new RepairBot(ship, body, view, collider, hitPoints);
             var radius = ship.Body.Scale + 1f + size;
 
-            repairBot.Controller = new RepairBotContoller(ship, repairBot, radius, repairRate);
+            repairBot.Controller = new RepairBotContoller(ship, repairBot, radius, repairRate, toward);
             repairBot.AddResource(gameObject);
 
             repairBot.AddTrigger(new DroneExplosionAction(repairBot, _effectFactory, _soundPlayer));
 
             var effect = _effectFactory.CreateEffect("Laser", body);
-            effect.Position = new Vector2(size/2, 0);
+            effect.Position = new Vector2(size / 2, 0);
             effect.Rotation = 0;
             effect.Color = color;
             effect.Size = radius - size;

@@ -10,6 +10,7 @@ namespace GameDatabase.DataModel
             Modification = component.Info.ModificationType;
             Quality = component.Info.ModificationQuality;
             Locked = true;
+            Layout = component.Layout;
             X = component.X;
             Y = component.Y;
             BarrelId = component.BarrelId;
@@ -25,6 +26,7 @@ namespace GameDatabase.DataModel
                 Modification = Modification,
                 Quality = Quality,
                 Locked = Locked,
+                Layout = Layout,
                 X = X,
                 Y = Y,
                 BarrelId = BarrelId,

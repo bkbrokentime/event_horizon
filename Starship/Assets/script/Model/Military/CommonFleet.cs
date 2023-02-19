@@ -15,7 +15,7 @@ namespace Model
 				_builds = ships;
 				_seed = seed;
 				_distance = distance;
-			    _database = database;
+				_database = database;
 				AiLevel = aiLevel < 0 ? Maths.Distance.AiLevel(distance) : aiLevel;
 			}
 
@@ -29,6 +29,7 @@ namespace Model
 					return _ships;
 				}
 			}
+			public IEnumerable<IShip> AllShips { get { return Ships; } }
 
 			public int AiLevel { get; private set; }
 
@@ -37,7 +38,7 @@ namespace Model
 				get
 				{
 					if (_power < 0)
-						_power = Maths.Threat.GetShipsPower(Ships);
+						_power = Maths.Power.GetShipsComprehensivePower(Ships, _database.ShipSettings);//_power = Maths.Threat.GetShipsPower(Ships);
 					return _power;
 				}
 			}
@@ -47,7 +48,7 @@ namespace Model
 			private readonly IEnumerable<ShipBuild> _builds;
 			private readonly int _distance;
 			private readonly int _seed;
-		    private readonly IDatabase _database;
+			private readonly IDatabase _database;
 		}
 	}
 }

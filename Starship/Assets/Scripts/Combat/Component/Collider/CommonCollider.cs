@@ -5,7 +5,6 @@ using Combat.Component.Body;
 using Combat.Component.Unit;
 using Combat.Component.Unit.Classification;
 using UnityEngine;
-using Utils;
 using Zenject;
 
 namespace Combat.Component.Collider
@@ -82,7 +81,6 @@ namespace Combat.Component.Collider
         {
             Unit = null;
             _activeCollision = null;
-            _cachedColliders = null;
             _recentTrigger = null;
             Enabled = true;
             _activeCollisions.Clear();
@@ -96,8 +94,8 @@ namespace Combat.Component.Collider
             var other = collider.gameObject.GetComponent<ICollider>();
             if (other == null || other.Unit == null || other.Unit.Body == null)
             {
-                OptimizedDebug.LogError("invalid collider: " + other);
-                //OptimizedDebug.Break();
+                Debug.LogError("invalid collider: " + other);
+                //Debug.Break();
                 return;
             }
 
@@ -120,8 +118,8 @@ namespace Combat.Component.Collider
             var other = collider.gameObject.GetComponent<ICollider>();
             if (other == null || other.Unit == null || other.Unit.Body == null)
             {
-                OptimizedDebug.LogError("invalid collider: " + other);
-                //OptimizedDebug.Break();
+                Debug.LogError("invalid collider: " + other);
+                //Debug.Break();
                 return;
             }
 
@@ -138,8 +136,8 @@ namespace Combat.Component.Collider
             //var other = collider.gameObject.GetComponent<ICollider>();
             //if (other == null || other.Unit == null)
             //{
-            //    UnityEngine.OptimizedDebug.Log("invalid collider: " + other);
-            //    //OptimizedDebug.Break();
+            //    UnityEngine.Debug.Log("invalid collider: " + other);
+            //    //Debug.Break();
             //    return;
             //}
 
@@ -154,8 +152,8 @@ namespace Combat.Component.Collider
             var other = collision.collider.gameObject.GetComponent<ICollider>();
             if (other == null || other.Unit == null)
             {
-                OptimizedDebug.LogError("invalid collider: " + other);
-                //OptimizedDebug.Break();
+                Debug.LogError("invalid collider: " + other);
+                //Debug.Break();
                 return;
             }
 
@@ -176,7 +174,7 @@ namespace Combat.Component.Collider
             var other = collision.collider.gameObject.GetComponent<ICollider>();
             if (other == null || other.Unit == null)
             {
-                OptimizedDebug.LogError("invalid collider: " + other);
+                Debug.LogError("invalid collider: " + other);
                 return;
             }
 
@@ -191,8 +189,8 @@ namespace Combat.Component.Collider
             var other = collision.collider.gameObject.GetComponent<ICollider>();
             if (other == null || other.Unit == null)
             {
-                OptimizedDebug.LogError("invalid collider: " + other);
-                //OptimizedDebug.Break();
+                Debug.LogError("invalid collider: " + other);
+                //Debug.Break();
                 return;
             }
 

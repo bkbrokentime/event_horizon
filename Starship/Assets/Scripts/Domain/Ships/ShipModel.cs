@@ -2,9 +2,11 @@
 using System.Linq;
 using Constructor.Model;
 using Constructor.Ships.Modification;
+using DebugLogSetting;
 using GameDatabase.DataModel;
 using GameDatabase.Enums;
 using GameDatabase.Model;
+using UnityEngine;
 using UnityEngine.Assertions;
 using Utils;
 
@@ -48,6 +50,8 @@ namespace Constructor.Ships
         public string OriginalName => _ship.Name;
         public Faction Faction { get; set; }
         public Layout Layout => _stats.Layout;
+        public Layout SecondLayout => _stats.SecondLayout;
+        public ImmutableCollection<UAVLaunchPlatform> UAVLaunchPlatforms => _ship.UAVLaunchPlatforms;
         public ImmutableCollection<Barrel> Barrels => _ship.Barrels;
         public SpriteId ModelImage => _ship.ModelImage;
         public SpriteId IconImage => _ship.IconImage;
@@ -79,12 +83,32 @@ namespace Constructor.Ships
             {
                 BaseWeightMultiplier = new StatMultiplier(_ship.BaseWeightModifier),
                 Layout = _layoutModifications.BuildLayout(),
+                SecondLayout = _layoutModifications.BuildSecondLayout(),
                 BuiltinDevices = _ship.BuiltinDevices
             };
 
             foreach (var modification in _modifications)
                 modification.Apply(ref _stats);
 
+            if (ShipDebugLogSetting.ShipModificationDebugLog)
+            {
+                Debug.Log("BaseArmorMultiplier:         " + _stats.BaseArmorMultiplier);
+                Debug.Log("BaseWeightMultiplier:            " + _stats.BaseWeightMultiplier);
+                Debug.Log("EnergyResistanceMultiplier:          " + _stats.EnergyResistanceMultiplier);
+                Debug.Log("HeatResistanceMultiplier:            " + _stats.HeatResistanceMultiplier);
+                Debug.Log("KineticResistanceMultiplier:         " + _stats.KineticResistanceMultiplier);
+                Debug.Log("QuantumResistanceMultiplier:         " + _stats.QuantumResistanceMultiplier);
+                Debug.Log("ShieldEnergyResistanceMultiplier:        " + _stats.ShieldEnergyResistanceMultiplier);
+                Debug.Log("ShieldHeatResistanceMultiplier:          " + _stats.ShieldHeatResistanceMultiplier);
+                Debug.Log("ShieldKineticResistanceMultiplier:       " + _stats.ShieldKineticResistanceMultiplier);
+                Debug.Log("ShieldQuantumResistanceMultiplier:       " + _stats.ShieldQuantumResistanceMultiplier);
+                Debug.Log("EnergyShieldEnergyResistanceMultiplier:      " + _stats.EnergyShieldEnergyResistanceMultiplier);
+                Debug.Log("EnergyShieldHeatResistanceMultiplier:        " + _stats.EnergyShieldHeatResistanceMultiplier);
+                Debug.Log("EnergyShieldHeatResistanceMultiplier:        " + _stats.EnergyShieldHeatResistanceMultiplier);
+                Debug.Log("EnergyShieldQuantumResistanceMultiplier:     " + _stats.EnergyShieldQuantumResistanceMultiplier);
+                Debug.Log("RegenerationRate:        " + _stats.RegenerationRate);
+                Debug.Log("AutoTargeting:     " + _stats.AutoTargeting.ToString());
+            }
             DataChanged = true;
         }
 

@@ -2,6 +2,7 @@
 using Combat.Component.Platform;
 using Combat.Factory;
 using UnityEngine;
+using Combat.Component.Ship;
 
 namespace Combat.Component.Systems.Weapons
 {
@@ -11,6 +12,7 @@ namespace Combat.Component.Systems.Weapons
         Manageable,
         Continuous,
         RequiredCharging,
+        BarrageCannon,
     }
 
     public enum BulletType
@@ -19,6 +21,7 @@ namespace Combat.Component.Systems.Weapons
         Homing,
         Projectile,
         AreaOfEffect,
+        RandomSteering,
     }
 
     public enum BulletEffectType
@@ -42,15 +45,23 @@ namespace Combat.Component.Systems.Weapons
                 Recoil = _bulletFactory.Stats.Recoil / platform.Body.TotalWeight();
         }
 
-        public WeaponType WeaponType => _weaponType;
-        public BulletType BulletType => _bulletFactory.Stats.Type;
-        public BulletEffectType BulletEffectType => _bulletFactory.Stats.EffectType;
-        public float Range => _bulletFactory.Stats.BulletHitRange;
-        public float Spread => _spread;
-        public bool IsRelativeVelocity => !_bulletFactory.Stats.IgnoresShipSpeed;
-        public float BulletSpeed => _bulletFactory.Stats.BulletSpeed;
-        public float EnergyCost => _bulletFactory.Stats.EnergyCost;
+        public WeaponType WeaponType { get { return _weaponType; } }
+        public BulletType BulletType { get { return _bulletFactory.Stats.Type; } }
+        public BulletEffectType BulletEffectType { get { return _bulletFactory.Stats.EffectType; } }
+        public float Range { get { return _bulletFactory.Stats.BulletHitRange; } }
+        public float Spread { get { return _spread; } }
+        public bool IsRelativeVelocity { get { return !_bulletFactory.Stats.IgnoresShipSpeed; } }
+        public float BulletSpeed { get { return _bulletFactory.Stats.BulletSpeed; } }
+        public float EnergyCost { get { return _bulletFactory.Stats.EnergyCost; } }
         public float Recoil { get; private set; }
+        /*
+        public void WeaponInfoUpgrade( WeaponInfo Info)
+        {
+            var bulletFactory = _bulletFactory;
+            bulletFactory.Stats.BulletHitRange*=
+            Info
+        }
+        */
 
         private readonly float _spread;
         private readonly WeaponType _weaponType;

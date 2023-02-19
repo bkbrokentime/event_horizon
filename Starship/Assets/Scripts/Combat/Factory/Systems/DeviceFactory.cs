@@ -9,6 +9,7 @@ using GameDatabase.DataModel;
 using GameDatabase.Enums;
 using Services.Audio;
 using Services.ObjectPool;
+using Services.Reources;
 using UnityEngine;
 using Zenject;
 
@@ -34,7 +35,7 @@ namespace Combat.Factory
             switch (stats.DeviceClass)
             {
                 case DeviceClass.ClonningCenter:
-                    device = new ClonningDevice(ship, stats, _shipFactory, shipSpec, _effectFactory, deviceData.KeyBinding);
+                    device = new ClonningDevice(ship, stats, _shipFactory, shipSpec, _effectFactory, deviceData.KeyBinding, ship);
                     break;
                 case DeviceClass.TimeMachine:
                     {
@@ -72,8 +73,9 @@ namespace Combat.Factory
                     {
                         var pointDefense = new PointDefenseSystem(ship, stats, deviceData.KeyBinding);
                         device = pointDefense;
-                        device.AddTrigger(new PointDefenseAction(ship, pointDefense, stats.Size + ship.Body.Scale/2f, 
-                            stats.Power*shipSpec.Stats.DamageMultiplier.Value, stats.EnergyConsumption, stats.Cooldown, stats.Color, _satelliteFactory, stats.Sound));
+                        int pointDefensenum = stats.Quantity > 0 ? stats.Quantity : Mathf.RoundToInt(stats.Power);
+                        device.AddTrigger(new PointDefenseAction(ship, pointDefense, stats.Size + ship.Body.Scale / 2f,
+                            pointDefensenum * shipSpec.Stats.DamageMultiplier.Value, stats.EnergyConsumption, stats.Cooldown, stats.Color, _satelliteFactory, stats.Sound));
                         soundEffectCondition = ConditionType.None;
                     }
                     break;
@@ -82,15 +84,18 @@ namespace Combat.Factory
                     break;
                 case DeviceClass.EnergyShield:
                     {
-                        var energyShield = _satelliteFactory.CreateEnergyShield(ship, 1f / (stats.Power * shipSpec.Stats.ShieldMultiplier.Value), stats.Size, stats.Color);
+                        var energyShield = _satelliteFactory.CreateEnergyShield(ship, 1f / (stats.Power * shipSpec.Stats.EnergyShieldMultiplier.Value), stats.Size, stats.Color);
                         var energyShieldDevice = new EnergyShieldDevice(ship, stats, deviceData.KeyBinding);
                         device = energyShieldDevice;
                         device.AddTrigger(new AuxiliaryUnitAction(energyShieldDevice, energyShield));
                     }
                     break;
+                case DeviceClass.Denseshield:
+                    device = new DenseEnergyShieldDevice(ship, stats, deviceData.KeyBinding);
+                    break;
                 case DeviceClass.PartialShield:
                     {
-                        var energyShield = _satelliteFactory.CreateFrontalShield(ship, 1f / (stats.Power * shipSpec.Stats.ShieldMultiplier.Value), stats.Offset, stats.Size, stats.Color);
+                        var energyShield = _satelliteFactory.CreateFrontalShield(ship, 1f / (stats.Power * shipSpec.Stats.EnergyShieldMultiplier.Value), stats.Offset, stats.Size, stats.Color);
                         var energyShieldDevice = new FrontalShieldDevice(ship, stats, deviceData.KeyBinding);
                         device = energyShieldDevice;
                         device.AddTrigger(new AuxiliaryUnitAction(energyShieldDevice, energyShield));
@@ -98,7 +103,10 @@ namespace Combat.Factory
                     break;
                 case DeviceClass.RepairBot:
                     device = new RepairSystem(ship, stats, deviceData.KeyBinding);
-                    device.AddTrigger(new RepairBotAction(ship, device, _satelliteFactory, stats.Power * ship.Stats.Armor.MaxValue / 100, stats.Size, stats.Color, stats.Sound));
+                    if (stats.Quantity > 1)
+                        device.AddTrigger(new RepairBotAction(ship, device, _satelliteFactory, stats.Power * ship.Stats.Armor.MaxValue / 100, stats.Size, stats.Color, stats.Sound, stats.Quantity));
+                    else
+                        device.AddTrigger(new RepairBotAction(ship, device, _satelliteFactory, stats.Power * ship.Stats.Armor.MaxValue / 100, stats.Size, stats.Color, stats.Sound));
                     soundEffectCondition = ConditionType.None;
                     break;
                 case DeviceClass.Detonator:
@@ -121,12 +129,25 @@ namespace Combat.Factory
                 case DeviceClass.Fortification:
                     device = new FortificationDevice(ship, stats, deviceData.KeyBinding);
                     break;
+                case DeviceClass.Equipment:
+                    device = new Equipment(ship, stats, deviceData.KeyBinding);
+                    break;
+                case DeviceClass.CombustionInhibition:
+                    device = new CombustionInhibitionDevice(ship, stats, deviceData.KeyBinding);
+                    break;
+                case DeviceClass.EnergyDiversion:
+                    device = new EnergyDiversionDevice(ship, stats, deviceData.KeyBinding);
+                    break;
+                case DeviceClass.FireAssault:
+                    device = new FireAssault(ship, stats, deviceData.KeyBinding);
+                    break;
                 case DeviceClass.ToxicWaste:
-                    device = new ToxicWaste(ship, stats, _spaceObjectFactory, shipSpec.Stats.DamageMultiplier.Value);
+                    device = new ToxicWaste(ship, stats, _spaceObjectFactory, shipSpec.Stats.DamageMultiplier.Value, ship);
                     break;
                 case DeviceClass.WormTail:
-                    device = new WormTailDevice(ship, stats, _spaceObjectFactory.CreateWormTail(ship, Mathf.FloorToInt(stats.Size), 0.1f,
-                        ship.Stats.Armor.MaxValue * stats.Power, stats.ObjectPrefab, stats.Offset.x, stats.Offset.y, 0.15f, shipSpec.Stats.ShipColor));
+                    int WormTailnum = stats.Quantity > 0 ? stats.Quantity : Mathf.FloorToInt(stats.Size);
+                    device = new WormTailDevice(stats, _spaceObjectFactory.CreateWormTail(ship, WormTailnum, 0.1f,
+                        ship.Stats.Armor.MaxValue * stats.Power, stats.ObjectPrefab, stats.UseMyIcon, stats.ObjectIconImage, stats.SecondObjectIconImage, stats.Offset, 0.15f, stats.ObjectOffset, shipSpec.Stats.ShipColor), ship);
                     break;
                 default:
                     return null;

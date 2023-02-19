@@ -4,7 +4,10 @@
     <string name="CraftPrice">价格:</string>
     <string name="CraftCommonItem">制作一般品质的道具</string>
     <string name="CraftImprovedItem">制作改良品质的道具</string>
-    <string name="CraftSuperiorItem">制作优秀品质的道具</string>
+    <string name="CraftExcellentItem">制作优秀品质的道具</string>
+    <string name="CraftSuperiorItem">制作高级品质的道具</string>
+    <string name="CraftTopItem">制作顶尖品质的道具</string>
+    <string name="CraftUltraItem">制作终极品质的道具</string>
     <string name="CraftNotAvailable">此项目不可用</string>
     <string name="CraftItem">制作普通物品</string>
     <string name="RareResourceLabel">稀有资源</string>

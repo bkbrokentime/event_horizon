@@ -5,11 +5,17 @@ namespace Economy.ItemType
 {
     public enum ItemQuality
     {
-        Low,
+        Low5,
+        Low4,
+        Low3,
+        Low2,
+        Low1,
         Common,
         Medium,
         High,
         Perfect,
+        Epic,
+        Legend,
     }
 
     public interface IItemType

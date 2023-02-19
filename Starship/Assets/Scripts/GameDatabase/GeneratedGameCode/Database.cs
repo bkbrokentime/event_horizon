@@ -16,6 +16,7 @@ namespace GameDatabase
 {
 	public partial interface IDatabase
 	{
+        DatabaseContent Content { get; }
 		DatabaseSettings DatabaseSettings { get; }
 		ExplorationSettings ExplorationSettings { get; }
 		GalaxySettings GalaxySettings { get; }
@@ -27,6 +28,7 @@ namespace GameDatabase
 		IEnumerable<ComponentStats> ComponentStatsList { get; }
 		IEnumerable<Device> DeviceList { get; }
 		IEnumerable<DroneBay> DroneBayList { get; }
+		IEnumerable<EquipmentStats> EquipmentStatsList { get; }
 		IEnumerable<Faction> FactionList { get; }
 		IEnumerable<Satellite> SatelliteList { get; }
 		IEnumerable<SatelliteBuild> SatelliteBuildList { get; }
@@ -50,6 +52,7 @@ namespace GameDatabase
 		ComponentStats GetComponentStats(ItemId<ComponentStats> id);
 		Device GetDevice(ItemId<Device> id);
 		DroneBay GetDroneBay(ItemId<DroneBay> id);
+		EquipmentStats GetEquipmentStats(ItemId<EquipmentStats> id);
 		Faction GetFaction(ItemId<Faction> id);
 		Satellite GetSatellite(ItemId<Satellite> id);
 		SatelliteBuild GetSatelliteBuild(ItemId<SatelliteBuild> id);
@@ -74,6 +77,7 @@ namespace GameDatabase
 
     public partial class Database : IDatabase
     {
+        public DatabaseContent Content { get; private set; }
 		public DatabaseSettings DatabaseSettings { get; private set; }
 		public ExplorationSettings ExplorationSettings { get; private set; }
 		public GalaxySettings GalaxySettings { get; private set; }
@@ -85,6 +89,7 @@ namespace GameDatabase
 		public IEnumerable<ComponentStats> ComponentStatsList => _componentStatsMap.Values;
 		public IEnumerable<Device> DeviceList => _deviceMap.Values;
 		public IEnumerable<DroneBay> DroneBayList => _droneBayMap.Values;
+		public IEnumerable<EquipmentStats> EquipmentStatsList => _equipmentStatsMap.Values;
 		public IEnumerable<Faction> FactionList => _factionMap.Values;
 		public IEnumerable<Satellite> SatelliteList => _satelliteMap.Values;
 		public IEnumerable<SatelliteBuild> SatelliteBuildList => _satelliteBuildMap.Values;
@@ -108,6 +113,7 @@ namespace GameDatabase
 		public ComponentStats GetComponentStats(ItemId<ComponentStats> id) { return (_componentStatsMap.TryGetValue(id.Value, out var item)) ? item : ComponentStats.DefaultValue; }
 		public Device GetDevice(ItemId<Device> id) { return (_deviceMap.TryGetValue(id.Value, out var item)) ? item : Device.DefaultValue; }
 		public DroneBay GetDroneBay(ItemId<DroneBay> id) { return (_droneBayMap.TryGetValue(id.Value, out var item)) ? item : DroneBay.DefaultValue; }
+		public EquipmentStats GetEquipmentStats(ItemId<EquipmentStats> id) { return (_equipmentStatsMap.TryGetValue(id.Value, out var item)) ? item : EquipmentStats.DefaultValue; }
 		public Faction GetFaction(ItemId<Faction> id) { return (_factionMap.TryGetValue(id.Value, out var item)) ? item : Faction.DefaultValue; }
 		public Satellite GetSatellite(ItemId<Satellite> id) { return (_satelliteMap.TryGetValue(id.Value, out var item)) ? item : Satellite.DefaultValue; }
 		public SatelliteBuild GetSatelliteBuild(ItemId<SatelliteBuild> id) { return (_satelliteBuildMap.TryGetValue(id.Value, out var item)) ? item : SatelliteBuild.DefaultValue; }
@@ -137,6 +143,7 @@ namespace GameDatabase
 			_componentStatsMap.Clear();
 			_deviceMap.Clear();
 			_droneBayMap.Clear();
+			_equipmentStatsMap.Clear();
 			_factionMap.Clear();
 			_satelliteMap.Clear();
 			_satelliteBuildMap.Clear();
@@ -154,6 +161,7 @@ namespace GameDatabase
 			_visualEffectMap.Clear();
 			_weaponMap.Clear();
 
+            Content = null;
 			DatabaseSettings = null;
 			ExplorationSettings = null;
 			GalaxySettings = null;
@@ -170,6 +178,7 @@ namespace GameDatabase
 		private readonly Dictionary<int, ComponentStats> _componentStatsMap = new Dictionary<int, ComponentStats>();
 		private readonly Dictionary<int, Device> _deviceMap = new Dictionary<int, Device>();
 		private readonly Dictionary<int, DroneBay> _droneBayMap = new Dictionary<int, DroneBay>();
+		private readonly Dictionary<int, EquipmentStats> _equipmentStatsMap = new Dictionary<int, EquipmentStats>();
 		private readonly Dictionary<int, Faction> _factionMap = new Dictionary<int, Faction>();
 		private readonly Dictionary<int, Satellite> _satelliteMap = new Dictionary<int, Satellite>();
 		private readonly Dictionary<int, SatelliteBuild> _satelliteBuildMap = new Dictionary<int, SatelliteBuild>();
@@ -225,6 +234,9 @@ namespace GameDatabase
 				foreach (var item in _content.DroneBayList)
 					if (!item.Disabled && !_database._droneBayMap.ContainsKey(item.Id))
 						DroneBay.Create(item, this);
+				foreach (var item in _content.EquipmentStatsList)
+					if (!item.Disabled && !_database._equipmentStatsMap.ContainsKey(item.Id))
+						EquipmentStats.Create(item, this);
 				foreach (var item in _content.FactionList)
 					if (!item.Disabled && !_database._factionMap.ContainsKey(item.Id))
 						Faction.Create(item, this);
@@ -353,6 +365,16 @@ namespace GameDatabase
                 if (serializable != null && !serializable.Disabled) return DroneBay.Create(serializable, this);
 
 				var value = DroneBay.DefaultValue;
+				if (notNull && value == null) throw new DatabaseException("Data not found " + id);
+                return value;
+			}
+			public EquipmentStats GetEquipmentStats(ItemId<EquipmentStats> id, bool notNull = false)
+			{
+				if (_database._equipmentStatsMap.TryGetValue(id.Value, out var item)) return item;
+                var serializable = _content.GetEquipmentStats(id.Value);
+                if (serializable != null && !serializable.Disabled) return EquipmentStats.Create(serializable, this);
+
+				var value = EquipmentStats.DefaultValue;
 				if (notNull && value == null) throw new DatabaseException("Data not found " + id);
                 return value;
 			}
@@ -524,6 +546,7 @@ namespace GameDatabase
 			public void AddComponentStats(int id, ComponentStats item) { _database._componentStatsMap.Add(id, item); }
 			public void AddDevice(int id, Device item) { _database._deviceMap.Add(id, item); }
 			public void AddDroneBay(int id, DroneBay item) { _database._droneBayMap.Add(id, item); }
+			public void AddEquipmentStats(int id, EquipmentStats item) { _database._equipmentStatsMap.Add(id, item); }
 			public void AddFaction(int id, Faction item) { _database._factionMap.Add(id, item); }
 			public void AddSatellite(int id, Satellite item) { _database._satelliteMap.Add(id, item); }
 			public void AddSatelliteBuild(int id, SatelliteBuild item) { _database._satelliteBuildMap.Add(id, item); }

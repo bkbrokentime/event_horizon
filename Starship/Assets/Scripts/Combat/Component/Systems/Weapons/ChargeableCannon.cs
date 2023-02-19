@@ -4,13 +4,16 @@ using Combat.Component.Triggers;
 using Combat.Unit;
 using GameDatabase.DataModel;
 using UnityEngine;
+using Combat.Component.Ship;
+using Combat.Factory;
+using Constructor.Modification;
 
 namespace Combat.Component.Systems.Weapons
 {
     public class ChargeableCannon : SystemBase, IWeapon
     {
-        public ChargeableCannon(IWeaponPlatform platform, WeaponStats weaponStats, Factory.IBulletFactory bulletFactory, int keyBinding)
-            : base(keyBinding, weaponStats.ControlButtonIcon)
+        public ChargeableCannon(IWeaponPlatform platform, WeaponStats weaponStats, Factory.IBulletFactory bulletFactory, int keyBinding, IShip ship)
+            : base(keyBinding, weaponStats.ControlButtonIcon, ship)
         {
             _bulletFactory = bulletFactory;
             _platform = platform;
@@ -18,24 +21,27 @@ namespace Combat.Component.Systems.Weapons
             _spread = weaponStats.Spread;
             _chargeTotalTime = 1.0f / weaponStats.FireRate;
 
+            _weaponStats = weaponStats;
+            _ship = ship;
+
             Info = new WeaponInfo(WeaponType.RequiredCharging, _spread, bulletFactory, platform);
         }
 
-        public override bool CanBeActivated { get { return _chargeTime > 0 || (_platform.IsReady && _platform.EnergyPoints.Value >= _energyConsumption*0.5f); } }
-        public override float Cooldown { get { return _platform.Cooldown; } }
+        public override bool CanBeActivated { get { return !_ship.Stats.SpaceJump && (_chargeTime > 0 || (_platform.IsReady && _platform.EnergyPoints.Value >= _energyConsumption * _ship.Stats.WeaponUpgrade.EnergyCostMultiplier * 0.5f)); } }
+        public override float Cooldown { get { return _platform.Cooldown / Mathf.Max(0.0000001f, _ship.Stats.WeaponUpgrade.FireRateMultiplier); } }
 
         public WeaponInfo Info { get; private set; }
         public IWeaponPlatform Platform { get { return _platform; } }
-        public float PowerLevel { get { return Mathf.Clamp01(_chargeTime / _chargeTotalTime); } }
+        public float PowerLevel { get { return Mathf.Clamp01(_chargeTime * _ship.Stats.WeaponUpgrade.FireRateMultiplier / _chargeTotalTime); } }
         public IBullet ActiveBullet { get { return null; } }
 
         protected override void OnUpdateView(float elapsedTime) {}
 
         protected override void OnUpdatePhysics(float elapsedTime)
         {
-            if (Active && CanBeActivated && _chargeTime > 0 && (_chargeTime > _chargeTotalTime || _platform.EnergyPoints.TryGet(_energyConsumption*elapsedTime / _chargeTotalTime)))
+            if (Active && CanBeActivated && _chargeTime > 0 && (_chargeTime * _ship.Stats.WeaponUpgrade.FireRateMultiplier > _chargeTotalTime || _platform.EnergyPoints.TryGet(_energyConsumption * _ship.Stats.WeaponUpgrade.EnergyCostMultiplier * elapsedTime / _chargeTotalTime)))
             {
-                _platform.Aim(Info);
+                _platform.Aim(Info.BulletSpeed, Info.Range, Info.IsRelativeVelocity);
                 _chargeTime += elapsedTime;
                 UpdatePower();
             }
@@ -53,7 +59,7 @@ namespace Combat.Component.Systems.Weapons
             }
             else if (HasActiveBullet && Info.BulletType == BulletType.Direct)
             {
-                _platform.Aim(Info);
+                _platform.Aim(Info.BulletSpeed, Info.Range, Info.IsRelativeVelocity);
             }
         }
 
@@ -61,9 +67,10 @@ namespace Combat.Component.Systems.Weapons
 
         private void Shot()
         {
-            _platform.Aim(Info);
+
+            _platform.Aim(Info.BulletSpeed, Info.Range, Info.IsRelativeVelocity);
             _platform.OnShot();
-            _activeBullet = _bulletFactory.Create(_platform, _spread, 0, 0);
+            _activeBullet = _bulletFactory.Create(_platform, _spread, 0, 0, Vector2.zero);
 
             InvokeTriggers(ConditionType.OnDischarge);
         }
@@ -83,5 +90,7 @@ namespace Combat.Component.Systems.Weapons
         private readonly float _energyConsumption;
         private readonly IWeaponPlatform _platform;
         private readonly Factory.IBulletFactory _bulletFactory;
+        private readonly IShip _ship;
+        private readonly WeaponStats _weaponStats;
     }
 }

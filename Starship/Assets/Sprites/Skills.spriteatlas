@@ -31,11 +31,12 @@ SpriteAtlas:
     variantMultiplier: 1
     packables:
     - {fileID: 102900000, guid: b4783b14e655b034ca2afd58f7203f9d, type: 3}
-    totalSpriteSurfaceArea: 163840
+    totalSpriteSurfaceArea: 180224
     bindAsDefault: 1
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
   - {fileID: 21300000, guid: 4b0c6930ad23df94085ed3231d7da232, type: 3}
+  - {fileID: 21300000, guid: cd6a61317f3e28b4d9b8e8eaf9eb3f89, type: 3}
   - {fileID: 21300000, guid: 5866d3528b63f1f4aa5da789ca33a3e6, type: 3}
   - {fileID: 21300000, guid: ccf8e6736201e5f4ea400d1b904ebc8d, type: 3}
   - {fileID: 21300000, guid: 9ee05104c84fe494c81e3099a557c6a9, type: 3}
@@ -47,6 +48,7 @@ SpriteAtlas:
   - {fileID: 21300000, guid: 5bbd27ae715ed5a4383e6204d443fb4a, type: 3}
   m_PackedSpriteNamesToIndex:
   - hangar5
+  - hangar6
   - icon_fueltank
   - hangar2
   - hangar3

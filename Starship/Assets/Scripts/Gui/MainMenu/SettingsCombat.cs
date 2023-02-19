@@ -17,7 +17,7 @@ namespace Gui.MainMenu
 
         public void SetCameraZoom(float value)
         {
-            _gameSettings.CameraZoom = value;
+            _gameSettings.CameraZoom = value / 50;
         }
 
         public void ConfigureControls()
@@ -37,7 +37,7 @@ namespace Gui.MainMenu
 
         private void OnEnable()
         {
-            _cameraZoomSlider.value = _gameSettings.CameraZoom;
+            _cameraZoomSlider.value = _gameSettings.CameraZoom * 50;
             _centerOnPlayerToggle.isOn = _gameSettings.CenterOnPlayer;
             _showDamageToogle.isOn = _gameSettings.ShowDamage;
         }

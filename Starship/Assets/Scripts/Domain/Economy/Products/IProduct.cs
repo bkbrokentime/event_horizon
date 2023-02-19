@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Economy.ItemType;
 using UnityEngine;
-using Utils;
 
 namespace Economy.Products
 {
@@ -22,7 +21,7 @@ namespace Economy.Products
             if (product == null || product.Type == null)
             {
                 var type = product != null ? product.Type : null;
-                OptimizedDebug.LogException(new System.ArgumentException("bad product: " + (type != null ? type.Id : "null")));
+                Debug.LogException(new System.ArgumentException("bad product: " + (type != null ? type.Id : "null")));
                 return;
             }
 

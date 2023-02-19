@@ -141,7 +141,7 @@ namespace Combat.Ai
 			{
 				var weapon = ship.Systems.All.Weapon(id);
 				if (!weapon.CanBeActivated) continue;
-			    // if (ship.Type.Class == UnitClass.Drone && weapon.Info.WeaponType == WeaponType.RequiredCharging) continue;
+			    //if (ship.Type.Class == UnitClass.Drone && weapon.Info.WeaponType == WeaponType.RequiredCharging) continue;
                 if (weapon.Info.BulletEffectType == BulletEffectType.ForDronesOnly && enemy.Type.Class != UnitClass.Drone) continue;
 
 				Vector2 target;
@@ -152,12 +152,8 @@ namespace Combat.Ai
 			    var shouldTrackTarget = weapon.Info.BulletType != BulletType.AreaOfEffect;
                 
                 var course = Helpers.TargetCourse(ship, target, weapon.Platform);
-                var weaponSpread = weapon.Info.Spread;
-                var autoAimingAngle = weapon.Platform.AutoAimingAngle;
-                if (weaponSpread < autoAimingAngle) weaponSpread = 0;
-                else autoAimingAngle = 0;
-                var spread = weaponSpread / 2 + Mathf.Asin(0.3f * enemy.Body.Scale / Vector2.Distance(enemy.Body.Position, ship.Body.Position))*Mathf.Rad2Deg;
-				var delta = Mathf.Abs(Mathf.DeltaAngle(course, ship.Body.Rotation)) - autoAimingAngle;
+			    var spread = weapon.Info.Spread/2 + Mathf.Asin(0.3f * enemy.Body.Scale / Vector2.Distance(enemy.Body.Position, ship.Body.Position))*Mathf.Rad2Deg;
+				var delta = Mathf.Abs(Mathf.DeltaAngle(course, ship.Body.Rotation)) - weapon.Platform.AutoAimingAngle;
 
 				if (delta < spread + 1 || shotImmediately)
 					controls.ActivateSystem(id, weapon.Info.WeaponType != WeaponType.RequiredCharging);

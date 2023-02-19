@@ -7,7 +7,6 @@ using GameServices.Player;
 using Services.InternetTime;
 using Session;
 using Session.Content;
-using Utils;
 using Zenject;
 
 namespace Domain.Quests
@@ -27,7 +26,7 @@ namespace Domain.Quests
             var data = _database.GetQuest(new ItemId<QuestModel>(progress.QuestId));
             if (data == null)
             {
-                OptimizedDebug.LogException(new ArgumentException("QuestFactory: quest not found - " + progress.QuestId));
+                UnityEngine.Debug.LogException(new ArgumentException("QuestFactory: quest not found - " + progress.QuestId));
                 return null;
             }
 

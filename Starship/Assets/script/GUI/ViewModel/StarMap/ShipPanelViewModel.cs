@@ -12,6 +12,7 @@ namespace ViewModel
 	{
 	    [Inject] private readonly PlayerFleet _playerFleet;
 	    [Inject] private readonly OpenConstructorSignal.Trigger _openConstructorTrigger;
+	    [Inject] private readonly OpenSatelliteConstructorSignal.Trigger _openSatelliteConstructorTrigger;
 
 		public GameObject ShipButtonPrefab;
 		public AnimatedWindow CompanionPanel;

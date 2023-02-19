@@ -24,5 +24,8 @@ namespace GameDatabase.Serializable
 		public string WeaponClass;
 		public string Image;
 		public float Size;
+		public UnityEngine.Vector2 MoveCenterPosition;
+		public float MoveSpeed;
+		public UnityEngine.Vector2 MoveCenterRange;
 	}
 }

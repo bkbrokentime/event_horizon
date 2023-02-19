@@ -56,7 +56,7 @@ namespace Combat.Ai
                         strategy.AddPolicy(new All(new AwakeCondition(level), new HasEnergyCondition(0.5f), new HasThreatsCondition(0.4f)), new ActivateDeviceAction(i, phaseShiftCooldown));
                     }
 
-                    if (device is TeleporterDevice || device is PointDefenseSystem || device is EnergyShieldDevice || device is FortificationDevice)
+                    if (device is TeleporterDevice || device is PointDefenseSystem || device is EnergyShieldDevice || device is FortificationDevice || device is CombustionInhibitionDevice || device is EnergyDiversionDevice || device is DenseEnergyShieldDevice)
                         strategy.AddPolicy(
                             new All(
                             new AwakeCondition(level),

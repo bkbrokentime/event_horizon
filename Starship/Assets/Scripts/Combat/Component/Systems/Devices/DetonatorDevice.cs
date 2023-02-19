@@ -14,7 +14,7 @@ namespace Combat.Component.Systems.Devices
     public class DetonatorDevice : SystemBase, IDevice, IEngineModification, IFeaturesModification, ISystemsModification
     {
         public DetonatorDevice(IShip ship, DeviceStats deviceSpec, int keyBinding, SpaceObjectFactory factory, float damageMultiplier)
-            : base(keyBinding, deviceSpec.ControlButtonIcon)
+            : base(keyBinding, deviceSpec.ControlButtonIcon, ship)
         {
             MaxCooldown = deviceSpec.Cooldown;
 
@@ -25,7 +25,6 @@ namespace Combat.Component.Systems.Devices
             _lifetime = deviceSpec.Lifetime;
             _range = deviceSpec.Range * Mathf.Sqrt(_ship.Body.Scale);
             _damage = deviceSpec.Power*damageMultiplier;
-            _offset = deviceSpec.Offset; 
         }
 
         public override float ActivationCost { get { return _energyCost; } }
@@ -70,17 +69,9 @@ namespace Combat.Component.Systems.Devices
             else if (_active)
             {
                 _active = false;
-                _factory.CreateStrongExplosion(
-                    _ship.Body.WorldPosition() + RotationHelpers.Transform(_offset, _ship.Body.Rotation), _range,
-                    DamageType.Heat,
-                    _damage,
-                    _ship.Type.Side,
-                    _color,
-                    1.0f,
-                    0.1f * Mathf.Sqrt(_ship.Body.Weight)
-                );
+                _factory.CreateStrongExplosion(_ship.Body.WorldPosition(), _range, DamageType.Heat, _damage, _ship.Type.Side, _color, 1.0f, 0.1f * Mathf.Sqrt(_ship.Body.Weight));
                 TimeFromLastUse = 0;
-                _ship.Affect(new Impact { Effects = CollisionEffect.Destroy });
+                _ship.Affect(new Impact(new GameDatabase.Model.AllDamageData(), 0, 0, new Impulse(), CollisionEffect.Destroy));
             }
             else if (Active && CanBeActivated && _ship.Stats.Energy.TryGet(_energyCost))
             {
@@ -102,6 +93,5 @@ namespace Combat.Component.Systems.Devices
         private readonly float _energyCost;
         private readonly IShip _ship;
         private readonly SpaceObjectFactory _factory;
-        private readonly Vector2 _offset;
     }
 }

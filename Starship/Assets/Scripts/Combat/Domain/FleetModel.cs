@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Combat.Component.Unit.Classification;
 using Combat.Unit;
-using Constructor;
 using Constructor.Ships;
 using GameDatabase;
 using GameServices.Player;
@@ -15,22 +14,9 @@ namespace Combat.Domain
             var settings = database.ShipSettings;
             Level = level;
 
-            var maxNonLazy = 12;
             foreach (var ship in ships)
             {
-                IShipSpecification shipSpec;
-                if (maxNonLazy-- > 0)
-                {
-                    shipSpec = playerSkills != null
-                        ? ship.BuildSpecAndApplySkills(playerSkills, settings)
-                        : ship.CreateBuilder().Build(settings);
-                }
-                else
-                {
-                    shipSpec = playerSkills != null
-                        ? new LazyShipSpecification(() => ship.BuildSpecAndApplySkills(playerSkills, settings))
-                        : new LazyShipSpecification(() => ship.CreateBuilder().Build(settings));
-                }
+                var shipSpec = playerSkills != null ? ship.BuildSpecAndApplySkills(playerSkills, settings) : ship.CreateBuilder().Build(settings);
                 var shipInfo = new ShipInfo(ship, shipSpec, unitSide);
                 _ships.Add(shipInfo);
             }
@@ -157,11 +143,11 @@ namespace Combat.Domain
 
 //            public IShipCombatModel ActivateShip(IShip ship, Position position, float rotation, bool showDamage, PlayerSkills playerSkills, IMessenger messenger, FactoryContext context, IAiManager aiManager, IDatabase database)
 //            {
-//                //OptimizedDebug.Log("CombatData.ActivateShip");
+//                //UnityEngine.Debug.Log("CombatData.ActivateShip");
 //                IShipCombatModel model = null;
 //                if (_activeShips.TryGetValue(ship, out model) && model.IsActiveObject)
 //                {
-//                    //OptimizedDebug.Log("CombatData.ActivateShip - already exists");
+//                    //UnityEngine.Debug.Log("CombatData.ActivateShip - already exists");
 //                    return model;
 //                }
 
@@ -174,9 +160,9 @@ namespace Combat.Domain
 
 //                _activeShips[ship] = model;
 
-//                //OptimizedDebug.Log("CombatData.ActivateShip - broadcasting");
+//                //UnityEngine.Debug.Log("CombatData.ActivateShip - broadcasting");
 //                messenger.Broadcast(EventType.CombatShipCreated);
-//                //OptimizedDebug.Log("CombatData.ActivateShip - done");
+//                //UnityEngine.Debug.Log("CombatData.ActivateShip - done");
 //                return model;
 //            }
 
@@ -212,7 +198,7 @@ namespace Combat.Domain
 
 //                model.ArmorPoints.Get((1f - armorPointsPercentage) * model.ArmorPoints.MaxValue);
 //                model.HullPoints.Get((1f - hullPointsPercentage) * model.HullPoints.MaxValue);
-//                //OptimizedDebug.Log("CombatData.CreateShipModel - done");
+//                //UnityEngine.Debug.Log("CombatData.CreateShipModel - done");
 //                return model;
 //            }
 

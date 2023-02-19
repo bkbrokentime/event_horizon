@@ -1,4 +1,5 @@
 ﻿using Combat.Component.Body;
+using Combat.Component.Ship;
 using Combat.Component.Triggers;
 using Combat.Component.Unit;
 using Combat.Factory;
@@ -11,15 +12,14 @@ namespace Combat.Component.Systems.Devices
 {
     public class ToxicWaste : SystemBase, IDevice, IUnitAction
     {
-        public ToxicWaste(IUnit unit, DeviceStats deviceSpec, SpaceObjectFactory objectFactory, float damageMultiplier)
-            : base(-1, SpriteId.Empty)
+        public ToxicWaste(IUnit unit, DeviceStats deviceSpec, SpaceObjectFactory objectFactory, float damageMultiplier, IShip ship)
+            : base(-1, SpriteId.Empty, ship)
         {
             _unit = unit;
             _color = deviceSpec.Color;
             _damage = deviceSpec.Power*damageMultiplier;
             _lifetime = deviceSpec.Lifetime;
             _size = deviceSpec.Size;
-            _offset = deviceSpec.Offset; 
             _objectFactory = objectFactory;
         }
 
@@ -30,15 +30,8 @@ namespace Combat.Component.Systems.Devices
         public bool TryUpdateAction(float elapsedTime) { return false; }
         public bool TryInvokeAction(ConditionType condition)
         {
-            _objectFactory.CreateCloud(
-                _unit.Body.WorldPosition() + RotationHelpers.Transform(_offset, _unit.Body.Rotation),
-                _unit.Body.WorldVelocity() * 0.02f, _lifetime,
-                _unit.Body.WorldScale() * _size + 1f,
-                DamageType.Direct,
-                _damage,
-                _unit.Type.Side,
-                _color
-            );
+            _objectFactory.CreateCloud(_unit.Body.WorldPosition(), _unit.Body.WorldVelocity()*0.02f, _lifetime,
+                _unit.Body.WorldScale()*_size + 1f, DamageType.Direct, _damage, _unit.Type.Side, _color);
 
             return false;
         }
@@ -55,6 +48,5 @@ namespace Combat.Component.Systems.Devices
         private readonly IUnit _unit;
         private readonly Color _color;
         private readonly SpaceObjectFactory _objectFactory;
-        private readonly Vector2 _offset;
     }
 }

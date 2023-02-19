@@ -20,6 +20,9 @@ namespace GameDatabase.Serializable
 		public float ModelScale;
 		public SizeClass SizeClass;
 		public string Layout;
+		public string SecondLayout;
+		public UAVLaunchPlatformSerializable[] UAVLaunchPlatforms;
 		public BarrelSerializable[] Barrels;
+		public SatelliteFormationSerializable[] Formations;
 	}
 }

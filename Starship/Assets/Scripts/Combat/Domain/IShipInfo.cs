@@ -20,7 +20,7 @@ namespace Combat.Domain
         float Condition { get; }
         float ActivationTime { get; }
         UnitSide Side { get; }
-
+        void ChangeSide(UnitSide NewSide);
         void Create(Factory.ShipFactory factory, IControllerFactory controllerFactory, Vector2 position);
         void Destroy();
     }

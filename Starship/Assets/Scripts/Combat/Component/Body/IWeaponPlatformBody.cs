@@ -1,4 +1,6 @@
-﻿namespace Combat.Component.Body
+﻿using UnityEngine;
+
+namespace Combat.Component.Body
 {
     public interface IWeaponPlatformBody : IBody
     {

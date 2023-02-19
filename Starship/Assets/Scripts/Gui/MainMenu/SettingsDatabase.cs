@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using GameDatabase;
+using GameDatabase.DataModel;
+using GameDatabase.Storage;
 using GameServices.GameManager;
 using GameServices.Gui;
 using Services.Localization;
 using Services.Messenger;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -51,7 +56,6 @@ namespace Gui.MainMenu
         {
             _modsGroup.InitializeElements<ModInfoItem, ModInfo>(ModInfo.Default.ToEnumerable().Concat(_database.AvailableMods), UpdateItem);
         }
-
         private void UpdateItem(ModInfoItem item, ModInfo mod)
         {
             var isDefault = string.IsNullOrEmpty(mod.Id);
@@ -59,6 +63,8 @@ namespace Gui.MainMenu
             var active = _database.Id.Equals(mod.Id, StringComparison.OrdinalIgnoreCase);
             item.Initialize(name, mod.Id, active);
         }
+
+        private readonly List<ModInfo> _mods = new List<ModInfo>();
 
         private bool _restoreOnNextLogin = false;
     }

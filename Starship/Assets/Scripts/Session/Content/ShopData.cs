@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GameModel.Serialization;
-using Utils;
 using Zenject;
 
 namespace Session.Content
@@ -88,7 +87,7 @@ namespace Session.Content
 			var version = Helpers.DeserializeInt(buffer, ref index);
 			if (version != CurrentVersion && !TryUpgrade(ref buffer, version))
 			{
-				OptimizedDebug.Log("ShopData: incorrect data version");
+				UnityEngine.Debug.Log("ShopData: incorrect data version");
                 throw new ArgumentException();
             }
 

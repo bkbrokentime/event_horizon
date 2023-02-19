@@ -1,6 +1,5 @@
 using GameServices.Settings;
 using UnityEngine;
-using Utils;
 using Zenject;
 
 namespace ViewModel
@@ -24,7 +23,7 @@ namespace ViewModel
 
         public void RateButtonClicked()
 		{
-			OptimizedDebug.Log("RateButtonClicked");
+			UnityEngine.Debug.Log("RateButtonClicked");
 			Application.OpenURL("market://details?id=" + AppConfig.bundleIdentifier);
 			Content.gameObject.SetActive(false);
 			_gameSettings.RateButtonClicked = true;

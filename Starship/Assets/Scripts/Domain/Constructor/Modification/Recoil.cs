@@ -9,7 +9,7 @@ namespace Constructor.Modification
     {
         public Recoil(ModificationQuality quality)
         {
-            _weightMultiplier = quality.PowerMultiplier(2.5f, 2.0f, 1.5f, 0.8f, 0.5f, 0.2f);
+            _weightMultiplier = quality.PowerMultiplier(4.0f, 3.0f, 2.5f, 2.0f, 1.5f, 0.8f, 0.5f, 0.2f, 0.1f, 0.05f);
             Quality = quality;
         }
 

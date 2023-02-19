@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Text;
 using GameDatabase.Enums;
-using UnityEngine;
 
 namespace GameDatabase.Model
 {
@@ -11,85 +10,37 @@ namespace GameDatabase.Model
         public Layout(string data)
         {
             _data = null;
-            CellCount = 0;
+            _cellcount = 0;
             _size = 0;
-            _stringCache = null;
 
             Data = data;
-        }
-        public Layout(char[] data):this(new string(data))
-        {
-        }
-        private Layout(char[] data, int cellsCount)
-        {
-            _data = data;
-            CellCount = cellsCount;
-            _size = (int) Math.Sqrt(data.Length);
-            _stringCache = null;
-        }
-
-        /// <summary>
-        /// Constructs new Layout from provided char[] without performing any checks on it
-        /// </summary>
-        /// <param name="data">Raw layout data</param>
-        /// <returns>Constructed Layout</returns>
-        public static Layout FromRawDataUnchecked(char[] data, int cellsCount)
-        {
-            return new Layout(data, cellsCount);
         }
 
         public string Data
         {
-            get
-            {
-                if (_stringCache != null) return _stringCache;
-                if (_data == null) return _stringCache = string.Empty;
-                return _stringCache = new string(_data);
-            }
+            get => _data?.ToString() ?? string.Empty;
             private set
             {
+                _data = new StringBuilder();
                 if (string.IsNullOrEmpty(value))
                 {
-                    _data = new[] { DefaultValue };
+                    _data.Append(_defaultValue);
                     _size = 1;
-                    CellCount = 0;
+                    _cellcount = 0;
                     return;
                 }
 
+                _data.Append(value);
+                _cellcount = value.Count(cell => cell != _defaultValue && cell != _customCell);
+
                 var length = value.Length;
                 _size = (int)Math.Sqrt(length);
-
-                _stringCache = null;
-
                 if (_size * _size == length)
-                {
-                    _stringCache = value;
-                    _data = new char[length];
-                }
-                else
-                {
-                    _size++;
-                    var actualLength = _size * _size;
-                    _data = new char[actualLength];
-                    for (var i = length; i < actualLength; i++)
-                    {
-                        _data[i] = DefaultValue;
-                    }
-                }
+                    return;
 
-                value.CopyTo(0, _data, 0, length);
-
-                CellCount = 0;
-                foreach (var cell in value)
-                {
-                    if (cell != DefaultValue && cell != CustomCell) CellCount++;
-                }
+                _size++;
+                _data.Append(_defaultValue, _size * _size - length);
             }
-        }
-
-        public char[] GetRawData()
-        {
-            return _data;
         }
 
         public char this[int x, int y]
@@ -97,23 +48,20 @@ namespace GameDatabase.Model
             get
             {
                 if (x < 0 || x >= _size || y < 0 || y >= _size)
-                    return DefaultValue;
+                    return _defaultValue;
 
-                return GetUnchecked(x, y);
+                return _data[y * _size + x];
             }
             private set
             {
                 if (x < 0 || x >= _size || y < 0 || y >= _size)
                     return;
 
-                _stringCache = null;
                 _data[y * _size + x] = value;
             }
         }
 
-        public char GetUnchecked(int x, int y) => _data[y * _size + x];
-
-        public int CellCount { get; private set; }
+        public int CellCount => _cellcount;
 
         public int Size
         {
@@ -123,26 +71,15 @@ namespace GameDatabase.Model
                 if (value == _size || value < 1)
                     return;
 
-                var length = _size * _size;
-                if (_data == null)
-                {
-                    _data = new char[length];
-                    for (var i = 0; i < length; i++)
-                    {
-                        _data[i] = DefaultValue;
-                    }
-                }
+                if (_data == null) _data = new StringBuilder();
 
-                var oldData = _data;
-                _data = new char[length];
-                Array.Copy(oldData, _data, length);
-                // If new size is larger then we fill the rest of layout with empty cells, otherwise we do nothign
-                if (value >= _size)
+                if (value < _size)
                 {
-                    for (var i = oldData.Length; i < length; i++)
-                    {
-                        _data[i] = DefaultValue;
-                    }
+                    _data.Length = value * value;
+                }
+                else
+                {
+                    _data.Append(_defaultValue, value * value - _size * _size);
                 }
 
                 _size = value;
@@ -150,9 +87,9 @@ namespace GameDatabase.Model
         }
 
         private int _size;
-        private char[] _data;
-        private string _stringCache;
-        private const char DefaultValue = (char)CellType.Empty;
-        private const char CustomCell = (char)CellType.Custom;
+        private int _cellcount;
+        private StringBuilder _data;
+        private const char _defaultValue = (char)CellType.Empty;
+        private const char _customCell = (char)CellType.Custom;
     }
 }

@@ -17,7 +17,8 @@ namespace Model
 			}
 			
 			public IEnumerable<IShip> Ships { get { yield return _ship; } }
-			public int AiLevel { get; private set; }			
+            public IEnumerable<IShip> AllShips { get { return Ships; } }
+            public int AiLevel { get; private set; }			
 			public float Power { get { return Maths.Threat.GetShipPower(_ship); } }
 
 			private IShip _ship;

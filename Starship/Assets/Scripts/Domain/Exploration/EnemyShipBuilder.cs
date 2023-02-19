@@ -6,6 +6,7 @@ using GameDatabase.DataModel;
 using GameDatabase.Enums;
 using GameDatabase.Extensions;
 using GameDatabase.Model;
+using Maths;
 using UnityEngine;
 
 namespace Game.Exploration
@@ -41,6 +42,15 @@ namespace Game.Exploration
             shipLevel -= random.Next(shipLevel/3);
             ship.Experience = Maths.Experience.FromLevel(shipLevel);
 
+            var minenhancementlevel = (EnhancementLevel)(_level / 50);
+            var maxenhancementlevel = (EnhancementLevel)(_level / 10);
+            var randomminenhancementlevel = build.MinEnhancementLevel == EnhancementLevel.Default ? minenhancementlevel : build.MinEnhancementLevel < minenhancementlevel ? minenhancementlevel : build.MinEnhancementLevel < maxenhancementlevel ? build.MinEnhancementLevel : maxenhancementlevel;
+            var randommaxenhancementlevel = build.MaxEnhancementLevel == EnhancementLevel.Default ? maxenhancementlevel : build.MaxEnhancementLevel < minenhancementlevel ? build.MaxEnhancementLevel : build.MaxEnhancementLevel < maxenhancementlevel ? build.MaxEnhancementLevel : maxenhancementlevel;
+
+            var enhancementlevel = randomminenhancementlevel <= randommaxenhancementlevel ? build.NoEnhancementLevel ? build.DefaultEnhancementLevel : (EnhancementLevel)UnityEngine.Random.Range((int)randomminenhancementlevel, (int)randommaxenhancementlevel) : randommaxenhancementlevel;
+            ship.ExtraEnhanceLevel = enhancementlevel;
+
+
             var satelliteClass = Maths.Distance.MaxShipClass(_level);
             if (_allowSatellites && satelliteClass != DifficultyClass.Default && build.Ship.ShipCategory != ShipCategory.Drone)
             {
@@ -48,9 +58,25 @@ namespace Game.Exploration
                 if (satellites.Any())
                 {
                     if (random.Next(3) != 0)
-                        ship.FirstSatellite = new CommonSatellite(satellites.RandomElement(random));
+                        ship.Satellite_Left_1 = new CommonSatellite(satellites.RandomElement(random));
                     if (random.Next(3) != 0)
-                        ship.SecondSatellite = new CommonSatellite(satellites.RandomElement(random));
+                        ship.Satellite_Right_1 = new CommonSatellite(satellites.RandomElement(random));
+                    if (random.Next(3) != 0)
+                        ship.Satellite_Left_2 = new CommonSatellite(satellites.RandomElement(random));
+                    if (random.Next(3) != 0)
+                        ship.Satellite_Right_2 = new CommonSatellite(satellites.RandomElement(random));
+                    if (random.Next(3) != 0)
+                        ship.Satellite_Left_3 = new CommonSatellite(satellites.RandomElement(random));
+                    if (random.Next(3) != 0)
+                        ship.Satellite_Right_3 = new CommonSatellite(satellites.RandomElement(random));
+                    if (random.Next(3) != 0)
+                        ship.Satellite_Left_4 = new CommonSatellite(satellites.RandomElement(random));
+                    if (random.Next(3) != 0)
+                        ship.Satellite_Right_4 = new CommonSatellite(satellites.RandomElement(random));
+                    if (random.Next(3) != 0)
+                        ship.Satellite_Left_5 = new CommonSatellite(satellites.RandomElement(random));
+                    if (random.Next(3) != 0)
+                        ship.Satellite_Right_5 = new CommonSatellite(satellites.RandomElement(random));
                 }
             }
 

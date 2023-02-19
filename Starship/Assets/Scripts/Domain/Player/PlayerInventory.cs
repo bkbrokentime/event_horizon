@@ -63,7 +63,7 @@ namespace GameServices.Player
                 if (!componentInfo.IsValidModification)
                 {
                     debug.Write("Invalid modification " + componentInfo.ModificationType + " for module " + componentInfo.Data.Id);
-                    componentInfo = ComponentInfo.CreateRandomModification(componentInfo.Data, random, componentInfo.ModificationQuality, componentInfo.ModificationQuality);
+                    componentInfo = ComponentInfo.CreateNoModification(componentInfo.Data);
                 }
 
                 _components.Add(componentInfo, item.Value);

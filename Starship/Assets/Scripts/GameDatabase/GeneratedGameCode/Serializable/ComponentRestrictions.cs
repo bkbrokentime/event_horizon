@@ -18,6 +18,10 @@ namespace GameDatabase.Serializable
 		public SizeClass[] ShipSizes;
 		public bool NotForOrganicShips;
 		public bool NotForMechanicShips;
-		public string UniqueComponentTag;
+		public int MinCellAmount;
+		public int MaxCellAmount;
+		public int[] OnlyForShipId;
+		public int[] NotForShipId;
+		public TagListSerializable[] UniqueComponentTag;
 	}
 }

@@ -1,0 +1,18 @@
+{
+  "ItemType": 1,
+  "Id": 324,
+  "Name": "小型量子护盾力场",
+  "DisplayCategory": 2,
+  "Availability": 1,
+  "ComponentStatsId": 324,
+  "Faction": 7,
+  "Level": 10,
+  "Icon": "armor11",
+  "Color": "#99DCFF",
+  "Layout": "1",
+  "CellType": "1",
+  "PossibleModifications": [
+    1,
+    3
+  ]
+}

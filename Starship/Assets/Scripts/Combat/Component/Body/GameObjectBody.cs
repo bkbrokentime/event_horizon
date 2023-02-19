@@ -4,8 +4,7 @@ namespace Combat.Component.Body
 {
     public class GameObjectBody : MonoBehaviour, IBodyComponent
     {
-        public void Initialize(IBody parent, Vector2 position, float rotation, float scale, Vector2 velocity,
-            float angularVelocity, float weight, bool frozen=false)
+        public void Initialize(IBody parent, Vector2 position, float rotation, float scale, Vector2 velocity, float angularVelocity, float weight)
         {
             if (parent != null)
                 parent.AddChild(transform);
@@ -19,7 +18,6 @@ namespace Combat.Component.Body
             Velocity = velocity;
             AngularVelocity = angularVelocity;
             Weight = weight;
-            _frozen = frozen;
         }
 
         public IBody Parent
@@ -51,25 +49,22 @@ namespace Combat.Component.Body
             set
             {
                 _position = value;
-                var transformCache = transform;
-                if (!this || !transformCache) return;
-                var targetPos = _parent?.ChildPosition(value) ?? value;
-                if (transformCache.localPosition.x != targetPos.x || transformCache.localPosition.y != targetPos.y)
-                    gameObject.Move(targetPos);
+                if (this && transform)
+                    gameObject.Move(Parent == null ? value : Parent.ChildPosition(value));
             }
         }
 
         public float Rotation
         {
-            get { return _rotation; }
+            get
+            {
+                return _rotation;
+            }
             set
             {
                 _rotation = value;
-                var transformCache = transform;
-                if (!this || !transformCache) return;
-                var targetAngle = Mathf.Repeat(value, 360);
-                if (transformCache.localRotation.z != targetAngle)
-                    transform.localEulerAngles = new Vector3(0, 0, targetAngle);
+                if (this && transform)
+                    transform.localEulerAngles = new Vector3(0, 0, Mathf.Repeat(value, 360));
             }
         }
 
@@ -89,9 +84,9 @@ namespace Combat.Component.Body
             }
         }
 
-        public void ApplyAcceleration(Vector2 acceleration) { }
+        public void ApplyAcceleration(Vector2 acceleration) {}
 
-        public void ApplyAngularAcceleration(float acceleration) { }
+        public void ApplyAngularAcceleration(float acceleration) {}
 
         public void ApplyForce(Vector2 position, Vector2 force)
         {
@@ -99,8 +94,7 @@ namespace Combat.Component.Body
                 Parent.ApplyForce(position, force);
         }
 
-        public void SetVelocityLimit(float value) { }
-        public void SetAngularVelocityLimit(float value) { }
+        public void SetVelocityLimit(float value) {}
 
         public void Move(Vector2 position)
         {
@@ -121,11 +115,6 @@ namespace Combat.Component.Body
 
         public void UpdatePhysics(float elapsedTime)
         {
-            if (_frozen)
-            {
-                Position = _position;
-                Rotation = _rotation;
-            }
             if (Parent != null)
                 return;
 
@@ -133,7 +122,7 @@ namespace Combat.Component.Body
             Rotation += AngularVelocity * elapsedTime * Mathf.Rad2Deg;
         }
 
-        public void UpdateView(float elapsedTime) { }
+        public void UpdateView(float elapsedTime) {}
 
         public void AddChild(Transform child)
         {
@@ -160,6 +149,5 @@ namespace Combat.Component.Body
         private float _rotation;
         private float _scale;
         private IBody _parent;
-        private bool _frozen;
     }
 }

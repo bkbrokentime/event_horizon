@@ -16,14 +16,14 @@ namespace Combat.Collision.Behaviour.Action
         {
             if (_impactType == BulletImpactType.DamageOverTime)
             {
-                targetImpact.EnergyDrain += _energyDrain * collisionData.TimeInterval;
+                targetImpact.AllDamageData.EnergyDrain.UpDateDamage(_energyDrain * collisionData.TimeInterval);
             }
             else
             {
                 if (!collisionData.IsNew || !_isAlive)
                     return;
 
-                targetImpact.EnergyDrain += _energyDrain;
+                targetImpact.AllDamageData.EnergyDrain.UpDateDamage(_energyDrain);
                 _isAlive = _impactType == BulletImpactType.HitAllTargets;
             }
         }

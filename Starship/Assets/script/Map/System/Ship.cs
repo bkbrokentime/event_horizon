@@ -10,15 +10,15 @@ namespace StarSystem
 
 		public float EnginePower { get { return _enginePower; } set { _enginePower = value; } }
 		
-		public void Initialize(GameDatabase.DataModel.Ship ship, IResourceLocator resourceLocator)
+		public void Initialize(GameDatabase.DataModel.Ship ship, IResourceLocator resourceLocator, int orbit)
 		{
-			CreateShip(ship, resourceLocator);
+			CreateShip(ship, resourceLocator, orbit);
 			Update();
 		}
 
-		public void InitializeFlagship(GameDatabase.DataModel.Ship ship, IResourceLocator resourceLocator)
+		public void InitializeFlagship(GameDatabase.DataModel.Ship ship, IResourceLocator resourceLocator, int orbit = 0)
 		{
-			CreateShip(ship, resourceLocator);
+			CreateShip(ship, resourceLocator, orbit);
 			_immovable = true;
 		}
         
@@ -45,20 +45,20 @@ namespace StarSystem
 			set { Sprite.transform.localEulerAngles = new Vector3(0,0,value); }
 		}
 
-		private void CreateShip(GameDatabase.DataModel.Ship ship, IResourceLocator resourceLocator)
+		private void CreateShip(GameDatabase.DataModel.Ship ship, IResourceLocator resourceLocator, int orbit)
 		{
-			var size = 0.5f + ship.ModelScale/5f;
+			var size = 0.5f + ship.ModelScale / 5f;
 			var random = new System.Random(GetHashCode());
 
-            Sprite.sprite = resourceLocator.GetSprite(ship.ModelImage);
+			Sprite.sprite = resourceLocator.GetSprite(ship.ModelImage);
 			Sprite.transform.parent = transform;
 			Sprite.transform.localPosition = Vector3.zero;
 			Sprite.transform.localEulerAngles = Vector3.zero;
-			Sprite.transform.localScale = size*Vector3.one;
-			
-			_shipSpeed = 5f*(0.8f + 0.4f*random.NextFloat())/(size+0.5f);
-			_shipOrbitRadius = 2f*(random.NextFloat()*0.4f + 0.8f + size*0.1f);
-			_angularVelocity = (random.Next()%2 == 0 ? _shipSpeed : -_shipSpeed)/(2*Mathf.PI*_shipOrbitRadius);
+			Sprite.transform.localScale = size * Vector3.one;
+
+			_shipSpeed = 5f * (0.8f + 0.4f * random.NextFloat()) / (size + 0.5f);
+			_shipOrbitRadius = 2f * (random.NextFloat() * 0.4f + 0.8f + size * 0.1f) + 1.5f * orbit;
+			_angularVelocity = (random.Next() % 2 == 0 ? _shipSpeed : -_shipSpeed) / (2 * Mathf.PI * _shipOrbitRadius);
 			_shipOrbitalAngle = random.Next(360);
 			_isMoving = false;
 		}

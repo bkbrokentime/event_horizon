@@ -20,6 +20,7 @@ namespace Installers
         [SerializeField] private ShipControlsPanel _shipControlsPanel;
         [SerializeField] private ShipSelectionPanel _shipSelectionPanel;
         [SerializeField] private RadarPanel _radarPanel;
+        [SerializeField] private RadarMapPanel _radarMapPanel;
         [SerializeField] private CombatMenu _combatMenu;
         [SerializeField] private TimerPanel _timerPanel;
         [SerializeField] private Settings _settings;
@@ -30,7 +31,7 @@ namespace Installers
         {
             Container.BindAllInterfacesAndSelf<CombatManager>().To<CombatManager>().AsSingle().NonLazy();
             Container.BindAllInterfaces<ViewRect>().To<ViewRect>().AsTransient();
-            Container.BindAllInterfaces<Scene>().To<Scene>().AsSingle().WithArguments(new SceneSettings { AreaWidth = 200, AreaHeight = 200 }).NonLazy();
+            Container.BindAllInterfaces<Scene>().To<Scene>().AsSingle().WithArguments(new SceneSettings { AreaWidth = 500, AreaHeight = 500 }).NonLazy();
             Container.BindAllInterfaces<CollisionManager>().To<CollisionManager>().AsSingle();
             Container.BindAllInterfaces<AiManager>().To<AiManager>().AsSingle().NonLazy();
             Container.BindAllInterfacesAndSelf<CombatTimer>().To<CombatTimer>().AsSingle().NonLazy();
@@ -39,6 +40,7 @@ namespace Installers
             Container.Bind<ShipControlsPanel>().FromInstance(_shipControlsPanel);
             Container.Bind<ShipSelectionPanel>().FromInstance(_shipSelectionPanel);
             Container.Bind<RadarPanel>().FromInstance(_radarPanel);
+            Container.Bind<RadarMapPanel>().FromInstance(_radarMapPanel);
             Container.Bind<CombatBackground>().FromInstance(_background);
             Container.Bind<CombatMenu>().FromInstance(_combatMenu);
             Container.Bind<TimerPanel>().FromInstance(_timerPanel);

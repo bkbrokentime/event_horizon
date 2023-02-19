@@ -16,6 +16,7 @@ namespace Combat.Helpers
         public bool IsActive { get { return _gameObject.activeSelf; } set { _gameObject.SetActive(value); } }
         public Layer Layer { get { return (Layer)_gameObject.layer; } set { _gameObject.layer = (int)value; } }
         public string Name { get { return _gameObject.name; } set { _gameObject.name = value; } }
+        public GameObject GameObject { get { return _gameObject; } }
 
         public T GetComponent<T>(bool recursive = false)
         {

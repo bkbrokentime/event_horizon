@@ -10,7 +10,6 @@ namespace GameServices.Database
     {
         ITechnology Get(ItemId<Technology> id);
         IEnumerable<ITechnology> All { get; }
-        IEnumerable<ITechnology> Dependants(ITechnology root);
         bool TryGetComponentTechnology(Component component, out ITechnology technology);
         bool TryGetShipTechnology(ItemId<Ship> ship, out ITechnology technology);
     }

@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 114483788141085612}
   - component: {fileID: 114551841619084260}
   - component: {fileID: 60730661040461934}
+  - component: {fileID: 114735252724873410}
   m_Layer: 0
   m_Name: flagships
   m_TagString: Untagged
@@ -62,7 +63,6 @@ SpriteRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -204,3 +204,19 @@ PolygonCollider2D:
       - {x: -0.44702148, y: 0.37112427}
       - {x: -0.4512024, y: 0.2893982}
       - {x: -0.4767151, y: 0.2897339}
+--- !u!114 &114735252724873410
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1425439508558922}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f8c6fe8fc912254b83cf553c9281a9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ArmorPoints: 0
+  EnergyPoints: 0
+  ShieldPoints: 0
+  EnergyShieldPoints: 0

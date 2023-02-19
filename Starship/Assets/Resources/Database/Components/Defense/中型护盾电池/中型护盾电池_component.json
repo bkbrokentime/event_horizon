@@ -1,0 +1,18 @@
+{
+  "ItemType": 1,
+  "Id": 331,
+  "Name": "中型护盾电池",
+  "DisplayCategory": 2,
+  "Availability": 1,
+  "ComponentStatsId": 331,
+  "Faction": -1,
+  "Level": 50,
+  "Icon": "shield_capacitor2",
+  "Color": "#99DCFF",
+  "Layout": "1111",
+  "CellType": "1",
+  "PossibleModifications": [
+    1,
+    3
+  ]
+}

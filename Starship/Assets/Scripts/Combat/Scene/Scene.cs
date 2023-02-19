@@ -57,6 +57,7 @@ namespace Combat.Scene
 
         public IShip PlayerShip => _activePlayerShip;
         public IShip EnemyShip => _nearestEnemyShip;
+        public IShip AllyShip => _nearestAllyShip;
         
         public void Tick()
         {
@@ -71,30 +72,19 @@ namespace Combat.Scene
         {
             _unitList.UpdateItems(UpdateUnitPhysics);
             UpdateEnemies();
+            UpdateAllies();
             CheckBounds();
 
             _lastUpdateTime = Time.fixedTime;
         }
 
-        private Vector2 RandomPoint(Vector2 center)
-        {
-            return new Vector2(center.x + _random.Next(-_settings.AreaWidth / 2, _settings.AreaWidth / 2),
-                center.y + _random.Next(-_settings.AreaHeight / 2, _settings.AreaHeight / 2));
-        }
-
         public Vector2 FindFreePlace(float minDistance, UnitSide unitSide)
         {
-            var squaredDistance = minDistance * minDistance;
             var center = _activePlayerShip?.Body.WorldPosition() ?? Vector2.zero;
-            var maxRadius =
-                Math.Sqrt(_settings.AreaWidth * _settings.AreaWidth + _settings.AreaHeight * _settings.AreaHeight) / 2;
-            // If required free area is larger than a field, just return a random point on a map 
-            if (minDistance >= maxRadius)
-                return RandomPoint(center);
 
             for (var i = 0; i < 100; ++i)
             {
-                var position = RandomPoint(center);
+                var position = new Vector2(center.x + _random.Next(-_settings.AreaWidth/2, _settings.AreaWidth / 2), center.y + _random.Next(-_settings.AreaHeight / 2, _settings.AreaHeight / 2));
 
                 var isFree = true;
 
@@ -104,7 +94,7 @@ namespace Combat.Scene
                     {
                         if (ship.Type.Side.IsAlly(unitSide))
                             continue;
-                        if (ship.Body.WorldPosition().SqrDistance(position) >= squaredDistance)
+                        if (ship.Body.WorldPosition().Distance(position) >= minDistance)
                             continue;
 
                         isFree = false;
@@ -116,21 +106,7 @@ namespace Combat.Scene
                     return position;
             }
 
-            // Free space was not found, so spawn ship away from player/center
-            var targetPos = center;
-            // In case of very large radius, aka so we can't find a suitable
-            // center, we just pick the farthest point we've got so far
-            var maxSquaredDist = 0f;
-            var tries = 1000;
-            do
-            {
-                var newPos = RandomPoint(center);
-                var sqrDist = center.SqrDistance(newPos);
-                if (sqrDist < maxSquaredDist) continue;
-                targetPos = newPos;
-                maxSquaredDist = sqrDist;
-            } while (maxSquaredDist < squaredDistance && tries-- > 0);
-            return targetPos;
+            return center;
         }
 
         public void Shake(float amplitude)
@@ -177,6 +153,10 @@ namespace Combat.Scene
                         if (!_nearestEnemyShip.IsActive())
                             _nearestEnemyShip = ship;
                         break;
+                    case UnitSide.Ally:
+                        if (!_nearestAllyShip.IsActive())
+                            _nearestAllyShip = ship;
+                        break;
                 }
             }
 
@@ -222,6 +202,36 @@ namespace Combat.Scene
             _playerInCenter = _settings.PlayerAlwaysInCenter || enemyCount > 1;
         }
 
+        private void UpdateAllies()
+        {
+            if (_activePlayerShip == null)
+                return;
+
+            var allyCount = 0;
+            var position = _activePlayerShip.Body.Position;
+            var minDistance = float.MaxValue;
+            _nearestAllyShip = null;
+
+            lock (_shipList.LockObject)
+            {
+                foreach (var ship in _shipList.Items)
+                {
+                    if (ship.IsActive() && ship.Type.Side == UnitSide.Ally && ship.Type.Class == UnitClass.Ship)
+                    {
+                        allyCount++;
+                        var distance = Vector2.SqrMagnitude(ship.Body.Position - position);
+                        if (distance < minDistance)
+                        {
+                            minDistance = distance;
+                            _nearestAllyShip = ship;
+                        }
+                    }
+                }
+            }
+
+            _playerInCenter = _settings.PlayerAlwaysInCenter || allyCount > 1;
+        }
+
         private void CheckBounds()
         {
             if (_activePlayerShip == null)
@@ -234,19 +244,10 @@ namespace Combat.Scene
             }
             _cooldown = 0.5f;
 
+            var center = _activePlayerShip.Body.Position;
+
             lock (_unitList.LockObject)
             {
-                const float maxDistancePlayerDistance = 1e5f;
-                var center = _activePlayerShip.Body.Position;
-                var extraOffset = Vector2.zero;
-                if (center.sqrMagnitude > maxDistancePlayerDistance * maxDistancePlayerDistance)
-                {
-                    extraOffset = -center;
-                    center = Vector2.zero;
-                    _activePlayerShip.Body.ShiftWithDependants(extraOffset);
-                    MainCamera.transform.Translate(extraOffset);
-                }
-
                 foreach (var unit in _unitList.Items)
                 {
                     if (unit == _activePlayerShip)
@@ -256,37 +257,34 @@ namespace Combat.Scene
                     if (unit.Type.Class == UnitClass.Limb)
                         continue;
 
-                    var changed = extraOffset != Vector2.zero;
+                    var changed = false;
 
                     var position = unit.Body.Position;
-                    var offset = new Vector2();
 
-                    while (position.x + offset.x - center.x > 0.5f * _settings.AreaWidth)
+                    if (position.x - center.x > 0.5f * _settings.AreaWidth)
                     {
-                        offset.x -= _settings.AreaWidth;
+                        position.x -= _settings.AreaWidth;
                         changed = true;
                     }
-                    while (position.x + offset.x - center.x < -0.5f * _settings.AreaWidth)
+                    else if (position.x - center.x < -0.5f * _settings.AreaWidth)
                     {
-                        offset.x += _settings.AreaWidth;
+                        position.x += _settings.AreaWidth;
                         changed = true;
                     }
 
-                    while (position.y + offset.y - center.y > 0.5f * _settings.AreaHeight)
+                    if (position.y - center.y > 0.5f * _settings.AreaHeight)
                     {
-                        offset.y -= _settings.AreaHeight;
+                        position.y -= _settings.AreaHeight;
                         changed = true;
                     }
-                    while (position.y + offset.y - center.y < -0.5f * _settings.AreaHeight)
+                    else if (position.y - center.y < -0.5f * _settings.AreaHeight)
                     {
-                        offset.y += _settings.AreaHeight;
+                        position.y += _settings.AreaHeight;
                         changed = true;
                     }
 
                     if (changed)
-                    {
-                        unit.Body.ShiftWithDependants(offset + extraOffset);
-                    }
+                        unit.Body.Move(position);
                 }
             }
         }
@@ -298,9 +296,7 @@ namespace Combat.Scene
         private bool _playerInCenter;
         private IShip _activePlayerShip;
         private IShip _nearestEnemyShip;
-        private UnityEngine.Camera _mainCamera;
-        // ReSharper disable once Unity.NoNullCoalescing
-        private UnityEngine.Camera MainCamera => _mainCamera ?? (_mainCamera = UnityEngine.Camera.main);
+        private IShip _nearestAllyShip;
 
         private readonly UnitList<IUnit> _unitList = new UnitList<IUnit>();
         private readonly ShipList _shipList = new ShipList();

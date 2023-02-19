@@ -41,6 +41,7 @@ namespace Combat.Factory
                 case AmmunitionClassObsolete.HomingImmobilizer:
                 case AmmunitionClassObsolete.HomingTorpedo:
                 case AmmunitionClassObsolete.Rocket:
+                case AmmunitionClassObsolete.IntelligentRocket:
                 case AmmunitionClassObsolete.ClusterMissile:
                     return BulletType.Homing;
                 case AmmunitionClassObsolete.Aura:
@@ -111,8 +112,17 @@ namespace Combat.Factory
 
         public static bool HasDirectImpulse(this AmmunitionClassObsolete ammunition)
         {
-            var type = GetBulletType(ammunition);
-            return type != BulletType.Direct && type != BulletType.AreaOfEffect && !IsDot(ammunition);
+            switch (ammunition)
+            {
+                case AmmunitionClassObsolete.Common:
+                case AmmunitionClassObsolete.Fragment:
+                case AmmunitionClassObsolete.Singularity:
+                case AmmunitionClassObsolete.AcidRocket:
+                case AmmunitionClassObsolete.EmpMissile:
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         public static bool HasDirectDamage(this AmmunitionClassObsolete ammunition, AmmunitionObsoleteStats stats)
@@ -128,6 +138,8 @@ namespace Combat.Factory
                 case AmmunitionClassObsolete.EmpMissile:
                 case AmmunitionClassObsolete.Fireworks:
                 case AmmunitionClassObsolete.UnguidedRocket:
+                case AmmunitionClassObsolete.IntelligentRocket:
+                case AmmunitionClassObsolete.RandomRocket:
                 case AmmunitionClassObsolete.Rocket:
                 case AmmunitionClassObsolete.FragBomb:
                 case AmmunitionClassObsolete.BlackHole:
@@ -165,6 +177,8 @@ namespace Combat.Factory
                 case AmmunitionClassObsolete.HomingImmobilizer:
                 case AmmunitionClassObsolete.EmpMissile:
                 case AmmunitionClassObsolete.UnguidedRocket:
+                case AmmunitionClassObsolete.IntelligentRocket:
+                case AmmunitionClassObsolete.RandomRocket:
                 case AmmunitionClassObsolete.ClusterMissile:
                 case AmmunitionClassObsolete.HomingCarrier:
                     return true;
@@ -182,6 +196,7 @@ namespace Combat.Factory
                 case AmmunitionClassObsolete.HomingTorpedo:
                 case AmmunitionClassObsolete.HomingImmobilizer:
                 case AmmunitionClassObsolete.EmpMissile:
+                case AmmunitionClassObsolete.IntelligentRocket:
                 case AmmunitionClassObsolete.ClusterMissile:
                 case AmmunitionClassObsolete.HomingCarrier:
                     return true;
@@ -224,6 +239,8 @@ namespace Combat.Factory
                 case AmmunitionClassObsolete.Bomb:
                 case AmmunitionClassObsolete.Rocket:
                 case AmmunitionClassObsolete.UnguidedRocket:
+                case AmmunitionClassObsolete.IntelligentRocket:
+                case AmmunitionClassObsolete.RandomRocket:
                 //case AmmunitionClass.BlackHole:
                     return true;
                 case AmmunitionClassObsolete.IonBeam:
@@ -334,9 +351,11 @@ namespace Combat.Factory
                 case AmmunitionClassObsolete.Rocket:
                 case AmmunitionClassObsolete.AcidRocket:
                 case AmmunitionClassObsolete.UnguidedRocket:
+                case AmmunitionClassObsolete.RandomRocket:
                 case AmmunitionClassObsolete.Emp:
                 case AmmunitionClassObsolete.EmpMissile:
                 case AmmunitionClassObsolete.FragBomb:
+                case AmmunitionClassObsolete.IntelligentRocket:
                 case AmmunitionClassObsolete.Fireworks:
                 case AmmunitionClassObsolete.PlasmaWeb:
                 case AmmunitionClassObsolete.ClusterMissile:

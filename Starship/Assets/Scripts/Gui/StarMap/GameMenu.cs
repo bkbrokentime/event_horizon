@@ -26,8 +26,10 @@ namespace Gui.StarMap
         public AnimatedWindow ResearchPanel;
 
         public AnimatedWindow SurvivalPanel;
+        public AnimatedWindow EndlessnessPanel;
         public AnimatedWindow ArenaPanel;
         public AnimatedWindow RuinsPanel;
+        public AnimatedWindow FortificationPanel;
         public AnimatedWindow XmasPanel;
         public AnimatedWindow MilitaryPanel;
         public AnimatedWindow PlanetPanel;
@@ -37,6 +39,7 @@ namespace Gui.StarMap
         public AnimatedWindow BlackMarketPanel;
         public AnimatedWindow ChallengePanel;
         public AnimatedWindow OutOfFuelDialog;
+        public AnimatedWindow IapStoreWindow;
         public AnimatedWindow QuestLogWindow;
 
         [SerializeField] private Button StarViewButton;
@@ -55,8 +58,10 @@ namespace Gui.StarMap
         public void ShowFleet() { FleetPanel.Open(); }
         public void ShowResearch() { ResearchPanel.Open(); }
         public void ShowSurvival() { SurvivalPanel.Open(); }
+        public void ShowEndlessness() { EndlessnessPanel.Open(); }
         public void ShowArena() { ArenaPanel.Open(); }
         public void ShowRuins() { RuinsPanel.Open(); }
+        public void ShowFortification() { FortificationPanel.Open(); }
         public void ShowXmas() { XmasPanel.Open(); }
         public void ShowMilitaryBase() { MilitaryPanel.Open(); }
         public void ShowPandemic() { PlanetPanel.Open(new WindowArgs(Game.Exploration.Planet.InfectedPlanetId)); }
@@ -67,6 +72,7 @@ namespace Gui.StarMap
         public void ShowBlackMarket() { BlackMarketPanel.Open(); }
         public void ShowChallenge() { ChallengePanel.Open(); }
         public void ShowOutOfFuel() { OutOfFuelDialog.Open(); }
+        public void ShowIapStore() { IapStoreWindow.Open(); }
         public void ShowQuestLog() { QuestLogWindow.Open(); }
 
         public void ExitToMainMenu()
@@ -143,6 +149,9 @@ namespace Gui.StarMap
                 case Galaxy.StarObjectType.StarBase:
                     ShowFaction();
                     break;
+                case Galaxy.StarObjectType.Fortification:
+                    ShowFortification();
+                    break;
                 case Galaxy.StarObjectType.Wormhole:
                     ShowWormhole();
                     break;
@@ -152,9 +161,9 @@ namespace Gui.StarMap
                 case Galaxy.StarObjectType.Challenge:
                     ShowChallenge();
                     break;
-                case Galaxy.StarObjectType.Arena:
-                    ShowArena();
-                    break;
+                //case Galaxy.StarObjectType.Arena:
+                //    ShowArena();
+                //    break;
                 case Galaxy.StarObjectType.Ruins:
                     ShowRuins();
                     break;
@@ -163,6 +172,9 @@ namespace Gui.StarMap
                     break;
                 case Galaxy.StarObjectType.Survival:
                     ShowSurvival();
+                    break;
+                case Galaxy.StarObjectType.Endlessness:
+                    ShowEndlessness();
                     break;
                 case Galaxy.StarObjectType.BlackMarket:
                     ShowBlackMarket();

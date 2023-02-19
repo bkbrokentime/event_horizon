@@ -31,7 +31,7 @@ namespace Combat.Collision.Behaviour.Action
                     targetImpact.Effects |= CollisionEffect.Disarm;
                     break;
                 case UnitClass.Drone:
-                    targetImpact.EnergyDamage += _damage;
+                    targetImpact.AllDamageData.EnergyDamage.UpDateDamage(_damage);
                     break;
                 default:
                     return;

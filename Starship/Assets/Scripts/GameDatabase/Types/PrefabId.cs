@@ -40,6 +40,8 @@ namespace GameDatabase.Model
             }
         }
 
+        public string Name { get { return _name; } }
+
         private readonly Type _type;
         private readonly string _name;
 

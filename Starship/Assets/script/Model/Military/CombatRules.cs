@@ -20,7 +20,9 @@ namespace Model
 		{
 			Decay,
 			NextEnemy,
+			NextAlly,
             AllEnemiesThenDraw,
+            AllAlliesThenDraw,
 		}
 
 		public struct CombatRules
@@ -33,11 +35,15 @@ namespace Model
             public TimeoutBehaviour TimeoutBehaviour;
 			public bool CanSelectShips;
 		    public bool CanCallEnemies;
+		    public bool CanCallAllies;
 			public bool AsteroidsEnabled;
 			public bool PlanetEnabled;
 			public bool DisableBonusses;
 		    public int InitialEnemies;
             public int MaxEnemies;
+			public bool NoLimitSet;
+            public int NoLimitMaxEnemies;
+            public int NoLimitMaxAllies;
         }
-	}
+    }
 }

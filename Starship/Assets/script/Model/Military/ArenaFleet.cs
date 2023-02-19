@@ -14,6 +14,7 @@ namespace Model
             }
 
             public IEnumerable<IShip> Ships { get { return _ships; } }
+            public IEnumerable<IShip> AllShips { get { return _ships; } }
 
             public int AiLevel { get { return 100; } }
 

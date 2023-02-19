@@ -22,8 +22,8 @@ public class AutoSize : MonoBehaviour
 
             var rectTransform = child.GetComponent<RectTransform>();
             var offset = rectTransform.anchoredPosition;
-            var width = rectTransform.rect.width/2;
-            var height = rectTransform.rect.height/2;
+            var width = rectTransform.rect.width / 2;
+            var height = rectTransform.rect.height / 2;
 
             if (isfirst)
             {
@@ -52,9 +52,9 @@ public class AutoSize : MonoBehaviour
             ymax = height;
         }
 
-		content.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, ymax - ymin + 2*HorizontalMargin);
+        content.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, ymax - ymin + 2 * HorizontalMargin);
         //content.anchoredPosition = new Vector2((xmax+xmin)/2, (ymax+ymin)/2);
-		content.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, xmax - xmin + 2*VerticalMargin);
+        content.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, xmax - xmin + 2 * VerticalMargin);
         //content.transform.localScale = Vector3.one * _zoom;
     }
 }

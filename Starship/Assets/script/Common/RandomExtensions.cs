@@ -17,6 +17,16 @@ public static class RandomExtension
         return random.Next(random.Next(random.Next(value + 2)));
     }
 
+    public static int NextN(this Random random, int value, int level)
+    {
+        int ans = value + level - 1;
+        for (int i = 0; i < level; i++)
+        {
+            ans = random.Next(ans);
+        }
+        return ans;
+    }
+
     public static bool Percentage(this Random random, int value)
     {
         if (value < 0)

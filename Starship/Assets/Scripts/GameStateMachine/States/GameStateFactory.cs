@@ -17,10 +17,12 @@ namespace GameStateMachine.States
         [Inject] private readonly RetreatState.Factory _retreatStateFactory;
         [Inject] private readonly SkillTreeState.Factory _skillTreeStateFactory;
         [Inject] private readonly ConstructorState.Factory _constructorStateStateFactory;
+   //     [Inject] private readonly ConstructorSatelliteState.Factory _constructorSatelliteStateStateFactory;
         [Inject] private readonly DialogState.Factory _dialogStateFactory;
         [Inject] private readonly TestingState.Factory _testingStateFactory;
         [Inject] private readonly EhopediaState.Factory _echopediaStateFactory;
         [Inject] private readonly CombatState.Factory _combatSceneStateFactory;
+        [Inject] private readonly DailyRewardState.Factory _dailyRewardStateFactory;
         [Inject] private readonly AnnouncementState.Factory _announcementStateFactory;
         [Inject] private readonly CombatRewardState.Factory _combatRewardStateFactory;
         [Inject] private readonly ExplorationState.Factory _explorationStateFactory;
@@ -38,6 +40,11 @@ namespace GameStateMachine.States
         public IGameState CreateAnnouncementState()
         {
             return _announcementStateFactory.Create();
+        }
+
+        public IGameState CreateDaylyRewardState()
+        {
+            return _dailyRewardStateFactory.Create();
         }
 
         public IGameState CreateTravelState(int destination)
@@ -64,6 +71,10 @@ namespace GameStateMachine.States
         {
             return _constructorStateStateFactory.Create(ship);
         }
+    /*    public IGameState CreateSatelliteConstructorState(Constructor.Satellites.ISatellite satellite)
+        {
+            return _constructorSatelliteStateStateFactory.Create(satellite);
+        }*/
 
         public IGameState CreateDialogState(string windowName, WindowArgs args, System.Action<WindowExitCode> onExitAction = null)
         {

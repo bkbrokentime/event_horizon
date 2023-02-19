@@ -16,6 +16,10 @@ namespace GameDatabase.Enums
 		Inner = '2',
 		InnerOuter = '3',
 		Engine = '5',
+		Special = '6',
+		UAVPlatform = '7',
+		InnerSpecial = '8',
+		OuterUAVPlatform = '9',
 		Custom = '*',
 	}
 }

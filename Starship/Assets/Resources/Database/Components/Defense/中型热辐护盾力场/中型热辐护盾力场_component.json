@@ -1,0 +1,18 @@
+{
+  "ItemType": 1,
+  "Id": 322,
+  "Name": "中型热辐护盾力场",
+  "DisplayCategory": 2,
+  "Availability": 1,
+  "ComponentStatsId": 322,
+  "Faction": 7,
+  "Level": 30,
+  "Icon": "armor42",
+  "Color": "#99DCFF",
+  "Layout": "1111",
+  "CellType": "1",
+  "PossibleModifications": [
+    1,
+    3
+  ]
+}

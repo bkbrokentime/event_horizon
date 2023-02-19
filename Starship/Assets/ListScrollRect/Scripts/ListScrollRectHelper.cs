@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using System.Collections;
-using Utils;
 
 /// <summary>
 /// This component is responsible for notifying the ListScrollRect when contents size has change so it can refresh
@@ -29,7 +28,7 @@ public class ListScrollRectHelper : UIBehaviour
 	{
 		if (listScrollRect == null)
 		{
-			OptimizedDebug.LogError("No ListScrollRect set in ListScrollRectHelper when trying to set the scroll direction.");
+			Debug.LogError("No ListScrollRect set in ListScrollRectHelper when trying to set the scroll direction.");
 			return;
 		}
 

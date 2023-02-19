@@ -50,7 +50,7 @@ namespace Combat.Ai
 
 			_threats.Update(deltaTime, _ship, strategy);
 		    _targets.Update(deltaTime, _ship, enemy);
-			var context = new Context(_ship, enemy, _targets, _threats, _currentTime);
+			var context = new Context(_ship, enemy, null,_targets, _threats, _currentTime);
 
 			strategy.Apply(context);
 		    _ship.Controls.DataChanged = false;
@@ -64,7 +64,7 @@ namespace Combat.Ai
 		{
 			_ship.Controls.Throttle = 0;
 			_ship.Controls.Course = null;
-			_ship.Controls.SystemsState.SetAll(false);
+			_ship.Controls.SystemsState = 0;
 		}
 
 		private IStrategy GetStrategy()
@@ -80,7 +80,7 @@ namespace Combat.Ai
 			_strategy = StrategySelector./*BestAvailable*/Random(_ship, _enemy, _level, new System.Random(), _scene);
 			_strategyUpdateCooldown = StrategyUpdateInterval;
 
-			//OptimizedDebug.Log("Strategy: " + _strategy.GetType().Name);
+			//UnityEngine.Debug.Log("Strategy: " + _strategy.GetType().Name);
 			return _strategy;
 		}
 
@@ -99,6 +99,7 @@ namespace Combat.Ai
 		}
 
 		private IShip _enemy;
+		private IShip _ally;
 		private float _enemyUpdateCooldown;
 		private float _strategyUpdateCooldown;
 		private float _currentTime;
@@ -111,8 +112,8 @@ namespace Combat.Ai
 		private readonly int _level;
  		private readonly IShip _ship;
 	    private readonly IScene _scene;
-		private const float EnemyUpdateInterval = 5.0f;
-		private const float StrategyUpdateInterval = 10.0f;
+		private const float EnemyUpdateInterval = 3.0f;//5f
+		private const float StrategyUpdateInterval = 5.0f;//10f
 	    private const float AutoPilotDelay = 2.0f;
 
         public class Factory : IControllerFactory

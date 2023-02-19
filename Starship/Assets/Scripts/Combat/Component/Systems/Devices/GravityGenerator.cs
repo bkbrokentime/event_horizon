@@ -7,7 +7,7 @@ namespace Combat.Component.Systems.Devices
     public class GravityGenerator : SystemBase, IDevice
     {
         public GravityGenerator(IShip ship, DeviceStats deviceSpec, int keyBinding)
-            : base(keyBinding, deviceSpec.ControlButtonIcon)
+            : base(keyBinding, deviceSpec.ControlButtonIcon, ship)
         {
             MaxCooldown = deviceSpec.Cooldown;
 

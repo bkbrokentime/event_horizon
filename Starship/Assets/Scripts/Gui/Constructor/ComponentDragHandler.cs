@@ -29,7 +29,7 @@ namespace Gui.Constructor
 
             ExecuteEvents.Execute<IEndDragHandler>(gameObject, eventData, ExecuteEvents.endDragHandler);
             var keyBinding = _constructor.GetDefaultKey(_component.Component.Data.Id);
-            _draggableComponent.Initialize(new IntegratedComponent(_component.Component, 0, 0, 0, keyBinding, 0, false), eventData, _shipLayout.BlockSize, null);
+            _draggableComponent.Initialize(new IntegratedComponent(_component.Component, 0, 0, 0, 0, keyBinding, 0, false), eventData, _shipLayout.BlockSize, null);
         }
 
         public void OnDrag(PointerEventData eventData)

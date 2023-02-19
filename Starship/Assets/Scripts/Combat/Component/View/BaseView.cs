@@ -11,6 +11,7 @@ namespace Combat.Component.View
         public float Rotation { get { return _rotation; } set { _rotation = value; _rotationChanged = true; } }
         public float Size { get { return _size; } set { _size = value; _sizeChanged = true; } }
         public Color Color { get { return _color; } set { _color = value; _colorChanged = true; } }
+        public bool ChangeableColor { get { return _changeablecolor; } set { _changeablecolor = value; } }
         public float Life { get { return _life; } set { _life = value; _lifeChanged = true; } }
 
         public virtual void UpdateView(float elapsedTime)
@@ -39,11 +40,21 @@ namespace Combat.Component.View
                 _sizeChanged = false;
             }
 
-            if (_colorChanged)
+            if(_changeablecolor)
+            {
+                Color.RGBToHSV(_color, out var H, out var S, out var V);
+                H += 0.2f * elapsedTime;
+                if (H > 1) H -= 1;
+                _color = Color.HSVToRGB(H, S, V);
+//                _colorChanged = true;
+            }
+
+            if (_colorChanged || _changeablecolor)
             {
                 UpdateColor(new Color(Color.r, Color.g, Color.b, Color.a * Opacity));
                 _colorChanged = false;
             }
+
         }
 
         public abstract void Dispose();
@@ -90,6 +101,7 @@ namespace Combat.Component.View
         private float _opacity;
         private Color _color;
         private bool _colorChanged;
+        private bool _changeablecolor;
 
         private float _life;
         private bool _lifeChanged;

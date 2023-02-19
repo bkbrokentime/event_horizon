@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GameModel.Serialization;
+using UnityEngine;
 
 namespace Session.Content
 {
@@ -13,10 +14,18 @@ namespace Session.Content
         public ObscuredLong Experience;
         public ShipComponentsData Components;
         public ShipModificationsData Modifications;
-        public SatelliteData Satellite1;
-        public SatelliteData Satellite2;
+        public SatelliteData Satellite_Left_1;
+        public SatelliteData Satellite_Right_1;
+        public SatelliteData Satellite_Left_2;
+        public SatelliteData Satellite_Right_2;
+        public SatelliteData Satellite_Left_3;
+        public SatelliteData Satellite_Right_3;
+        public SatelliteData Satellite_Left_4;
+        public SatelliteData Satellite_Right_4;
+        public SatelliteData Satellite_Left_5;
+        public SatelliteData Satellite_Right_5;
 
-        public const byte Version = 1;
+        public const byte Version = 2;
 
         public IEnumerable<byte> Serialize()
         {
@@ -33,9 +42,25 @@ namespace Session.Content
                 yield return value;
             foreach (var value in Modifications.Serialize())
                 yield return value;
-            foreach (var value in Satellite1.Serialize())
+            foreach (var value in Satellite_Left_1.Serialize())
                 yield return value;
-            foreach (var value in Satellite2.Serialize())
+            foreach (var value in Satellite_Right_1.Serialize())
+                yield return value;
+            foreach (var value in Satellite_Left_2.Serialize())
+                yield return value;
+            foreach (var value in Satellite_Right_2.Serialize())
+                yield return value;
+            foreach (var value in Satellite_Left_3.Serialize())
+                yield return value;
+            foreach (var value in Satellite_Right_3.Serialize())
+                yield return value;
+            foreach (var value in Satellite_Left_4.Serialize())
+                yield return value;
+            foreach (var value in Satellite_Right_4.Serialize())
+                yield return value;
+            foreach (var value in Satellite_Left_5.Serialize())
+                yield return value;
+            foreach (var value in Satellite_Right_5.Serialize())
                 yield return value;
         }
 
@@ -52,14 +77,36 @@ namespace Session.Content
             info.Experience = Helpers.DeserializeLong(buffer, ref index);
             info.Components = ShipComponentsData.Deserialize(buffer, ref index);
             info.Modifications = ShipModificationsData.Deserialize(buffer, ref index);
-            info.Satellite1 = SatelliteData.Deserialize(buffer, ref index);
-            info.Satellite2 = SatelliteData.Deserialize(buffer, ref index);
+            info.Satellite_Left_1 = SatelliteData.Deserialize(buffer, ref index);
+            info.Satellite_Right_1= SatelliteData.Deserialize(buffer, ref index);
+            info.Satellite_Left_2 = SatelliteData.Deserialize(buffer, ref index);
+            info.Satellite_Right_2= SatelliteData.Deserialize(buffer, ref index);
+            info.Satellite_Left_3 = SatelliteData.Deserialize(buffer, ref index);
+            info.Satellite_Right_3= SatelliteData.Deserialize(buffer, ref index);
+            info.Satellite_Left_4 = SatelliteData.Deserialize(buffer, ref index);
+            info.Satellite_Right_4= SatelliteData.Deserialize(buffer, ref index);
+            info.Satellite_Left_5 = SatelliteData.Deserialize(buffer, ref index);
+            info.Satellite_Right_5= SatelliteData.Deserialize(buffer, ref index);
             return info;
         }
 
         public static ShipData Deserialize(byte[] buffer, ref int index, byte version)
         {
-            throw new ArgumentException("ShipData: Unknown version - " + version);
+            if (version == 1)
+            {
+                var info = new ShipData();
+                info.Id = Helpers.DeserializeInt(buffer, ref index);
+                info.Name = Helpers.DeserializeString(buffer, ref index);
+                info.ColorScheme = Helpers.DeserializeLong(buffer, ref index);
+                info.Experience = Helpers.DeserializeLong(buffer, ref index);
+                info.Components = ShipComponentsData.Deserialize(buffer, ref index);
+                info.Modifications = ShipModificationsData.Deserialize(buffer, ref index);
+                info.Satellite_Left_1 = SatelliteData.Deserialize(buffer, ref index);
+                info.Satellite_Right_1 = SatelliteData.Deserialize(buffer, ref index);
+                return info;
+            }
+            else 
+                throw new ArgumentException("ShipData: Unknown version - " + version);
         }
     }
 
@@ -90,6 +137,7 @@ namespace Session.Content
                 yield return (byte)item.Quality;
                 yield return (byte)item.Modification;
                 yield return (byte)item.UpgradeLevel;
+                yield return (byte)item.Layout;
                 foreach (var value in Helpers.Serialize((short)item.X))
                     yield return value;
                 foreach (var value in Helpers.Serialize((short)item.Y))
@@ -98,6 +146,7 @@ namespace Session.Content
                 yield return (byte)item.KeyBinding;
                 yield return (byte)item.Behaviour;
                 yield return item.Locked ? (byte)1 : (byte)0;
+
             }
         }
 
@@ -121,12 +170,13 @@ namespace Session.Content
                         Quality = (sbyte)buffer[index++],
                         Modification = (sbyte)buffer[index++],
                         UpgradeLevel = (sbyte)buffer[index++],
+                        Layout = (sbyte)buffer[index++],
                         X = Helpers.DeserializeShort(buffer, ref index),
                         Y = Helpers.DeserializeShort(buffer, ref index),
                         BarrelId = (sbyte)buffer[index++],
                         KeyBinding = (sbyte)buffer[index++],
                         Behaviour = (sbyte)buffer[index++],
-                        Locked = buffer[index++] == 1
+                        Locked = buffer[index++] == 1,
                     };
                 }
             }
@@ -151,12 +201,40 @@ namespace Session.Content
                             Quality = (sbyte)buffer[index++],
                             Modification = (sbyte)buffer[index++],
                             UpgradeLevel = (sbyte)buffer[index++],
+                            Layout = 0,
                             X = (sbyte)buffer[index++],
                             Y = (sbyte)buffer[index++],
                             BarrelId = (sbyte)buffer[index++],
                             KeyBinding = (sbyte)buffer[index++],
                             Behaviour = (sbyte)buffer[index++],
-                            Locked = buffer[index++] == 1
+                            Locked = buffer[index++] == 1,
+                        };
+                    }
+                }
+                return info;
+            }      
+            if(version==2)
+            {
+                var info = new ShipComponentsData();
+                var count = Helpers.DeserializeInt(buffer, ref index);
+                if (count > 0)
+                {
+                    info._components = new Component[count];
+                    for (var i = 0; i < count; ++i)
+                    {
+                        info._components[i] = new Component
+                        {
+                            Id = Helpers.DeserializeInt(buffer, ref index),
+                            Quality = (sbyte)buffer[index++],
+                            Modification = (sbyte)buffer[index++],
+                            UpgradeLevel = (sbyte)buffer[index++],
+                            Layout = 0,
+                            X = Helpers.DeserializeShort(buffer, ref index),
+                            Y = Helpers.DeserializeShort(buffer, ref index),
+                            BarrelId = (sbyte)buffer[index++],
+                            KeyBinding = (sbyte)buffer[index++],
+                            Behaviour = (sbyte)buffer[index++],
+                            Locked = buffer[index++] == 1,
                         };
                     }
                 }
@@ -172,6 +250,7 @@ namespace Session.Content
             public int Quality;
             public int Modification;
             public int UpgradeLevel;
+            public int Layout;
             public int X;
             public int Y;
             public int BarrelId;
@@ -182,7 +261,7 @@ namespace Session.Content
 
         private Component[] _components;
 
-        public const byte Version = 2;
+        public const byte Version = 3;
     }
 
     public struct ShipModificationsData
@@ -218,6 +297,10 @@ namespace Session.Content
 
         public static ShipModificationsData Deserialize(byte[] buffer, ref int index, byte version)
         {
+            for(int i = index-10; i < index+10; i++)
+            {
+                Debug.Log("buffer[" + i + "]: " + buffer[i]);
+            }
             throw new ArgumentException("ShipModificationsData: Unknown version - " + version);
         }
 

@@ -18,6 +18,10 @@ namespace GameDatabase.Serializable
 		public int ShipId;
 		public bool NotAvailableInGame;
 		public DifficultyClass DifficultyClass;
+		public bool NoEnhancementLevel;
+		public EnhancementLevel DefaultEnhancementLevel;
+		public EnhancementLevel MinEnhancementLevel;
+		public EnhancementLevel MaxEnhancementLevel;
 		public int BuildFaction;
 		public InstalledComponentSerializable[] Components;
 	}

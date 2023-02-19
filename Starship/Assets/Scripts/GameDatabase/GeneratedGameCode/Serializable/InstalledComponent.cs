@@ -19,6 +19,7 @@ namespace GameDatabase.Serializable
 		public ComponentModType Modification;
 		public ModificationQuality Quality;
 		public bool Locked;
+		public int Layout;
 		public int X;
 		public int Y;
 		public int BarrelId;

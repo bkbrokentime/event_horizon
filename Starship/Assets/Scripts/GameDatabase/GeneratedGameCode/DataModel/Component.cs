@@ -35,8 +35,9 @@ namespace GameDatabase.DataModel
 			if (Stats == null)
 			    throw new DatabaseException(this.GetType().Name + ".Stats cannot be null - " + serializable.ComponentStatsId);
 			Faction = loader.GetFaction(new ItemId<Faction>(serializable.Faction));
-			Level = UnityEngine.Mathf.Clamp(serializable.Level, 0, 2147483647);
+			Level = UnityEngine.Mathf.Clamp(serializable.Level, 0, 1000);
 			Icon = new SpriteId(serializable.Icon, SpriteId.Type.Component);
+			GIFIcon = serializable.GIFIcon;
 			Color = new ColorData(serializable.Color);
 			Layout = new Layout(serializable.Layout);
 			_cellType = serializable.CellType;
@@ -48,6 +49,7 @@ namespace GameDatabase.DataModel
 			DroneBay = loader.GetDroneBay(new ItemId<DroneBay>(serializable.DroneBayId));
 			Drone = loader.GetShipBuild(new ItemId<ShipBuild>(serializable.DroneId));
 			Restrictions = ComponentRestrictions.Create(serializable.Restrictions, loader);
+			PresetMod = serializable.PresetMod;
 			PossibleModifications = new ImmutableCollection<ComponentMod>(serializable.PossibleModifications?.Select(item => loader.GetComponentMod(new ItemId<ComponentMod>(item), true)));
 
 			OnDataDeserialized(serializable, loader);
@@ -63,6 +65,7 @@ namespace GameDatabase.DataModel
 		public Faction Faction { get; private set; }
 		public int Level { get; private set; }
 		public SpriteId Icon { get; private set; }
+		public bool GIFIcon { get; private set; }
 		public ColorData Color { get; private set; }
 		public Layout Layout { get; private set; }
 		private readonly string _cellType;
@@ -74,6 +77,7 @@ namespace GameDatabase.DataModel
 		public DroneBay DroneBay { get; private set; }
 		public ShipBuild Drone { get; private set; }
 		public ComponentRestrictions Restrictions { get; private set; }
+		public PresetModListType PresetMod { get; private set; }
 		public ImmutableCollection<ComponentMod> PossibleModifications { get; private set; }
 
 		public static Component DefaultValue { get; private set; }

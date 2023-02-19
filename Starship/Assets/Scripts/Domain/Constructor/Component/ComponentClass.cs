@@ -1,4 +1,5 @@
 using Constructor.Component;
+using Domain.Quests;
 using GameDatabase.Enums;
 
 namespace Constructor
@@ -10,10 +11,12 @@ namespace Constructor
 	        return new CommonComponent(component, shipSize);
 	    }
 
-        public static string GetUniqueKey(this GameDatabase.DataModel.Component component)
+        public static string[] GetUniqueKey(this GameDatabase.DataModel.Component component)
         {
-            if (!string.IsNullOrEmpty(component.Restrictions.UniqueComponentTag))
-                return component.Restrictions.UniqueComponentTag;
+            var Keys = new string[0];
+            if (component.Restrictions.UniqueComponentTag.Count > 0)
+                foreach (var key in component.Restrictions.UniqueComponentTag)
+                    Keys.Add(key.Tag);
 
             if (component.Device != null)
             {
@@ -21,6 +24,10 @@ namespace Constructor
                 {
                     case DeviceClass.Teleporter:
                     case DeviceClass.Fortification:
+                    case DeviceClass.Equipment:
+                    case DeviceClass.CombustionInhibition:
+                    case DeviceClass.EnergyDiversion:
+                    case DeviceClass.Denseshield:
                     case DeviceClass.Brake:
                     case DeviceClass.RepairBot:
                     case DeviceClass.PointDefense:
@@ -30,21 +37,26 @@ namespace Constructor
                     case DeviceClass.Detonator:
                     case DeviceClass.Accelerator:
                     case DeviceClass.ToxicWaste:
-                        return component.Device.Stats.DeviceClass.ToString();
+                    case DeviceClass.FireAssault:
+                        Keys.Add(component.Device.Stats.DeviceClass.ToString());
+                        break;
                     case DeviceClass.Stealth:
                     case DeviceClass.SuperStealth:
-                        return DeviceClass.Stealth.ToString();
+                        Keys.Add(DeviceClass.Stealth.ToString());
+                        break;
                     case DeviceClass.EnergyShield:
                     case DeviceClass.PartialShield:
-                        return DeviceClass.EnergyShield.ToString();
+                        Keys.Add(DeviceClass.EnergyShield.ToString());
+                        break;
                     case DeviceClass.WormTail:
-                        return DeviceClass.WormTail.ToString();
+                        Keys.Add(DeviceClass.WormTail.ToString());
+                        break;
                     default:
-                        return null;
+                        break;
                 }
             }
 
-            return null;
+            return Keys;
         }
     }
 }

@@ -9,7 +9,7 @@ namespace Constructor.Modification
     class EmptyModification : IModification
     {
         public string GetDescription(ILocalization localization) { return string.Empty; }
-        public ModificationQuality Quality { get { return ModificationQuality.N3; } }
+        public ModificationQuality Quality { get { return ModificationQuality.N5; } }
         public void Apply(ref ShipEquipmentStats stats) { }
         public void Apply(ref DeviceStats device) { }
         public void Apply(ref DroneBayStats droneBay) { }

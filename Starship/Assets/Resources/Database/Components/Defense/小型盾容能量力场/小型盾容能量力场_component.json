@@ -1,0 +1,18 @@
+{
+  "ItemType": 1,
+  "Id": 306,
+  "Name": "小型盾容能量力场",
+  "DisplayCategory": 2,
+  "Availability": 1,
+  "ComponentStatsId": 306,
+  "Faction": 7,
+  "Level": 10,
+  "Icon": "armor31",
+  "Color": "#DC32FF",
+  "Layout": "1",
+  "CellType": "1",
+  "PossibleModifications": [
+    1,
+    3
+  ]
+}

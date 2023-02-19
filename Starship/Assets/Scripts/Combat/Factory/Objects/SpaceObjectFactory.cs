@@ -19,11 +19,14 @@ using Constructor;
 using Constructor.Model;
 using GameDatabase.Enums;
 using GameDatabase.Model;
-using GameServices.Settings;
 using Services.Audio;
 using Services.ObjectPool;
 using UnityEngine;
 using Zenject;
+using Session.Content;
+using Services.Reources;
+using System.Runtime.Serialization;
+using DebugLogSetting;
 
 namespace Combat.Factory
 {
@@ -34,7 +37,7 @@ namespace Combat.Factory
         [Inject] private readonly ISoundPlayer _soundPlayer;
         [Inject] private readonly EffectFactory _effectFactory;
         [Inject] private readonly PrefabCache _prefabCache;
-        [Inject] private readonly GameSettings _gameSettings;
+        [Inject] private readonly IResourceLocator _resourceLocator;
 
         public IUnit CreateExplosion(Vector2 position, float radius, DamageType damageType, float damage, UnitSide unitSide, Color color, float impulseMultiplier = 1.0f)
         {
@@ -192,10 +195,33 @@ namespace Combat.Factory
             return unit;
         }
 
-        public IUnit CreateDecoy(IShip parent, Vector2 position, float size, Vector2 velocity, float angularVelocity, float hitPoints, float lifetime, Color color)
+        public IUnit CreateDecoy(IShip parent, Vector2 position, float size, Vector2 velocity, float angularVelocity, float hitPoints, float lifetime, Color color, bool usemayicon, SpriteId spriteid)
         {
             var prefab = _prefabCache.LoadResourcePrefab("Combat/Objects/Decoy");
+
             var gameObject = new GameObjectHolder(prefab, _objectPool);
+            if (usemayicon)
+            {
+                if (_resourceLocator == null && OtherDebugLogSetting.SpaceObjectDebugLog)
+                {
+                    Debug.Log("_resourceLocator is null");
+                }
+                var sprite = _resourceLocator.GetSprite(new SpriteId(spriteid.Id, SpriteId.Type.Ship));
+                if (sprite == null && OtherDebugLogSetting.SpaceObjectDebugLog)
+                    Debug.Log("_resourceLocator GetSprite failed: " + spriteid.Id);
+
+                gameObject.GetComponent<ChangeView>().ChangeableSprite[0].sprite = sprite;
+                gameObject.GetComponent<ChangeView>().ChangeableSprite[0].gameObject.transform.localPosition = Vector3.zero;
+
+                if (OtherDebugLogSetting.SpaceObjectDebugLog)
+                {
+                    if (gameObject.GetComponent<ChangeView>().ChangeableSprite[0].sprite != null)
+                        Debug.Log("Decoy Icon Changed: " + spriteid.Id);
+                    else
+                        Debug.Log("Decoy Icon Changed failed: " + spriteid.Id);
+                }
+
+            }
             gameObject.IsActive = true;
             var body = gameObject.GetComponent<IBodyComponent>();
             body.Initialize(null, position, 0f, size, velocity, angularVelocity, 0.1f);
@@ -207,7 +233,7 @@ namespace Combat.Factory
 
             var effect = _effectFactory.CreateEffect("FlashAdditive");
             effect.Position = position;
-            effect.Size = size*4;
+            effect.Size = size * 4;
             effect.Color = color;
             effect.Run(lifetime, Vector2.zero, 0f);
             effect.Run(0.3f, parent.Body.Velocity, 0);
@@ -218,9 +244,32 @@ namespace Combat.Factory
             return unit;
         }
 
-        public IEnumerable<WormSegment> CreateWormTail(IShip parent, int size, float weightScale, float hitPoints, PrefabId prefabId, float offset1, float offset2, float extraOffset, ColorScheme colorScheme)
+        public IEnumerable<WormSegment> CreateWormTail(IShip parent, int size, float weightScale, float hitPoints, PrefabId prefabId, bool usemyicon, SpriteId spriteid, SpriteId secondspriteid, Vector2 offset, float extraOffset,Vector2 objectOffset, ColorScheme colorScheme)
         {
             var prefab = _prefabCache.LoadPrefab(prefabId);
+            if (prefab == null)
+            {
+                prefab = _prefabCache.LoadPrefab(new PrefabId("WormSegment", PrefabId.Type.Object));
+            }
+            Sprite icon = null;
+            Sprite secondicon = null;
+            if (usemyicon)
+            {
+                if (_resourceLocator == null && OtherDebugLogSetting.SpaceObjectDebugLog)
+                {
+                    Debug.Log("_resourceLocator is null");
+                }
+                icon = _resourceLocator.GetSprite(new SpriteId(spriteid.Id, SpriteId.Type.Ship));
+                secondicon = _resourceLocator.GetSprite(new SpriteId(secondspriteid.Id, SpriteId.Type.Ship));
+
+                if (OtherDebugLogSetting.SpaceObjectDebugLog)
+                {
+                    if (icon == null)
+                        Debug.Log("_resourceLocator GetSprite failed: " + spriteid.Id);
+                    if (secondicon == null)
+                        Debug.Log("_resourceLocator GetSprite failed: " + secondspriteid.Id);
+                }
+            }   
             var damageIndicator = new DamageIndicator(parent, _effectFactory, parent.Type.Side == UnitSide.Player ? 0.75f : 0.5f);
 
             WormSegment segment = null;
@@ -230,27 +279,49 @@ namespace Combat.Factory
                 var parentWeight = segment != null ? segment.Body.Weight * 0.95f : parent.Body.Weight * weightScale;
 
                 var gameObject = new GameObjectHolder(prefab, _objectPool);
+
+                if (usemyicon)
+                {
+                    gameObject.GetComponent<ChangeView>().ChangeableSprite[0].sprite = icon;
+                    gameObject.GetComponent<ChangeView>().ChangeableSprite[1].sprite = secondicon;
+                    gameObject.GetComponent<ChangeView>().ChangeableSprite[2].sprite = icon;
+                    gameObject.GetComponent<ChangeView>().ChangeableSprite[3].sprite = secondicon;
+                    gameObject.GetComponent<ChangeView>().ChangeableSprite[1].gameObject.transform.localPosition = objectOffset;
+
+                    if (OtherDebugLogSetting.SpaceObjectDebugLog)
+                    {
+                        if (gameObject.GetComponent<ChangeView>().ChangeableSprite[0].sprite != null)
+                            Debug.Log("WormSegment Icon Changed: " + spriteid.Id);
+                        else
+                            Debug.Log("WormSegment Icon Changed failed: " + spriteid.Id);
+
+                        if (gameObject.GetComponent<ChangeView>().ChangeableSprite[1].sprite != null)
+                            Debug.Log("WormSegment PointIcon Changed: " + secondspriteid.Id);
+                        else
+                            Debug.Log("WormSegment PointIcon Changed failed: " + secondspriteid.Id);
+                    }
+                }
                 gameObject.IsActive = true;
                 var body = gameObject.GetComponent<IBodyComponent>();
                 var position = parentBody.Position - RotationHelpers.Direction(parentBody.Rotation) * parentBody.Scale;
-                body.Initialize(null, position, parentBody.Rotation, parentBody.Scale * 0.95f, Vector2.zero, 0.0f, parentWeight * 0.95f);
+                body.Initialize(null, position, parentBody.Rotation, parentBody.Scale * 0.975f, Vector2.zero, 0.0f, parentWeight * 0.975f);
                 var physics = gameObject.GetComponent<PhysicsManager>();
                 var collider = gameObject.GetComponent<ICollider>();
                 var view = gameObject.GetComponent<IView>();
                 view.ApplyHsv(colorScheme.Hue, colorScheme.Saturation);
-                var unit = new WormSegment(parent, body, view, collider, physics, hitPoints *= 0.95f);
+                var unit = new WormSegment(parent, body, view, collider, physics, hitPoints *= 0.975f);
                 unit.AddResource(gameObject);
                 unit.AddTrigger(new DroneExplosionAction(unit, _effectFactory, _soundPlayer));
 
                 if (segment != null)
                 {
-                    unit.Connect(segment, offset1, offset2, 30f);
-                    if(_gameSettings.ShowDamage) unit.SetDamageIndicator(damageIndicator, false);
+                    unit.Connect(segment, offset.x, offset.y, 30f);
+                    unit.SetDamageIndicator(damageIndicator, false);
                 }
                 else
                 {
-                    unit.Connect(parent, offset1 + extraOffset, offset2, 60f);
-                    if(_gameSettings.ShowDamage) unit.SetDamageIndicator(damageIndicator, true);
+                    unit.Connect(parent, offset.x + extraOffset, offset.y, 60f);
+                    unit.SetDamageIndicator(damageIndicator, true);
                 }
 
                 segment = unit;

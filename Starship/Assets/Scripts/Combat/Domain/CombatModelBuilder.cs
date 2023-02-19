@@ -14,6 +14,7 @@ namespace Combat.Domain
     public interface ICombatModelBuilder
     {
         ICombatModel Build(IEnumerable<IProduct> specialLoot = null);
+        ICombatModel NoLimitBuild(IEnumerable<IProduct> specialLoot = null);
         IFleet PlayerFleet { get; }
         IFleet EnemyFleet { get; }
     }
@@ -53,6 +54,23 @@ namespace Combat.Domain
 
             var model = new CombatModel(
                 new FleetModel(playerFleet.Ships, UnitSide.Player, _database, playerFleet.AiLevel, useBonuses ? _playerSkills : null),
+                new FleetModel(enemyFleet.Ships, UnitSide.Enemy, _database, enemyFleet.AiLevel),
+                _shipCreatedSignal, 
+                _shipDestroyedSignal);
+
+            model.SpecialRewards = specialLoot != null ? _specialReward.Concat(specialLoot) : _specialReward;
+            model.Rules = Rules;
+
+            return model;
+        }
+        public ICombatModel NoLimitBuild(IEnumerable<IProduct> specialLoot = null)
+        {
+            var playerFleet = PlayerFleet ?? Model.Factories.Fleet.Empty;
+            var enemyFleet = EnemyFleet ?? Model.Factories.Fleet.Empty;
+            var useBonuses = !Rules.DisableBonusses;
+
+            var model = new CombatModel(
+                new FleetModel(playerFleet.AllShips, UnitSide.Player, _database, playerFleet.AiLevel, useBonuses ? _playerSkills : null),
                 new FleetModel(enemyFleet.Ships, UnitSide.Enemy, _database, enemyFleet.AiLevel),
                 _shipCreatedSignal, 
                 _shipDestroyedSignal);

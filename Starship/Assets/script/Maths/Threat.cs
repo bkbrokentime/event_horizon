@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Constructor.Ships;
+using GameDatabase.DataModel;
 
 namespace Maths
 {
@@ -10,14 +11,29 @@ namespace Maths
 		public static float GetShipPower(IShip ship)
 		{
 			var size = ship.Model.Layout.CellCount;
-		    if (ship.FirstSatellite != null)
-		        size += ship.FirstSatellite.Information.Layout.CellCount;
-            if (ship.SecondSatellite != null)
-                size += ship.SecondSatellite.Information.Layout.CellCount;
-			
-			return ship.Experience.PowerMultiplier * size * (1f + 0.5f*(int)ship.ExtraThreatLevel);
+		    if (ship.Satellite_Left_1 != null)
+		        size += ship.Satellite_Left_1.Information.Layout.CellCount;
+            if (ship.Satellite_Right_1 != null)
+                size += ship.Satellite_Right_1.Information.Layout.CellCount;
+		    if (ship.Satellite_Left_2 != null)
+		        size += ship.Satellite_Left_2.Information.Layout.CellCount;
+            if (ship.Satellite_Right_2 != null)
+                size += ship.Satellite_Right_2.Information.Layout.CellCount;
+		    if (ship.Satellite_Left_3 != null)
+		        size += ship.Satellite_Left_3.Information.Layout.CellCount;
+            if (ship.Satellite_Right_3 != null)
+                size += ship.Satellite_Right_3.Information.Layout.CellCount;
+		    if (ship.Satellite_Left_4 != null)
+		        size += ship.Satellite_Left_4.Information.Layout.CellCount;
+            if (ship.Satellite_Right_4 != null)
+                size += ship.Satellite_Right_4.Information.Layout.CellCount;
+		    if (ship.Satellite_Left_5 != null)
+		        size += ship.Satellite_Left_5.Information.Layout.CellCount;
+            if (ship.Satellite_Right_5 != null)
+                size += ship.Satellite_Right_5.Information.Layout.CellCount;
+
+			return ship.Experience.PowerMultiplier * size * (1f + 0.5f * (int)ship.ExtraThreatLevel) * (1 + (int)ship.ExtraEnhanceLevel * 0.05f);
 		}
-		
 		public static float GetShipsPower(IEnumerable<IShip> ships)
 		{
 			var power = 0f;
@@ -27,7 +43,7 @@ namespace Maths
 			return power;
 		}
 
-		public static Level GetLevel(float playerPower, float enemyPower)
+        public static Level GetLevel(float playerPower, float enemyPower)
 		{
 			var threat = enemyPower/(playerPower + enemyPower);
 

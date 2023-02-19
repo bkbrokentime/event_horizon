@@ -116,10 +116,12 @@ namespace Gui.Combat
             viewModel.Icon.sprite = _resourceLocator.GetSprite(ship.ShipData.Model.ModelImage);
             viewModel.Icon.color = ship.ShipData.ColorScheme.HsvColor;
             viewModel.DisabledIcon.gameObject.SetActive(ship.Status == ShipStatus.Destroyed);
+            viewModel.ActiveIcon.gameObject.SetActive(ship.Status == ShipStatus.Active);
             viewModel.ConditionText.gameObject.SetActive(ship.Condition > 0 && ship.Condition < 1);
             viewModel.ConditionText.text = Mathf.FloorToInt(ship.Condition * 100) + "%";
             viewModel.SetClass(ship.ShipData.ExtraThreatLevel);
             viewModel.SetLevel(ship.ShipData.Experience.Level);
+            viewModel.SetEnhanceLevel(ship.ShipData.ExtraEnhanceLevel);
         }
 
         private void Update()
@@ -134,6 +136,6 @@ namespace Gui.Combat
         private int _selectedIndex;
         private int _firstShipIndex;
         private IFleetModel _fleet;
-        private const int MaxShipCount = 24;
+        private const int MaxShipCount = 50;
     }
 }

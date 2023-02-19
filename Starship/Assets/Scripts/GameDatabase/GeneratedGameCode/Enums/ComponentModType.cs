@@ -32,5 +32,12 @@ namespace GameDatabase.Enums
 		DroneSpeed,
 		DroneRange,
 		Recoil,
+		Implosion,
+		WideExplosion,
+		Burst,
+		HeavyWeapon,
+		Accurate,
+		Scatter,
+		Magazine,
 	}
 }

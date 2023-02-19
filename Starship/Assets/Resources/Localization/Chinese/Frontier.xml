@@ -77,11 +77,11 @@
     <string name="ShipAttackSkill">飞船攻击加成</string>
     <string name="ShipAttackDescription">你控制的飞船造成的伤害增加$1%</string>
     <string name="ShipDefenseSkill">飞船防御加成</string>
-    <string name="ShipDefenseDescription">你控制的飞船增加$1%护盾值和装甲值</string>
+    <string name="ShipDefenseDescription">你控制的飞船增加$1%盾容值和装甲值</string>
     <string name="StarbaseAttackSkill">空间站攻击加成</string>
     <string name="StarbaseAttackDescription">空间站造成的伤害增加$1%</string>
     <string name="StarbaseDefenseSkill">空间站防御加成</string>
-    <string name="StarbaseDefenseDescription">空间站增加$1%护盾值和装甲值</string>
+    <string name="StarbaseDefenseDescription">空间站增加$1%盾容值和装甲值</string>
     <string name="QuickLearningSkill">快速学习</string>
     <string name="QuickLearningDescription">你的飞船及雇佣兵获得的经验增加$1%</string>
     <string name="BetterLootSkill">更多的战利品</string>
@@ -96,7 +96,7 @@
     <string name="EngineerSkillDescription">制造或升级物品时有$1%的几率不消耗蓝图</string>
     <string name="TutorialMessage_Start">指挥官，你好。教程关卡即将开始，你需要保护空间站并消灭所有敌人。</string>
     <string name="TutorialMessage1">做得好！红条表示装甲值，若装甲耗尽，飞船将会炸毁。
-护盾没有装甲耐操，但是它可以随时间回复。
+盾容没有装甲耐操，但是它可以随时间回复。
 用这些装甲片加强一下空间站吧。</string>
     <string name="TutorialMessage2">黄条表示能量值。能量由反应堆产生并储存在能量电池中，是每艘飞船不可或缺的部分。把这些模块放进空间站里</string>
     <string name="TutorialMessage3">空间站是战斗中的一股强大战力，合理地装配可以帮助你有效地打击敌人。用这些炮来武装太空站</string>

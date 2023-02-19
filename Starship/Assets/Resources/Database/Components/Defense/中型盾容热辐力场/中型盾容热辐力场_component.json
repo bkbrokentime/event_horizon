@@ -1,0 +1,18 @@
+{
+  "ItemType": 1,
+  "Id": 310,
+  "Name": "中型盾容热辐力场",
+  "DisplayCategory": 2,
+  "Availability": 1,
+  "ComponentStatsId": 310,
+  "Faction": 7,
+  "Level": 30,
+  "Icon": "armor42",
+  "Color": "#DC32FF",
+  "Layout": "1111",
+  "CellType": "1",
+  "PossibleModifications": [
+    1,
+    3
+  ]
+}

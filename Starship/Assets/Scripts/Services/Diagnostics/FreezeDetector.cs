@@ -2,7 +2,6 @@
 using System.Runtime.Serialization;
 using System.Threading;
 using GameServices;
-using Utils;
 using Zenject;
 
 namespace Services.Diagnostics
@@ -24,7 +23,7 @@ namespace Services.Diagnostics
             var thread = new Thread(ThreadFunc);
             while (thread.ManagedThreadId == Thread.CurrentThread.ManagedThreadId)
             {
-                OptimizedDebug.Log("Invalid thread id (" + thread.ManagedThreadId + ")");
+                UnityEngine.Debug.Log("Invalid thread id (" + thread.ManagedThreadId + ")");
                 thread = new Thread(ThreadFunc);
             }
 
@@ -48,7 +47,7 @@ namespace Services.Diagnostics
         {
             var paused = _gameFlow.ApplicationPaused;
 
-            OptimizedDebug.Log("FreezeDetector: OnGamePaused(" + paused + ")");
+            UnityEngine.Debug.Log("FreezeDetector: OnGamePaused(" + paused + ")");
             UpdateTime();
             Paused = paused;
         }
@@ -61,7 +60,7 @@ namespace Services.Diagnostics
         private void ThreadFunc(object data)
         {
             var context = (FreezeDetector)data;
-            OptimizedDebug.Log("FreezeDetector thread started");
+            UnityEngine.Debug.Log("FreezeDetector thread started");
 
             while (!context._terminate)
             {
@@ -72,15 +71,15 @@ namespace Services.Diagnostics
 
                 var time = Interlocked.Read(ref context._lastTickTime);
                 var deltatime = time > 0 ? (double)(DateTime.UtcNow.Ticks - time)/TimeSpan.TicksPerSecond : 0.0;
-                OptimizedDebug.Log("Freeze detector: " + deltatime);
+                UnityEngine.Debug.Log("Freeze detector: " + deltatime);
 
                 if (deltatime > 30)
                 {
-                    OptimizedDebug.LogError("Freeze detected");
+                    UnityEngine.Debug.LogError("Freeze detected");
 #if !UNITY_EDITOR
                     context._mainThread.Abort();
 #else
-                    OptimizedDebug.Break();
+                    UnityEngine.Debug.Break();
 #endif
                     //break;
                 }

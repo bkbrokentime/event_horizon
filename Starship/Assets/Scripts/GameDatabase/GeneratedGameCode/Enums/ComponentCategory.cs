@@ -10,12 +10,13 @@ namespace GameDatabase.Enums
 {
 	public enum ComponentCategory
 	{
-		Undefined,
+		Undefined=0,
 		Weapon,
 		Defense,
 		Energy,
 		Engine,
 		Drones,
 		Special,
+		Equipment,
 	}
 }

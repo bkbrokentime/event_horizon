@@ -17,9 +17,9 @@ namespace Combat.Collision.Behaviour.Action
         public void Invoke(IUnit self, IUnit target, CollisionData collisionData, ref Impact selfImpact, ref Impact targetImpact)
         {
             if (target.Type.Side.IsAlly(_unitSide))
-                targetImpact.Repair += _damagePerSecond*collisionData.TimeInterval;
+                targetImpact.AllDamageData.Repair.UpDateDamage(_damagePerSecond * collisionData.TimeInterval);
             else
-                targetImpact.AddDamage(_damageType, _damagePerSecond*collisionData.TimeInterval);
+                targetImpact.AddDamage(_damageType, _damagePerSecond * collisionData.TimeInterval);
         }
 
         public void Dispose() { }

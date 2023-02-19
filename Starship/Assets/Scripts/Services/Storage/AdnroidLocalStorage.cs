@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using Utils;
 
 namespace Services.Storage
 {
@@ -12,8 +11,8 @@ namespace Services.Storage
         {
             _internalDirectory = GetInternalStoragePath() + "/";
             _externalDirectory = GetExternalStoragePath() + "/";
-            OptimizedDebug.Log("AndroidLocalStorage: internal dir - " + _internalDirectory);
-            OptimizedDebug.Log("AndroidLocalStorage: external dir - " + _externalDirectory);
+            UnityEngine.Debug.Log("AndroidLocalStorage: internal dir - " + _internalDirectory);
+            UnityEngine.Debug.Log("AndroidLocalStorage: external dir - " + _externalDirectory);
         }
 
         protected override bool TryLoadMainFile(out byte[] data)
@@ -36,7 +35,7 @@ namespace Services.Storage
         {
             foreach (var name in BackupFileNames)
             {
-                OptimizedDebug.Log("Loading backup file: " + name);
+                UnityEngine.Debug.Log("Loading backup file: " + name);
 
                 byte[] data;
                 if (TryLoadFile(name, out data))
@@ -126,7 +125,7 @@ namespace Services.Storage
             }
             catch (System.Exception e)
             {
-                OptimizedDebug.LogException(e);
+                UnityEngine.Debug.LogException(e);
             }
 
             return string.Empty;
@@ -144,7 +143,7 @@ namespace Services.Storage
             }
             catch (System.Exception e)
             {
-                OptimizedDebug.LogException(e);
+                UnityEngine.Debug.LogException(e);
             }
 
             return string.Empty;

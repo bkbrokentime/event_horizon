@@ -14,7 +14,7 @@ namespace Constructor.Component
 
     public interface IComponent
 	{
-		void UpdateStats(ref ShipEquipmentStats stats);
+        void UpdateStats(ref ShipEquipmentStats stats);
 		void UpdateWeaponPlatform(IWeaponPlatformStats stats);
 	    IEnumerable<WeaponData> Weapons { get; }
 	    IEnumerable<KeyValuePair<WeaponStats, AmmunitionObsoleteStats>> WeaponsObsolete { get; }
@@ -22,6 +22,7 @@ namespace Constructor.Component
         IEnumerable<DeviceStats> Devices { get; }
         ActivationType ActivationType { get; }
 		bool IsSuitable(IShipModel ship);
+		GameDatabase.DataModel.Component GetComponent();
 
 	    int UpgradeLevel { get; set; }
 	    IModification Modification { get; set; }

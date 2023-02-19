@@ -27,9 +27,9 @@ namespace Game
         {
             get
             {
-//#if UNITY_EDITOR
-//                return true;
-//#endif
+#if UNITY_EDITOR
+                return true;
+#endif
                 var date = _timeService.DateTime;
                 return date.Month == 12 && date.Day >= 10 || date.Month == 1 && date.Day <= 15;
             }

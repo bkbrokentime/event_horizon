@@ -15,6 +15,7 @@ namespace Gui.ComponentList
         int ItemCount { get; }
 
         string Name { get; }
+        void ChangeName(string NewName);
         SpriteId Icon { get; }
         UnityEngine.Color Color { get; }
 

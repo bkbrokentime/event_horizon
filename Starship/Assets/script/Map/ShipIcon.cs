@@ -16,7 +16,7 @@ public class ShipIcon : Square
 		_scale = Mathf.Sqrt(ship.ModelScale);
 		_distance = 1 + 0.5f*_scale;
 		_angle = ship.GetHashCode() % 360;
-		_speed = 25f/ship.Layout.CellCount;
+		_speed = 25f / (ship.Layout.CellCount + ship.SecondLayout.CellCount);
 		transform.localScale = _scale * Size * Vector3.one;
 	}
 

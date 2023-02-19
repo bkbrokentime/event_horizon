@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Database.Legacy;
 using GameDatabase;
 using GameDatabase.DataModel;
-using GameDatabase.Enums;
 using GameDatabase.Model;
 using Session.Content;
 
@@ -19,15 +17,11 @@ namespace Constructor.Satellites
             return new CommonSatellite(satellite.Information, satellite.Components);
         }
 
-        public static ISatellite FromSatelliteData(IDatabase database, SatelliteData data,
-            List<ShipComponentsData.Component> orphanedComponents = null)
+        public static ISatellite FromSatelliteData(IDatabase database, SatelliteData data)
         {
             var satellite = database.GetSatellite(new ItemId<Satellite>(data.Id));
             if (satellite == null)
-            {
-                orphanedComponents?.AddRange(data.Components.Components);
                 return null;
-            }
 
             return new CommonSatellite(satellite, data.Components.FromShipComponentsData(database));
         }
@@ -46,26 +40,7 @@ namespace Constructor.Satellites
             return info;
         }
 
-        public static bool IsSuitable(this Satellite satellite, SizeClass shipClass, float shipModelScale)
-        {
-            if (satellite.SizeClass != SizeClass.Undefined)
-                return shipClass >= satellite.SizeClass;
-
-            return shipModelScale >= satellite.ModelScale * 2;
-        }
-
-        public static IEnumerable<SatelliteBuild> SuitableFor(this IEnumerable<SatelliteBuild> satellites, Ship ship)
-        {
-            return satellites.Where(item => item.Satellite.IsSuitable(ship.SizeClass, ship.ModelScale));
-        }
-
-        public static IEnumerable<SatelliteBuild> LimitClass(this IEnumerable<SatelliteBuild> satellites,
-            DifficultyClass shipClass)
-        {
-            return satellites.Where(item => item.DifficultyClass <= shipClass);
-        }
-        
-        #region Obsolete
+#region Obsolete
         public static ISatellite FromSatelliteInfo(IDatabase database, FleetData.SatelliteInfoV2 info)
         {
             if (string.IsNullOrEmpty(info.Id))
@@ -85,6 +60,6 @@ namespace Constructor.Satellites
             return new CommonSatellite(database.GetSatellite(int.TryParse(info.Id, out id) ? new ItemId<Satellite>(id) : LegacySatelliteNames.GetId(info.Id)),
                 info.Components.Select(item => ComponentExtensions.DeserializeObsolete(database, item)));
         }
-        #endregion
+#endregion
     }
 }

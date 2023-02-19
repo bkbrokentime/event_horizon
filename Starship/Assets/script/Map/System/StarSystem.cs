@@ -4,7 +4,6 @@ using UnityEngine;
 using GameServices.Player;
 using Services.Messenger;
 using Services.Reources;
-using Utils;
 using Zenject;
 
 namespace StarSystem
@@ -17,7 +16,9 @@ namespace StarSystem
 	    [Inject] private readonly IDatabase _database;
 	    [Inject] private readonly IResourceLocator _resourceLocator;
 
-		public FleetObjects PlayerFleet;
+        [Inject] private readonly PlayerFleet _playerFleet;
+
+        public FleetObjects PlayerFleet;
 		public FleetObjects EnemyFleet;
 		public OrbitalObjects Objects;
 
@@ -35,7 +36,7 @@ namespace StarSystem
             }
             catch (System.Exception e)
             {
-	            OptimizedDebug.LogException(e);
+                Debug.LogException(e);
             }
         }
 
@@ -43,7 +44,10 @@ namespace StarSystem
 		{
 			Objects.Cleanup();
 			EnemyFleet.Cleanup();
-			gameObject.SetActive(false);
+            PlayerFleet.Cleanup();
+            _playerShip = null;
+
+            gameObject.SetActive(false);
 		}		
 
 		public event System.Action<Vector2> MovedEvent = position => {};
@@ -53,6 +57,7 @@ namespace StarSystem
 			if (SelectObject(ref position, true) && Vector2.Distance(_playerShip.transform.localPosition, position) > 0.1f)
 			{
 				MoveTo(position);
+				PlayerFleet.MoveTo(position);
 
                 if (EnemyFleet.AreEnemiesNearby(position, transform.localScale.z))
 				{
@@ -89,7 +94,7 @@ namespace StarSystem
         private void MoveTo(Vector2 target)
 		{
 			_playerShip.MoveTo(target);
-			MovedEvent.Invoke((Vector2)transform.localPosition + 0.75f*target*transform.localScale.z);
+            MovedEvent.Invoke((Vector2)transform.localPosition + 0.75f*target*transform.localScale.z);
         }
 
 		private void Start()
@@ -105,8 +110,9 @@ namespace StarSystem
 				var angle = new System.Random(seed).Next(360);
 				var position = distance*RotationHelpers.Direction(angle+180);
 				_playerShip = PlayerFleet.CreateFlagship(_database.GetShip(LegacyShipNames.GetId("mothership")), position, angle);
+				PlayerFleet.CreateShips(Model.Factories.Fleet.Player(_playerFleet, _database).Ships, position);
 
-				_playerShip.EnginePower = _playerSkills.MainEnginePower;
+                _playerShip.EnginePower = _playerSkills.MainEnginePower;
 			}
 
 			MovedEvent((Vector2)transform.localPosition + 0.75f*_playerShip.Position*transform.localScale.z);

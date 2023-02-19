@@ -28,8 +28,8 @@ namespace Combat.Collision.Manager
             if (!first.IsActive() || !second.IsActive())
                 return;
 
-            var selfImpact = new Impact();
-            var targetImpact = new Impact();
+            var selfImpact = new Impact(new GameDatabase.Model.AllDamageData(), 0, 0, new Impulse(), CollisionEffect.None);
+            var targetImpact = new Impact(new GameDatabase.Model.AllDamageData(), 0, 0, new Impulse(), CollisionEffect.None);
 
             behaviour.Process(first, second, collisionData, ref selfImpact, ref targetImpact);
 

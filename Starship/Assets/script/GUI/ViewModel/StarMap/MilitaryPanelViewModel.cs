@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
 using GameServices.Player;
-using Utils;
 using Zenject;
 
 namespace ViewModel
@@ -31,7 +30,7 @@ namespace ViewModel
 		
 		public void StartButtonClicked()
 		{
-			OptimizedDebug.Log("MilitaryPanelViewModel.StartButtonClicked");
+			UnityEngine.Debug.Log("MilitaryPanelViewModel.StartButtonClicked");
             // TODO:
 			//if (Game.Session.GameLogic.StartCombat(Game.Session.CurrentStar.Military.CombatData, GameUiManager.Instance.ShowRewardDialog))
 			//{

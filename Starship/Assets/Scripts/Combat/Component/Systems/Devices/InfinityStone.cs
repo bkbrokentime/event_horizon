@@ -9,15 +9,13 @@ namespace Combat.Component.Systems.Devices
     public class InfinityStone : SystemBase, IDevice, IFeaturesModification
     {
         public InfinityStone(IShip ship, DeviceStats deviceSpec, int keyBinding)
-            : base(keyBinding, deviceSpec.ControlButtonIcon)
+            : base(keyBinding, deviceSpec.ControlButtonIcon, ship)
         {
             MaxCooldown = deviceSpec.Cooldown;
 
             _ship = ship;
             _activeColor = deviceSpec.Color;
             _lifetime = deviceSpec.Lifetime;
-            _amountMultiplier = deviceSpec.Power;
-            if (_amountMultiplier == 0) _amountMultiplier = 1;
         }
 
         public void Deactivate() { }
@@ -52,9 +50,9 @@ namespace Combat.Component.Systems.Devices
         {
             InvokeTriggers(ConditionType.OnActivate);
             TimeFromLastUse = 0;
-            _ship.Stats.Energy.Get(-_ship.Stats.Energy.MaxValue * _amountMultiplier);
-            _ship.Stats.Armor.Get(-_ship.Stats.Armor.MaxValue * _amountMultiplier);
-            _ship.Stats.Shield.Get(-_ship.Stats.Shield.MaxValue * _amountMultiplier);
+            _ship.Stats.Energy.Get(-_ship.Stats.Energy.MaxValue);
+            _ship.Stats.Armor.Get(-_ship.Stats.Armor.MaxValue);
+            _ship.Stats.Shield.Get(-_ship.Stats.Shield.MaxValue);
             _invulnerabilityTime = _lifetime;
         }
 
@@ -69,7 +67,6 @@ namespace Combat.Component.Systems.Devices
         private float _invulnerabilityTime;
         private Color _color = Color.white;
         private readonly float _lifetime;
-        private readonly float _amountMultiplier;
         private readonly Color _activeColor;
         private readonly IShip _ship;
     }

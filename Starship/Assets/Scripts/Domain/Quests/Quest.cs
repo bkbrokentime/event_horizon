@@ -4,7 +4,6 @@ using GameDatabase.DataModel;
 using GameDatabase.Enums;
 using GameServices.Quests;
 using Services.Localization;
-using Utils;
 
 namespace Domain.Quests
 {
@@ -40,7 +39,6 @@ namespace Domain.Quests
         {
             get
             {
-                if (_activeNode == null) return QuestStatus.Error;
                 switch (_activeNode.Type)
                 {
                     case NodeType.CompleteQuest:
@@ -93,7 +91,7 @@ namespace Domain.Quests
 
                 if (--counter <= 0)
                 {
-                    OptimizedDebug.LogException(new InvalidOperationException("Quest - infinite loop"));
+                    UnityEngine.Debug.LogException(new InvalidOperationException("Quest - infinite loop"));
                     _activeNode = null;
                     break;
                 }

@@ -7,16 +7,16 @@ using GameDatabase.DataModel;
 using GameDatabase.Enums;
 using GameDatabase.Model;
 using Session.Content;
-using Utils;
 using Helpers = GameModel.Serialization.Helpers;
 
 namespace Constructor
 {
 	public class IntegratedComponent
 	{
-		public IntegratedComponent(ComponentInfo component, int x, int y, int barrelId, int keyBinding, int behaviour, bool locked)
+		public IntegratedComponent(ComponentInfo component,int layout, int x, int y, int barrelId, int keyBinding, int behaviour, bool locked)
 		{
 			Info = component;
+            Layout = layout;
 			X = x;
 			Y = y;
 			BarrelId = barrelId;
@@ -30,8 +30,9 @@ namespace Constructor
 		public int KeyBinding { get; set; }
 		public bool Locked { get; set; }
         public int Behaviour { get; set; }
+		public int Layout { get; set; }
 
-		public readonly ComponentInfo Info;
+        public readonly ComponentInfo Info;
 		public readonly int X;
 		public readonly int Y;
 		public readonly int BarrelId;
@@ -41,25 +42,19 @@ namespace Constructor
     {
         public static IEnumerable<IntegratedComponent> FromShipComponentsData(this ShipComponentsData data, IDatabase database)
         {
-            return FromComponentsData(data.Components, database);
-        }
-
-        public static IEnumerable<IntegratedComponent> FromComponentsData(
-            this IEnumerable<ShipComponentsData.Component> data, IDatabase database)
-        {
-            foreach (var item in data)
+            foreach (var item in data.Components)
             {
                 var component = database.GetComponent(new ItemId<GameDatabase.DataModel.Component>(item.Id));
                 if (component == null)
                 {
-                    OptimizedDebug.LogException(new ArgumentException("Unknown component - " + item.Id));
+                    UnityEngine.Debug.LogException(new ArgumentException("Unknown component - " + item.Id));
                     continue;
                 }
 
                 var info = new ComponentInfo(component, (ComponentModType)item.Modification, (ModificationQuality)item.Quality, item.UpgradeLevel);
                 var x = item.X > -component.Layout.Size ? item.X : 256 + item.X;
                 var y = item.Y > -component.Layout.Size ? item.Y : 256 + item.Y;
-                yield return new IntegratedComponent(info, x, y, item.BarrelId, item.KeyBinding, item.Behaviour, item.Locked);
+                yield return new IntegratedComponent(info, item.Layout, x, y, item.BarrelId, item.KeyBinding, item.Behaviour, item.Locked);
             }
         }
 
@@ -73,6 +68,7 @@ namespace Constructor
                     Quality = (int)item.Info.ModificationQuality,
                     Modification = (int)item.Info.ModificationType,
                     UpgradeLevel = 0,
+                    Layout = item.Layout,
                     X = item.X,
                     Y = item.Y,
                     BarrelId = item.BarrelId,
@@ -92,6 +88,7 @@ namespace Constructor
             foreach (var value in Helpers.Serialize(component.Info.SerializeToInt64()))
                 yield return value;
 
+            yield return (byte)component.Layout;
             yield return (byte)component.X;
             yield return (byte)component.Y;
             yield return (byte)component.BarrelId;
@@ -104,6 +101,7 @@ namespace Constructor
         {
             var index = 0;
             var component = ComponentInfo.FromInt64(database, Helpers.DeserializeLong(data, ref index));
+            var layout = data[index++];
             var x = (sbyte)data[index++];
             var y = (sbyte)data[index++];
             var barrelId = (sbyte)data[index++];
@@ -111,7 +109,7 @@ namespace Constructor
             var mode = (sbyte)data[index++];
             var locked = data[index++] > 0;
 
-            return new IntegratedComponent(component, x, y, barrelId, keyBinding, mode, locked);
+            return new IntegratedComponent(component, layout, x, y, barrelId, keyBinding, mode, locked);
         }
 
         public static IEnumerable<byte> SerializeObsolete(this IntegratedComponent component)
@@ -119,6 +117,7 @@ namespace Constructor
             foreach (var value in Helpers.Serialize(component.Info.SerializeToInt32Obsolete()))
                 yield return value;
 
+            yield return (byte)component.Layout;
             yield return (byte)component.X;
             yield return (byte)component.Y;
             yield return (byte)component.BarrelId;
@@ -131,6 +130,7 @@ namespace Constructor
         {
             var index = 0;
             var component = ComponentInfo.FromInt32Obsolete(database, Helpers.DeserializeInt(data, ref index));
+            var layout = data[index++];
             var x = (sbyte)data[index++];
             var y = (sbyte)data[index++];
             var barrelId = (sbyte)data[index++];
@@ -138,13 +138,15 @@ namespace Constructor
             var mode = (sbyte)data[index++];
             var locked = data[index++] > 0;
 
-            return new IntegratedComponent(component, x, y, barrelId, keyBinding, mode, locked);
+            return new IntegratedComponent(component, layout, x, y, barrelId, keyBinding, mode, locked);
         }
 
         public static string SerializeToStringObsolete(this IntegratedComponent component)
         {
             var builder = new StringBuilder();
             builder.Append(component.Info.ToString());
+            builder.Append(_separator);
+            builder.Append(component.Layout);
             builder.Append(_separator);
             builder.Append(component.X);
             builder.Append(_separator);
@@ -167,6 +169,7 @@ namespace Constructor
             var parser = new StringParser(data, _separator);
 
             var info = ComponentInfo.FormString(database, parser.CurrentString);
+            var layout = parser.MoveNext().CurrentInt;
             var x = parser.MoveNext().CurrentInt;
             var y = parser.MoveNext().CurrentInt;
             var barrelId = parser.MoveNext().CurrentInt;
@@ -174,7 +177,7 @@ namespace Constructor
             var locked = !string.IsNullOrEmpty(parser.MoveNext().CurrentString);
             var mode = parser.MoveNext().CurrentInt;
 
-            var component = new IntegratedComponent(info, x, y, barrelId, keyBinding, mode, locked);
+            var component = new IntegratedComponent(info, layout, x, y, barrelId, keyBinding, mode, locked);
 
             return component;
         }
@@ -182,6 +185,8 @@ namespace Constructor
         public static long SerializeToInt64Obsolete(this IntegratedComponent component) // deprecated
         {
             long value = component.Info.SerializeToInt32Obsolete();
+            value <<= 8;
+            value += (byte)component.Layout;
             value <<= 8;
             value += (byte)component.X;
             value <<= 8;
@@ -207,9 +212,11 @@ namespace Constructor
             data >>= 8;
             var x = (sbyte)data;
             data >>= 8;
+            var layout = (sbyte)data;
+            layout >>= 8;
             var component = ComponentInfo.FromInt32Obsolete(database, (int)data);
 
-            return new IntegratedComponent(component, x, y, barrelId, keyBinding, 0, locked);
+            return new IntegratedComponent(component, layout,x, y, barrelId, keyBinding, 0, locked);
         }
 
 #endregion
@@ -217,7 +224,7 @@ namespace Constructor
         public static IntegratedComponent FromDatabase(InstalledComponent serializable)
         {
             var info = new ComponentInfo(serializable.Component, serializable.Modification, serializable.Quality);
-            var component = new IntegratedComponent(info, serializable.X, serializable.Y, serializable.BarrelId, serializable.KeyBinding, serializable.Behaviour, serializable.Locked);
+            var component = new IntegratedComponent(info, serializable.Layout, serializable.X, serializable.Y, serializable.BarrelId, serializable.KeyBinding, serializable.Behaviour, serializable.Locked);
 
             return component;
         }

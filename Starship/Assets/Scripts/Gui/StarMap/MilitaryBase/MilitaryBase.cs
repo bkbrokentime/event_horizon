@@ -20,6 +20,7 @@ namespace Gui.StarMap
         [Inject] private readonly MotherShip _motherShip;
         [Inject] private readonly GameObjectFactory _gameObjectFactory;
         [Inject] private readonly PlayerFleet _playerFleet;
+        [Inject] private readonly PlayerSkills _playerSkills;
 
         [Inject]
         private void Initialize(IMessenger _messenger)
@@ -51,14 +52,14 @@ namespace Gui.StarMap
         public void LevelUpButtonClicked(MilitaryBaseShipItem shipItem)
         {
             var ship = shipItem.Ship;
-            if (ship.Experience.Level >= Level || ship.Experience >= Maths.Experience.MaxPlayerExperience)
+            if (ship.Experience.Level >= Level || ship.Experience >= _playerSkills.MaxShipExperience)
                 return;
 
             var price = GetLevelUpPrice(ship);
             if (!price.TryWithdraw(_playerResources))
                 return;
 
-            ship.Experience = System.Math.Min((long)Maths.Experience.MaxPlayerExperience, (long)ship.Experience + ship.Experience.NextLevelCost);
+            ship.Experience = System.Math.Min(_playerSkills.MaxShipExperience, (long)ship.Experience + ship.Experience.NextLevelCost);
             _soundPlayer.Play(_buySound);
 
             UpdateContent();
@@ -71,7 +72,7 @@ namespace Gui.StarMap
 
         private void UpdateShipItem(MilitaryBaseShipItem item, IShip ship)
         {
-            item.Initialize(ship, GetLevelUpPrice(ship), Mathf.Min(Level, Maths.Experience.MaxPlayerRank));
+            item.Initialize(ship, GetLevelUpPrice(ship), Mathf.Min(Level,Maths.Experience.ExpToLevel( _playerSkills.MaxShipExperience))); 
         }
 
         private void UpdateResources()
@@ -81,12 +82,12 @@ namespace Gui.StarMap
             _starsPanel.SetActive(Economy.CurrencyExtensions.PremiumCurrencyAllowed);
         }
 
-        private int Level { get { return Mathf.Max(5, _motherShip.CurrentStar.Level/2); } }
+        private int Level { get { return Mathf.Max(5, _motherShip.CurrentStar.Level / 2 - 10); } }
 
         private static Price GetLevelUpPrice(IShip ship)
         {
-            var size = 1 + Mathf.Max(0, (int)ship.Model.SizeClass);
-            var price = 1 + ship.Experience.Level * size / 25;
+            var size = 5 + Mathf.Max(0, (int)ship.Model.SizeClass);
+            var price = 1 + ship.Experience.NextLevelCost * size / 50000;
             return Price.Premium(price);
         }
     }

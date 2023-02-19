@@ -6,14 +6,14 @@
 
 //	private void Awake()
 //	{
-//		OptimizedDebug.Log("awake");
+//		UnityEngine.Debug.Log("awake");
 //		_object = gameObject.GameObjectInterface();
 //		_parent = transform.parent.gameObject.GameObjectInterface();
 //	}
 
 //	private void Start()
 //	{
-//		OptimizedDebug.Log("start");
+//		UnityEngine.Debug.Log("start");
 //		gameObject.SetActive(true);
 //		_object.Lifetime = 1;
 //	}

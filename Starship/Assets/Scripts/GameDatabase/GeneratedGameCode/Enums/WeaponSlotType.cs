@@ -16,5 +16,7 @@ namespace GameDatabase.Enums
 		Missile = 'M',
 		Laser = 'L',
 		Special = 'S',
+		Forcefield = 'F',
+		Bomb = 'B',
 	}
 }

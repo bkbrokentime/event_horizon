@@ -89,7 +89,7 @@ namespace Domain.Quests
 
         public IRequirements Create(Requirement_StarbaseCaptured content)
         {
-            return new StarbaseCapturedRequirement( _motherShip );
+            throw new System.NotImplementedException();
         }
 
         public IRequirements Create(Requirement_Faction content)

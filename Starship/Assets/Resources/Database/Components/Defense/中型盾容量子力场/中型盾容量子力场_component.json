@@ -1,0 +1,18 @@
+{
+  "ItemType": 1,
+  "Id": 313,
+  "Name": "中型盾容量子力场",
+  "DisplayCategory": 2,
+  "Availability": 1,
+  "ComponentStatsId": 313,
+  "Faction": 7,
+  "Level": 30,
+  "Icon": "armor12",
+  "Color": "#7F00FF",
+  "Layout": "1111",
+  "CellType": "1",
+  "PossibleModifications": [
+    1,
+    3
+  ]
+}

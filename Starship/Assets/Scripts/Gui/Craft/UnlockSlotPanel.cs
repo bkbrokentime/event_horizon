@@ -90,6 +90,8 @@ namespace Gui.Craft
                 case CraftItemQuality.Improved: return 10;
                 case CraftItemQuality.Excellent: return 15;
                 case CraftItemQuality.Superior: return 20;
+                case CraftItemQuality.Top: return 50;
+                case CraftItemQuality.Ultra: return 100;
                 default: throw new ArgumentOutOfRangeException();
             }
         }
@@ -101,6 +103,8 @@ namespace Gui.Craft
                 case CraftItemQuality.Improved: return 50;
                 case CraftItemQuality.Excellent: return 75;
                 case CraftItemQuality.Superior: return 100;
+                case CraftItemQuality.Top: return 200;
+                case CraftItemQuality.Ultra: return 300;
                 default: throw new ArgumentOutOfRangeException();
             }
         }

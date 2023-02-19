@@ -25,6 +25,7 @@ using Utils;
 using Zenject;
 using Component = GameDatabase.DataModel.Component;
 using ICommand = Gui.Constructor.ICommand;
+using DebugLogSetting;
 
 namespace ViewModel
 {
@@ -53,18 +54,59 @@ namespace ViewModel
         [SerializeField] public ComponentInfoViewModel ComponentInfo;
         [SerializeField] public FleetPanelViewModel FleetPanel;
         [SerializeField] public StatsPanelViewModel Stats;
+        [SerializeField] public GameObject ScorePanel;
+        [SerializeField] public ScorePanelViewModel Score;
         [SerializeField] public ShipLayoutViewModel ShipLayoutViewModel;
-        [SerializeField] public ShipLayoutViewModel LeftPlatformLayoutViewModel;
-        [SerializeField] public ShipLayoutViewModel RightPlatformLayoutViewModel;
+        [SerializeField] public ShipLayoutViewModel PlatformLayoutViewModel_Left_1;
+        [SerializeField] public ShipLayoutViewModel PlatformLayoutViewModel_Right_1;
+        [SerializeField] public ShipLayoutViewModel PlatformLayoutViewModel_Left_2;
+        [SerializeField] public ShipLayoutViewModel PlatformLayoutViewModel_Right_2;
+        [SerializeField] public ShipLayoutViewModel PlatformLayoutViewModel_Left_3;
+        [SerializeField] public ShipLayoutViewModel PlatformLayoutViewModel_Right_3;
+		[SerializeField] public ShipLayoutViewModel PlatformLayoutViewModel_Left_4;
+        [SerializeField] public ShipLayoutViewModel PlatformLayoutViewModel_Right_4;
+        [SerializeField] public ShipLayoutViewModel PlatformLayoutViewModel_Left_5;
+        [SerializeField] public ShipLayoutViewModel PlatformLayoutViewModel_Right_5;
+
+		public GameObject Panel;
+
+        [SerializeField] public ShipLayoutViewModel Second_ShipLayoutViewModel;
+        [SerializeField] public ShipLayoutViewModel Second_PlatformLayoutViewModel_Left_1;
+        [SerializeField] public ShipLayoutViewModel Second_PlatformLayoutViewModel_Right_1;
+        [SerializeField] public ShipLayoutViewModel Second_PlatformLayoutViewModel_Left_2;
+        [SerializeField] public ShipLayoutViewModel Second_PlatformLayoutViewModel_Right_2;
+        [SerializeField] public ShipLayoutViewModel Second_PlatformLayoutViewModel_Left_3;
+        [SerializeField] public ShipLayoutViewModel Second_PlatformLayoutViewModel_Right_3;
+		[SerializeField] public ShipLayoutViewModel Second_PlatformLayoutViewModel_Left_4;
+        [SerializeField] public ShipLayoutViewModel Second_PlatformLayoutViewModel_Right_4;
+        [SerializeField] public ShipLayoutViewModel Second_PlatformLayoutViewModel_Left_5;
+        [SerializeField] public ShipLayoutViewModel Second_PlatformLayoutViewModel_Right_5;
+
+		public GameObject Second_Panel;
+
+		public int layout;
+		public Image layout_toggle_image;
+		public Sprite[] layout_sprite;
+
+		public DraggableComponentObject draggableComponentObject;
+
         [SerializeField] public SatellitesPanel SatellitesPanel;
         [SerializeField] public CustomInputField NameText;
         [SerializeField] public CanvasGroup ShipPanel;
+        [SerializeField] public CanvasGroup Second_ShipPanel;
         [SerializeField] public GameObject[] DisabledInViewMode;
 		[SerializeField] public Toggle ViewModeToggle;
+		[SerializeField] public GameObject[] DisabledInFreeMoveMode;
 	    [SerializeField] private Button _rollbackButton;
         [SerializeField] private AudioClip _installSound;
 
-        [Serializable]
+		[SerializeField] ScrollRect scrollRect;
+		[SerializeField] Zoom zoom;
+		[SerializeField] RectTransform panel_1;
+		[SerializeField] RectTransform panel_2;
+
+
+		[Serializable]
         public class CommandEvent : UnityEvent<ICommand> { }
 
         public int ShipSize { get; private set; }
@@ -77,8 +119,28 @@ namespace ViewModel
 		{
 			var keys = new HashSet<int>();
 			var items = ShipLayoutViewModel.Components.
-				Concat(LeftPlatformLayoutViewModel.Components).
-				Concat(RightPlatformLayoutViewModel.Components);
+				Concat(PlatformLayoutViewModel_Left_1.Components).
+				Concat(PlatformLayoutViewModel_Right_1.Components).
+				Concat(PlatformLayoutViewModel_Left_2.Components).
+				Concat(PlatformLayoutViewModel_Right_2.Components).
+				Concat(PlatformLayoutViewModel_Left_3.Components).
+				Concat(PlatformLayoutViewModel_Right_3.Components).
+				Concat(PlatformLayoutViewModel_Left_4.Components).
+				Concat(PlatformLayoutViewModel_Right_4.Components).
+				Concat(PlatformLayoutViewModel_Left_5.Components).
+				Concat(PlatformLayoutViewModel_Right_5.Components).
+				Concat(Second_ShipLayoutViewModel.Components).
+				Concat(Second_PlatformLayoutViewModel_Left_1.Components).
+				Concat(Second_PlatformLayoutViewModel_Right_1.Components).
+				Concat(Second_PlatformLayoutViewModel_Left_2.Components).
+				Concat(Second_PlatformLayoutViewModel_Right_2.Components).
+				Concat(Second_PlatformLayoutViewModel_Left_3.Components).
+				Concat(Second_PlatformLayoutViewModel_Right_3.Components).
+				Concat(Second_PlatformLayoutViewModel_Left_4.Components).
+				Concat(Second_PlatformLayoutViewModel_Right_4.Components).
+				Concat(Second_PlatformLayoutViewModel_Left_5.Components).
+				Concat(Second_PlatformLayoutViewModel_Right_5.Components)
+				;
 
 			foreach (var item in items)
 			{
@@ -90,7 +152,7 @@ namespace ViewModel
 				keys.Add(key);
 			}
 			
-			for (int i = 0; i < 6; ++i)
+			for (int i = 0; i < 10; ++i)
 				if (!keys.Contains(i))
 					return i;
 			
@@ -99,17 +161,36 @@ namespace ViewModel
 
 		public bool IsUniqueItemInstalled(Component component)
 		{
-			var key = component.GetUniqueKey();
-			if (string.IsNullOrEmpty(key))
+			var keys = component.GetUniqueKey();
+			if (keys.Length == 0)
 				return false;
 
 			var items = ShipLayoutViewModel.Components.
-				Concat(LeftPlatformLayoutViewModel.Components).
-					Concat(RightPlatformLayoutViewModel.Components);
+                Concat(PlatformLayoutViewModel_Left_1.Components).
+                Concat(PlatformLayoutViewModel_Right_1.Components).
+                Concat(PlatformLayoutViewModel_Left_2.Components).
+                Concat(PlatformLayoutViewModel_Right_2.Components).
+                Concat(PlatformLayoutViewModel_Left_3.Components).
+                Concat(PlatformLayoutViewModel_Right_3.Components).
+                Concat(PlatformLayoutViewModel_Left_4.Components).
+                Concat(PlatformLayoutViewModel_Right_4.Components).
+                Concat(PlatformLayoutViewModel_Left_5.Components).
+                Concat(PlatformLayoutViewModel_Right_5.Components).
+                Concat(Second_ShipLayoutViewModel.Components).
+                Concat(Second_PlatformLayoutViewModel_Left_1.Components).
+                Concat(Second_PlatformLayoutViewModel_Right_1.Components).
+                Concat(Second_PlatformLayoutViewModel_Left_2.Components).
+                Concat(Second_PlatformLayoutViewModel_Right_2.Components).
+                Concat(Second_PlatformLayoutViewModel_Left_3.Components).
+                Concat(Second_PlatformLayoutViewModel_Right_3.Components).
+                Concat(Second_PlatformLayoutViewModel_Left_4.Components).
+                Concat(Second_PlatformLayoutViewModel_Right_4.Components).
+                Concat(Second_PlatformLayoutViewModel_Left_5.Components).
+                Concat(Second_PlatformLayoutViewModel_Right_5.Components)
+                ;
 
-		    return items.Any(item => item.Info.Data.GetUniqueKey() == key);
+			return items.Any(item => item.Info.Data.GetUniqueKey().Any(key => keys.Contains(key)));
 		}
-
 		public void OnComponentInstalled(ComponentInfo component)
 		{
 			_components.Remove(component);
@@ -139,64 +220,108 @@ namespace ViewModel
 
 		public void OnViewModeSelected(bool selected)
 		{
-			ShowComponentList();
-            ShipPanel.blocksRaycasts = !selected;
-			foreach (var item in DisabledInViewMode)
-				item.SetActive(!selected);
+			if (layout == 0)
+			{
+				ShowComponentList();
+				ShipPanel.blocksRaycasts = !selected;
+				foreach (var item in DisabledInViewMode)
+					item.SetActive(!selected);
 
-			var transform = ShipPanel.GetComponent<RectTransform>();
-			if (selected)
-			{
-				var size = transform.rect.size;
-				var container = transform.parent.GetComponent<RectTransform>().rect.size;
-				transform.localScale = Vector3.one * Mathf.Clamp01(container.y / size.y);
+				var transform = ShipPanel.GetComponent<RectTransform>();
+				if (selected)
+				{
+					var size = transform.rect.size;
+					var container = transform.parent.GetComponent<RectTransform>().rect.size;
+					transform.localScale = Vector3.one * Mathf.Clamp01(container.y / size.y);
+				}
+				else
+				{
+					transform.localScale = Vector3.one;
+				}
 			}
-			else
+			else if(layout == 1)
 			{
-				transform.localScale = Vector3.one;
+                ShowComponentList();
+                Second_ShipPanel.blocksRaycasts = !selected;
+                foreach (var item in DisabledInViewMode)
+                    item.SetActive(!selected);
+
+                var transform = Second_ShipPanel.GetComponent<RectTransform>();
+                if (selected)
+                {
+                    var size = transform.rect.size;
+                    var container = transform.parent.GetComponent<RectTransform>().rect.size;
+                    transform.localScale = Vector3.one * Mathf.Clamp01(container.y / size.y);
+                }
+                else
+                {
+                    transform.localScale = Vector3.one;
+                }
             }
         }
 
-		public void ShowWeapons()
+		public void OnFreeMoveModeSelected(bool selected)
 		{
-			OptimizedDebug.Log("ShowWeapons");
+			ShowComponentList();
+            foreach (var item in DisabledInFreeMoveMode)
+                item.SetActive(!selected);
+
+        }
+
+		public void OnSecondLayoutModeSelected(bool selected)
+		{
+			layout = selected ? 1 : 0;
+			layout_toggle_image.sprite = layout_sprite[layout];
+            UpgradeLayout();
+        }
+
+        public void ShowWeapons()
+		{
+			UnityEngine.Debug.Log("ShowWeapons");
             ShowComponentList();
 		    _componentList.ShowWeapon();
 		}
 
 		public void ShowEnergy()
 		{
-			OptimizedDebug.Log("ShowEnergy");
+			UnityEngine.Debug.Log("ShowEnergy");
 		    ShowComponentList();
 		    _componentList.ShowEnergy();
 		}
 
 		public void ShowDefense()
 		{
-			OptimizedDebug.Log("ShowDefense");
+			UnityEngine.Debug.Log("ShowDefense");
 		    ShowComponentList();
 		    _componentList.ShowArmor();
 		}
 
 		public void ShowEngine()
 		{
-			OptimizedDebug.Log("ShowEngine");
+			UnityEngine.Debug.Log("ShowEngine");
 		    ShowComponentList();
 		    _componentList.ShowEngine();
 		}
         
         public void ShowDrones()
 		{
-			OptimizedDebug.Log("ShowDrones");
+			UnityEngine.Debug.Log("ShowDrones");
 		    ShowComponentList();
 		    _componentList.ShowDrone();
 		}
 
 		public void ShowSpecial()
 		{
-			OptimizedDebug.Log("ShowSpecial");
+			UnityEngine.Debug.Log("ShowSpecial");
 		    ShowComponentList();
 		    _componentList.ShowSpecial();
+		}
+
+		public void ShowEquipment()
+		{
+			UnityEngine.Debug.Log("ShowEquipment");
+		    ShowComponentList();
+		    _componentList.ShowEquipment();
 		}
 
         public void ShowAll()
@@ -231,7 +356,7 @@ namespace ViewModel
 
 	            if (!command.TryRollback())
 	            {
-	                OptimizedDebug.Log("Undo - failed");
+	                UnityEngine.Debug.Log("Undo - failed");
                     _commands.Clear();
 	            }
 	        }
@@ -248,13 +373,32 @@ namespace ViewModel
 
 		public void SaveCurrentShip()
 		{
-			Ship.Components.Assign(_layout.Components);
+			Ship.Components.Assign(Second_layout != null ? _layout.Components.Concat(Second_layout.Components) : _layout.Components);
 			if (!String.IsNullOrEmpty(NameText.text))
 				Ship.Name = NameText.text;
 
-            Ship.FirstSatellite?.Components.Assign(_leftPlatformLayout.Components);
-            Ship.SecondSatellite?.Components.Assign(_rightPlatformLayout.Components);
-
+			Ship.Satellite_Left_1?.Components.Assign(Second_PlatformLayout_left_1 != null ? PlatformLayout_left_1.Components.Concat(Second_PlatformLayout_left_1.Components) : PlatformLayout_left_1.Components);
+            Ship.Satellite_Right_1?.Components.Assign(Second_PlatformLayout_right_1 != null ? PlatformLayout_right_1.Components.Concat(Second_PlatformLayout_right_1.Components) : PlatformLayout_right_1.Components);
+            Ship.Satellite_Left_2?.Components.Assign(Second_PlatformLayout_left_2 != null ? PlatformLayout_left_2.Components.Concat(Second_PlatformLayout_left_2.Components) : PlatformLayout_left_2.Components);
+            Ship.Satellite_Right_2?.Components.Assign(Second_PlatformLayout_right_2 != null ? PlatformLayout_right_2.Components.Concat(Second_PlatformLayout_right_2.Components) : PlatformLayout_right_2.Components);
+            Ship.Satellite_Left_3?.Components.Assign(Second_PlatformLayout_left_3 != null ? PlatformLayout_left_3.Components.Concat(Second_PlatformLayout_left_3.Components) : PlatformLayout_left_3.Components);
+            Ship.Satellite_Right_3?.Components.Assign(Second_PlatformLayout_right_3 != null ? PlatformLayout_right_3.Components.Concat(Second_PlatformLayout_right_3.Components) : PlatformLayout_right_3.Components);
+            Ship.Satellite_Left_4?.Components.Assign(Second_PlatformLayout_left_4 != null ? PlatformLayout_left_4.Components.Concat(Second_PlatformLayout_left_4.Components) : PlatformLayout_left_4.Components);
+            Ship.Satellite_Right_4?.Components.Assign(Second_PlatformLayout_right_4 != null ? PlatformLayout_right_4.Components.Concat(Second_PlatformLayout_right_4.Components) : PlatformLayout_right_4.Components);
+            Ship.Satellite_Left_5?.Components.Assign(Second_PlatformLayout_left_5 != null ? PlatformLayout_left_5.Components.Concat(Second_PlatformLayout_left_5.Components) : PlatformLayout_left_5.Components);
+            Ship.Satellite_Right_5?.Components.Assign(Second_PlatformLayout_right_5 != null ? PlatformLayout_right_5.Components.Concat(Second_PlatformLayout_right_5.Components) : PlatformLayout_right_5.Components);
+/*
+            Ship.Satellite_Left_1?.Components.Assign(PlatformLayout_left_1.Components);
+            Ship.Satellite_Right_1?.Components.Assign(PlatformLayout_right_1.Components);
+            Ship.Satellite_Left_2?.Components.Assign(PlatformLayout_left_2.Components);
+            Ship.Satellite_Right_2?.Components.Assign(PlatformLayout_right_2.Components);
+            Ship.Satellite_Left_3?.Components.Assign(PlatformLayout_left_3.Components);
+            Ship.Satellite_Right_3?.Components.Assign(PlatformLayout_right_3.Components);
+            Ship.Satellite_Left_4?.Components.Assign(PlatformLayout_left_4.Components);
+            Ship.Satellite_Right_4?.Components.Assign(PlatformLayout_right_4.Components);
+            Ship.Satellite_Left_5?.Components.Assign(PlatformLayout_left_5.Components);
+            Ship.Satellite_Right_5?.Components.Assign(PlatformLayout_right_5.Components);
+*/
             if (!IsEditorMode)
 				_components.SaveToInventory(_playerInventory);
         }
@@ -265,6 +409,7 @@ namespace ViewModel
             ComponentInfo.gameObject.SetActive(false);
             FleetPanel.Close();
             SatellitesPanel.Open(Ship, IsEditorMode);
+            ScorePanel.SetActive(false);
         }
 
         public void ShowComponent(ComponentInfo component)
@@ -274,15 +419,17 @@ namespace ViewModel
 			ComponentInfo.gameObject.SetActive(true);
             ComponentInfo.SetComponent(component);
             SatellitesPanel.gameObject.SetActive(false);
+            ScorePanel.SetActive(false);
         }
 
-		public void ShowComponent(ShipLayoutViewModel activeLayout, int id)
+        public void ShowComponent(ShipLayoutViewModel activeLayout, int id)
 		{
 			FleetPanel.Close();
             _componentList.gameObject.SetActive(false);
 			ComponentInfo.gameObject.SetActive(true);
 			ComponentInfo.SetComponent(activeLayout, id);
             SatellitesPanel.gameObject.SetActive(false);
+            ScorePanel.SetActive(false);
         }
 
         public void ShowComponentList()
@@ -291,6 +438,7 @@ namespace ViewModel
             ComponentInfo.gameObject.SetActive(false);
             _componentList.gameObject.SetActive(true);
             SatellitesPanel.gameObject.SetActive(false);
+            ScorePanel.SetActive(false);
         }
 
         public void ShowShipList()
@@ -299,6 +447,15 @@ namespace ViewModel
 			ComponentInfo.gameObject.SetActive(false);
 			FleetPanel.Open(IsEditorMode);
             SatellitesPanel.gameObject.SetActive(false);
+			ScorePanel.SetActive(false);
+        }
+        public void ShowShipScore()
+		{
+	        _componentList.gameObject.SetActive(false);
+			ComponentInfo.gameObject.SetActive(false);
+            FleetPanel.Close();
+            SatellitesPanel.gameObject.SetActive(false);
+			ScorePanel.SetActive(true);
         }
 
 	    public void InstallSatellite(ItemId<SatelliteBuild> buildId, ItemId<Satellite> id, CompanionLocation location)
@@ -332,13 +489,53 @@ namespace ViewModel
 	        ISatellite oldValue;
 	        if (location == CompanionLocation.Left)
 	        {
-	            oldValue = Ship.FirstSatellite;
-	            Ship.FirstSatellite = satellite;
+	            oldValue = Ship.Satellite_Left_1;
+	            Ship.Satellite_Left_1 = satellite;
 	        }
-	        else
-	        {
-	            oldValue = Ship.SecondSatellite;
-	            Ship.SecondSatellite = satellite;
+            else if(location == CompanionLocation.Right)
+            {
+	            oldValue = Ship.Satellite_Right_1;
+	            Ship.Satellite_Right_1 = satellite;
+	        }
+            else if(location == CompanionLocation.Left_2)
+            {
+	            oldValue = Ship.Satellite_Left_2;
+	            Ship.Satellite_Left_2 = satellite;
+	        }
+            else if(location == CompanionLocation.Right_2)
+            {
+	            oldValue = Ship.Satellite_Right_2;
+	            Ship.Satellite_Right_2 = satellite;
+	        }
+            else if(location == CompanionLocation.Left_3)
+            {
+	            oldValue = Ship.Satellite_Left_3;
+	            Ship.Satellite_Left_3 = satellite;
+	        }
+            else if(location == CompanionLocation.Right_3)
+            {
+	            oldValue = Ship.Satellite_Right_3;
+	            Ship.Satellite_Right_3 = satellite;
+	        }
+            else if(location == CompanionLocation.Left_4)
+            {
+	            oldValue = Ship.Satellite_Left_4;
+	            Ship.Satellite_Left_4 = satellite;
+	        }
+            else if(location == CompanionLocation.Right_4)
+            {
+	            oldValue = Ship.Satellite_Right_4;
+	            Ship.Satellite_Right_4 = satellite;
+	        }
+            else if(location == CompanionLocation.Left_5)
+            {
+	            oldValue = Ship.Satellite_Left_5;
+	            Ship.Satellite_Left_5 = satellite;
+	        }
+            else
+            {
+	            oldValue = Ship.Satellite_Right_5;
+	            Ship.Satellite_Right_5 = satellite;
 	        }
 
             if (oldValue != null && !IsEditorMode)
@@ -367,14 +564,48 @@ namespace ViewModel
 		    IsEditorMode = _playerFleet == null || _playerInventory == null || !_playerFleet.Ships.Contains(ship);
 
 		    var debug = _debugManager.CreateLog(ship.Name);
-			_layout = new ShipLayout(Ship.Model.Layout, ship.Model.Barrels, ship.Components, debug);
-			
-			NameText.text = _localization.GetString(ship.Name);
+			_layout = new ShipLayout(Ship.Model.Layout, ship.Model.Barrels, ship.Components.Where(item => item.Layout == 0), debug);
+			Second_layout = Ship.Model.SecondLayout.Data != string.Empty ? new ShipLayout(Ship.Model.SecondLayout, null, ship.Components.Where(item => item.Layout == 1), debug) : null;
+			if (ShipDebugLogSetting.ShipLayoutDebugLog)
+			{
+				if (_layout != null)
+					UnityEngine.Debug.Log("_layout set  " + Ship.Model.Layout.Data);
+				if (Second_layout != null)
+					UnityEngine.Debug.Log("Second_layout set  " + Ship.Model.SecondLayout.Data);
+			}
+            NameText.text = _localization.GetString(ship.Name);
 
-            _leftPlatformLayout = ship.FirstSatellite != null ? new ShipLayout(ship.FirstSatellite.Information.Layout, ship.FirstSatellite.Information.Barrels, ship.FirstSatellite.Components, debug) : null;
-            _rightPlatformLayout = ship.SecondSatellite != null ? new ShipLayout(ship.SecondSatellite.Information.Layout, ship.SecondSatellite.Information.Barrels, ship.SecondSatellite.Components, debug) : null;
+            PlatformLayout_left_1 = ship.Satellite_Left_1 != null ? new ShipLayout(ship.Satellite_Left_1.Information.Layout, ship.Satellite_Left_1.Information.Barrels, ship.Satellite_Left_1.Components.Where(item => item.Layout == 0), debug) : null;
+            PlatformLayout_right_1 = ship.Satellite_Right_1 != null ? new ShipLayout(ship.Satellite_Right_1.Information.Layout, ship.Satellite_Right_1.Information.Barrels,  ship.Satellite_Right_1.Components.Where(item => item.Layout == 0), debug) : null;
 
-			ShipSize = Ship.Model.Layout.CellCount;
+            PlatformLayout_left_2 = ship.Satellite_Left_2 != null ? new ShipLayout(ship.Satellite_Left_2.Information.Layout, ship.Satellite_Left_2.Information.Barrels, ship.Satellite_Left_2.Components.Where(item => item.Layout == 0), debug) : null;
+            PlatformLayout_right_2 = ship.Satellite_Right_2 != null ? new ShipLayout(ship.Satellite_Right_2.Information.Layout, ship.Satellite_Right_2.Information.Barrels, ship.Satellite_Right_2.Components.Where(item => item.Layout == 0), debug) : null;
+
+            PlatformLayout_left_3 = ship.Satellite_Left_3 != null ? new ShipLayout(ship.Satellite_Left_3.Information.Layout, ship.Satellite_Left_3.Information.Barrels, ship.Satellite_Left_3.Components.Where(item => item.Layout == 0), debug) : null;
+            PlatformLayout_right_3 = ship.Satellite_Right_3 != null ? new ShipLayout(ship.Satellite_Right_3.Information.Layout, ship.Satellite_Right_3.Information.Barrels,ship.Satellite_Right_3.Components.Where(item => item.Layout == 0), debug) : null;
+
+            PlatformLayout_left_4 = ship.Satellite_Left_4 != null ? new ShipLayout(ship.Satellite_Left_4.Information.Layout, ship.Satellite_Left_4.Information.Barrels, ship.Satellite_Left_4.Components.Where(item => item.Layout == 0), debug) : null;
+            PlatformLayout_right_4 = ship.Satellite_Right_4 != null ? new ShipLayout(ship.Satellite_Right_4.Information.Layout, ship.Satellite_Right_4.Information.Barrels, ship.Satellite_Right_4.Components.Where(item => item.Layout == 0), debug) : null;
+
+            PlatformLayout_left_5 = ship.Satellite_Left_5 != null ? new ShipLayout(ship.Satellite_Left_5.Information.Layout, ship.Satellite_Left_5.Information.Barrels,ship.Satellite_Left_5.Components.Where(item => item.Layout == 0), debug) : null;
+            PlatformLayout_right_5 = ship.Satellite_Right_5 != null ? new ShipLayout(ship.Satellite_Right_5.Information.Layout, ship.Satellite_Right_5.Information.Barrels, ship.Satellite_Right_5.Components.Where(item => item.Layout == 0), debug) : null;
+
+			Second_PlatformLayout_left_1 = ship.Satellite_Left_1 != null && ship.Satellite_Left_1.Information.SecondLayout.Data != string.Empty ? new ShipLayout(ship.Satellite_Left_1.Information.SecondLayout, null, ship.Satellite_Left_1.Components.Where(item=>item.Layout==1), debug) : null;
+            Second_PlatformLayout_right_1 = ship.Satellite_Right_1 != null && ship.Satellite_Right_1.Information.SecondLayout.Data != string.Empty ? new ShipLayout(ship.Satellite_Right_1.Information.SecondLayout, null, ship.Satellite_Right_1.Components.Where(item => item.Layout == 1), debug) : null;
+
+            Second_PlatformLayout_left_2 = ship.Satellite_Left_2 != null && ship.Satellite_Left_2.Information.SecondLayout.Data != string.Empty ? new ShipLayout(ship.Satellite_Left_2.Information.SecondLayout, null, ship.Satellite_Left_2.Components.Where(item => item.Layout == 1), debug) : null;
+            Second_PlatformLayout_right_2 = ship.Satellite_Right_2 != null && ship.Satellite_Right_2.Information.SecondLayout.Data != string.Empty ? new ShipLayout(ship.Satellite_Right_2.Information.SecondLayout, null, ship.Satellite_Right_2.Components.Where(item => item.Layout == 1), debug) : null;
+
+            Second_PlatformLayout_left_3 = ship.Satellite_Left_3 != null && ship.Satellite_Left_3.Information.SecondLayout.Data != string.Empty ? new ShipLayout(ship.Satellite_Left_3.Information.SecondLayout, null, ship.Satellite_Left_3.Components.Where(item => item.Layout == 1), debug) : null;
+            Second_PlatformLayout_right_3 = ship.Satellite_Right_3 != null && ship.Satellite_Right_3.Information.SecondLayout.Data != string.Empty ? new ShipLayout(ship.Satellite_Right_3.Information.SecondLayout, null, ship.Satellite_Right_3.Components.Where(item => item.Layout == 1), debug) : null;
+
+            Second_PlatformLayout_left_4 = ship.Satellite_Left_4 != null && ship.Satellite_Left_4.Information.SecondLayout.Data != string.Empty ? new ShipLayout(ship.Satellite_Left_4.Information.SecondLayout, null, ship.Satellite_Left_4.Components.Where(item => item.Layout == 1), debug) : null;
+            Second_PlatformLayout_right_4 = ship.Satellite_Right_4 != null && ship.Satellite_Right_4.Information.SecondLayout.Data != string.Empty ? new ShipLayout(ship.Satellite_Right_4.Information.SecondLayout, null, ship.Satellite_Right_4.Components.Where(item => item.Layout == 1), debug) : null;
+
+            Second_PlatformLayout_left_5 = ship.Satellite_Left_5 != null && ship.Satellite_Left_5.Information.SecondLayout.Data != string.Empty ? new ShipLayout(ship.Satellite_Left_5.Information.SecondLayout, null, ship.Satellite_Left_5.Components.Where(item => item.Layout == 1), debug) : null;
+            Second_PlatformLayout_right_5 = ship.Satellite_Right_5 != null && ship.Satellite_Right_5.Information.SecondLayout.Data != string.Empty ? new ShipLayout(ship.Satellite_Right_5.Information.SecondLayout,null, ship.Satellite_Right_5.Components.Where(item => item.Layout == 1), debug) : null;
+
+			ShipSize = Ship.Model.Layout.CellCount + Ship.Model.SecondLayout.CellCount;
 
 		    if (IsEditorMode)
 				_components.LoadFromDatabase(_database);
@@ -383,83 +614,577 @@ namespace ViewModel
 
             _componentList.Initialize(_components.Items);
 
-		    ResetLayout();
+			layout = 0;
+			draggableComponentObject.layoutnum = 0;
+
+            ResetLayout();
 			UpdateStats();
 		}
-		
+
 		private void ResetLayout()
 		{
-            _commands.Clear();
-		    
+			_commands.Clear();
 			ShipLayoutViewModel.Initialize(_layout, _components);
 			ShipLayoutViewModel.BackgroundImage.sprite = _resourceLocator.GetSprite(Ship.Model.ModelImage);
-			
-			if (_leftPlatformLayout != null)
+			if (PlatformLayout_left_1 != null)
 			{
-				LeftPlatformLayoutViewModel.Initialize(_leftPlatformLayout, _components);
-				LeftPlatformLayoutViewModel.BackgroundImage.sprite = _resourceLocator.GetSprite(Ship.FirstSatellite.Information.ModelImage);
-			}
-			else
-			{
-				LeftPlatformLayoutViewModel.Reset();
-			}
-
-            if (_rightPlatformLayout != null)
-            {
-                RightPlatformLayoutViewModel.Initialize(_rightPlatformLayout, _components);
-                RightPlatformLayoutViewModel.BackgroundImage.sprite = _resourceLocator.GetSprite(Ship.SecondSatellite.Information.ModelImage);
+				PlatformLayoutViewModel_Left_1.Initialize(PlatformLayout_left_1, _components);
+				PlatformLayoutViewModel_Left_1.BackgroundImage.sprite = _resourceLocator.GetSprite(Ship.Satellite_Left_1.Information.ModelImage);
+                if (ShipDebugLogSetting.ShipLayoutDebugLog)
+                    UnityEngine.Debug.Log("PlatformLayoutViewModel_Left_1 set  ");
             }
             else
-            {
-                RightPlatformLayoutViewModel.Reset();
+			{
+				PlatformLayoutViewModel_Left_1.Reset();
+			}
+
+			if (PlatformLayout_right_1 != null)
+			{
+				PlatformLayoutViewModel_Right_1.Initialize(PlatformLayout_right_1, _components);
+				PlatformLayoutViewModel_Right_1.BackgroundImage.sprite = _resourceLocator.GetSprite(Ship.Satellite_Right_1.Information.ModelImage);
+                if (ShipDebugLogSetting.ShipLayoutDebugLog)
+                    UnityEngine.Debug.Log("PlatformLayoutViewModel_Right_1 set  ");
             }
+            else
+			{
+				PlatformLayoutViewModel_Right_1.Reset();
+			}
+
+			if (PlatformLayout_left_2 != null)
+			{
+				PlatformLayoutViewModel_Left_2.Initialize(PlatformLayout_left_2, _components);
+				PlatformLayoutViewModel_Left_2.BackgroundImage.sprite = _resourceLocator.GetSprite(Ship.Satellite_Left_2.Information.ModelImage);
+                if (ShipDebugLogSetting.ShipLayoutDebugLog)
+                    UnityEngine.Debug.Log("PlatformLayoutViewModel_Left_2 set  ");
+            }
+            else
+			{
+				PlatformLayoutViewModel_Left_2.Reset();
+			}
+
+			if (PlatformLayout_right_2 != null)
+			{
+				PlatformLayoutViewModel_Right_2.Initialize(PlatformLayout_right_2, _components);
+				PlatformLayoutViewModel_Right_2.BackgroundImage.sprite = _resourceLocator.GetSprite(Ship.Satellite_Right_2.Information.ModelImage);
+                if (ShipDebugLogSetting.ShipLayoutDebugLog)
+                    UnityEngine.Debug.Log("PlatformLayoutViewModel_Right_2 set  ");
+            }
+            else
+			{
+				PlatformLayoutViewModel_Right_2.Reset();
+			}
+
+			if (PlatformLayout_left_3 != null)
+			{
+				PlatformLayoutViewModel_Left_3.Initialize(PlatformLayout_left_3, _components);
+				PlatformLayoutViewModel_Left_3.BackgroundImage.sprite = _resourceLocator.GetSprite(Ship.Satellite_Left_3.Information.ModelImage);
+                if (ShipDebugLogSetting.ShipLayoutDebugLog)
+                    UnityEngine.Debug.Log("PlatformLayoutViewModel_Left_3 set  ");
+            }
+            else
+			{
+				PlatformLayoutViewModel_Left_3.Reset();
+			}
+
+			if (PlatformLayout_right_3 != null)
+			{
+				PlatformLayoutViewModel_Right_3.Initialize(PlatformLayout_right_3, _components);
+				PlatformLayoutViewModel_Right_3.BackgroundImage.sprite = _resourceLocator.GetSprite(Ship.Satellite_Right_3.Information.ModelImage);
+                if (ShipDebugLogSetting.ShipLayoutDebugLog)
+                    UnityEngine.Debug.Log("PlatformLayoutViewModel_Right_3 set  ");
+            }
+            else
+			{
+				PlatformLayoutViewModel_Right_3.Reset();
+			}
+
+			if (PlatformLayout_left_4 != null)
+			{
+				PlatformLayoutViewModel_Left_4.Initialize(PlatformLayout_left_4, _components);
+				PlatformLayoutViewModel_Left_4.BackgroundImage.sprite = _resourceLocator.GetSprite(Ship.Satellite_Left_4.Information.ModelImage);
+                if (ShipDebugLogSetting.ShipLayoutDebugLog)
+                    UnityEngine.Debug.Log("PlatformLayoutViewModel_Left_4 set  ");
+            }
+            else
+			{
+				PlatformLayoutViewModel_Left_4.Reset();
+			}
+
+			if (PlatformLayout_right_4 != null)
+			{
+				PlatformLayoutViewModel_Right_4.Initialize(PlatformLayout_right_4, _components);
+				PlatformLayoutViewModel_Right_4.BackgroundImage.sprite = _resourceLocator.GetSprite(Ship.Satellite_Right_4.Information.ModelImage);
+                if (ShipDebugLogSetting.ShipLayoutDebugLog)
+                    UnityEngine.Debug.Log("PlatformLayoutViewModel_Right_4 set  ");
+            }
+            else
+			{
+				PlatformLayoutViewModel_Right_4.Reset();
+			}
+
+			if (PlatformLayout_left_5 != null)
+			{
+				PlatformLayoutViewModel_Left_5.Initialize(PlatformLayout_left_5, _components);
+				PlatformLayoutViewModel_Left_5.BackgroundImage.sprite = _resourceLocator.GetSprite(Ship.Satellite_Left_5.Information.ModelImage);
+                if (ShipDebugLogSetting.ShipLayoutDebugLog)
+                    UnityEngine.Debug.Log("PlatformLayoutViewModel_Left_5 set  ");
+            }
+            else
+			{
+				PlatformLayoutViewModel_Left_5.Reset();
+			}
+
+			if (PlatformLayout_right_5 != null)
+			{
+				PlatformLayoutViewModel_Right_5.Initialize(PlatformLayout_right_5, _components);
+				PlatformLayoutViewModel_Right_5.BackgroundImage.sprite = _resourceLocator.GetSprite(Ship.Satellite_Right_5.Information.ModelImage);
+                if (ShipDebugLogSetting.ShipLayoutDebugLog)
+                    UnityEngine.Debug.Log("PlatformLayoutViewModel_Right_5 set  ");
+            }
+            else
+			{
+				PlatformLayoutViewModel_Right_5.Reset();
+			}
+
+			if (Second_layout != null)
+			{
+				Second_ShipLayoutViewModel.Initialize(Second_layout, _components);
+				Second_ShipLayoutViewModel.BackgroundImage.sprite = _resourceLocator.GetSprite(Ship.Model.ModelImage);
+                if (ShipDebugLogSetting.ShipLayoutDebugLog)
+                    UnityEngine.Debug.Log("Second_ShipLayoutViewModel set  " + Second_layout.CellCount);
+            }
+            else
+			{
+                Second_ShipLayoutViewModel.Reset();
+            }
+
+            if (Second_PlatformLayout_left_1 != null)
+			{
+				Second_PlatformLayoutViewModel_Left_1.Initialize(Second_PlatformLayout_left_1, _components);
+				Second_PlatformLayoutViewModel_Left_1.BackgroundImage.sprite = _resourceLocator.GetSprite(Ship.Satellite_Left_1.Information.ModelImage);
+                if (ShipDebugLogSetting.ShipLayoutDebugLog)
+                    UnityEngine.Debug.Log("Second_PlatformLayoutViewModel_Left_1 set  ");
+            }
+            else
+			{
+				Second_PlatformLayoutViewModel_Left_1.Reset();
+			}
+
+			if (Second_PlatformLayout_right_1 != null)
+			{
+				Second_PlatformLayoutViewModel_Right_1.Initialize(Second_PlatformLayout_right_1, _components);
+				Second_PlatformLayoutViewModel_Right_1.BackgroundImage.sprite = _resourceLocator.GetSprite(Ship.Satellite_Right_1.Information.ModelImage);
+                if (ShipDebugLogSetting.ShipLayoutDebugLog)
+                    UnityEngine.Debug.Log("Second_PlatformLayoutViewModel_Right_1 set  ");
+            }
+            else
+			{
+				Second_PlatformLayoutViewModel_Right_1.Reset();
+			}
+
+			if (Second_PlatformLayout_left_2 != null)
+			{
+				Second_PlatformLayoutViewModel_Left_2.Initialize(Second_PlatformLayout_left_2, _components);
+				Second_PlatformLayoutViewModel_Left_2.BackgroundImage.sprite = _resourceLocator.GetSprite(Ship.Satellite_Left_2.Information.ModelImage);
+                if (ShipDebugLogSetting.ShipLayoutDebugLog)
+                    UnityEngine.Debug.Log("Second_PlatformLayoutViewModel_Left_2 set  ");
+            }
+            else
+			{
+				Second_PlatformLayoutViewModel_Left_2.Reset();
+			}
+
+			if (Second_PlatformLayout_right_2 != null)
+			{
+				Second_PlatformLayoutViewModel_Right_2.Initialize(Second_PlatformLayout_right_2, _components);
+				Second_PlatformLayoutViewModel_Right_2.BackgroundImage.sprite = _resourceLocator.GetSprite(Ship.Satellite_Right_2.Information.ModelImage);
+                if (ShipDebugLogSetting.ShipLayoutDebugLog)
+                    UnityEngine.Debug.Log("Second_PlatformLayoutViewModel_Right_2 set  ");
+            }
+            else
+			{
+				Second_PlatformLayoutViewModel_Right_2.Reset();
+			}
+
+			if (Second_PlatformLayout_left_3 != null)
+			{
+				Second_PlatformLayoutViewModel_Left_3.Initialize(Second_PlatformLayout_left_3, _components);
+				Second_PlatformLayoutViewModel_Left_3.BackgroundImage.sprite = _resourceLocator.GetSprite(Ship.Satellite_Left_3.Information.ModelImage);
+                if (ShipDebugLogSetting.ShipLayoutDebugLog)
+                    UnityEngine.Debug.Log("Second_PlatformLayoutViewModel_Left_3 set  ");
+            }
+            else
+			{
+				Second_PlatformLayoutViewModel_Left_3.Reset();
+			}
+
+			if (Second_PlatformLayout_right_3 != null)
+			{
+				Second_PlatformLayoutViewModel_Right_3.Initialize(Second_PlatformLayout_right_3, _components);
+				Second_PlatformLayoutViewModel_Right_3.BackgroundImage.sprite = _resourceLocator.GetSprite(Ship.Satellite_Right_3.Information.ModelImage);
+                if (ShipDebugLogSetting.ShipLayoutDebugLog)
+                    UnityEngine.Debug.Log("Second_PlatformLayoutViewModel_Right_3 set  ");
+            }
+            else
+			{
+				Second_PlatformLayoutViewModel_Right_3.Reset();
+			}
+
+			if (Second_PlatformLayout_left_4 != null)
+			{
+				Second_PlatformLayoutViewModel_Left_4.Initialize(Second_PlatformLayout_left_4, _components);
+				Second_PlatformLayoutViewModel_Left_4.BackgroundImage.sprite = _resourceLocator.GetSprite(Ship.Satellite_Left_4.Information.ModelImage);
+                if (ShipDebugLogSetting.ShipLayoutDebugLog)
+                    UnityEngine.Debug.Log("Second_PlatformLayoutViewModel_Left_4 set  ");
+            }
+            else
+			{
+				Second_PlatformLayoutViewModel_Left_4.Reset();
+			}
+
+			if (Second_PlatformLayout_right_4 != null)
+			{
+				Second_PlatformLayoutViewModel_Right_4.Initialize(Second_PlatformLayout_right_4, _components);
+				Second_PlatformLayoutViewModel_Right_4.BackgroundImage.sprite = _resourceLocator.GetSprite(Ship.Satellite_Right_4.Information.ModelImage);
+                if (ShipDebugLogSetting.ShipLayoutDebugLog)
+                    UnityEngine.Debug.Log("Second_PlatformLayoutViewModel_Right_4 set  ");
+            }
+            else
+			{
+				PlatformLayoutViewModel_Right_4.Reset();
+			}
+
+			if (Second_PlatformLayout_left_5 != null)
+			{
+				Second_PlatformLayoutViewModel_Left_5.Initialize(Second_PlatformLayout_left_5, _components);
+				Second_PlatformLayoutViewModel_Left_5.BackgroundImage.sprite = _resourceLocator.GetSprite(Ship.Satellite_Left_5.Information.ModelImage);
+                if (ShipDebugLogSetting.ShipLayoutDebugLog)
+                    UnityEngine.Debug.Log("Second_PlatformLayoutViewModel_Left_5 set  ");
+            }
+            else
+			{
+				Second_PlatformLayoutViewModel_Left_5.Reset();
+			}
+
+			if (Second_PlatformLayout_right_5 != null)
+			{
+				Second_PlatformLayoutViewModel_Right_5.Initialize(Second_PlatformLayout_right_5, _components);
+				Second_PlatformLayoutViewModel_Right_5.BackgroundImage.sprite = _resourceLocator.GetSprite(Ship.Satellite_Right_5.Information.ModelImage);
+                if (ShipDebugLogSetting.ShipLayoutDebugLog)
+                    UnityEngine.Debug.Log("Second_PlatformLayoutViewModel_Right_5 set  ");
+            }
+            else
+			{
+				Second_PlatformLayoutViewModel_Right_5.Reset();
+			}
+		}
+
+		private void UpgradeLayout()
+		{
+			if (layout == 0)
+			{
+				Panel.SetActive(true);
+				Second_Panel.SetActive(false);
+				scrollRect.content = panel_1;
+				zoom.ChangeZoom(panel_1);
+            }
+			else if(layout == 1)
+			{
+                Panel.SetActive(false);
+                Second_Panel.SetActive(true);
+				scrollRect.content = panel_2;
+				zoom.ChangeZoom(panel_2);
+            }
+			draggableComponentObject.layoutnum = layout;
         }
 
         private bool HasUnlockedComponents
 		{
 			get
 			{
-				if (_layout.Components.Any(item => !item.Locked)) return true;
-				if (_leftPlatformLayout != null && _leftPlatformLayout.Components.Any(item => !item.Locked)) return true;
-				if (_rightPlatformLayout != null && _rightPlatformLayout.Components.Any(item => !item.Locked)) return true;
+				if (_layout.Components.Any(item => !item.Locked && item.Layout == 0)) return true;
+				if (PlatformLayout_left_1 != null && PlatformLayout_left_1.Components.Any(item => !item.Locked && item.Layout == 0)) return true;
+				if (PlatformLayout_right_1 != null && PlatformLayout_right_1.Components.Any(item => !item.Locked && item.Layout == 0)) return true;
+				if (PlatformLayout_left_2 != null && PlatformLayout_left_2.Components.Any(item => !item.Locked && item.Layout == 0)) return true;
+				if (PlatformLayout_right_2 != null && PlatformLayout_right_2.Components.Any(item => !item.Locked && item.Layout == 0)) return true;
+				if (PlatformLayout_left_3 != null && PlatformLayout_left_3.Components.Any(item => !item.Locked && item.Layout == 0)) return true;
+				if (PlatformLayout_right_3 != null && PlatformLayout_right_3.Components.Any(item => !item.Locked && item.Layout == 0)) return true;
+				if (PlatformLayout_left_4 != null && PlatformLayout_left_4.Components.Any(item => !item.Locked && item.Layout == 0)) return true;
+				if (PlatformLayout_right_4 != null && PlatformLayout_right_4.Components.Any(item => !item.Locked && item.Layout == 0)) return true;
+				if (PlatformLayout_left_5 != null && PlatformLayout_left_5.Components.Any(item => !item.Locked && item.Layout == 0)) return true;
+				if (PlatformLayout_right_5 != null && PlatformLayout_right_5.Components.Any(item => !item.Locked && item.Layout == 0)) return true;
+
+				if (Second_layout != null && Second_layout.Components.Any(item => !item.Locked && item.Layout == 1)) return true;
+				if (Second_PlatformLayout_left_1 != null && Second_PlatformLayout_left_1.Components.Any(item => !item.Locked && item.Layout == 1)) return true;
+				if (Second_PlatformLayout_right_1 != null && Second_PlatformLayout_right_1.Components.Any(item => !item.Locked && item.Layout == 1)) return true;
+				if (Second_PlatformLayout_left_2 != null && Second_PlatformLayout_left_2.Components.Any(item => !item.Locked && item.Layout == 1)) return true;
+				if (Second_PlatformLayout_right_2 != null && Second_PlatformLayout_right_2.Components.Any(item => !item.Locked && item.Layout == 1)) return true;
+				if (Second_PlatformLayout_left_3 != null && Second_PlatformLayout_left_3.Components.Any(item => !item.Locked && item.Layout == 1)) return true;
+				if (Second_PlatformLayout_right_3 != null && Second_PlatformLayout_right_3.Components.Any(item => !item.Locked && item.Layout == 1)) return true;
+				if (Second_PlatformLayout_left_4 != null && Second_PlatformLayout_left_4.Components.Any(item => !item.Locked && item.Layout == 1)) return true;
+				if (Second_PlatformLayout_right_4 != null && Second_PlatformLayout_right_4.Components.Any(item => !item.Locked && item.Layout == 1)) return true;
+				if (Second_PlatformLayout_left_5 != null && Second_PlatformLayout_left_5.Components.Any(item => !item.Locked && item.Layout == 1)) return true;
+				if (Second_PlatformLayout_right_5 != null && Second_PlatformLayout_right_5.Components.Any(item => !item.Locked && item.Layout == 1)) return true;
 				return false;
 			}
 		}
 
 		private void RemoveAllComponents()
 		{
-            if (IsEditorMode)
+			if (IsEditorMode)
 			{
-                _layout.Clear();
-			    _leftPlatformLayout?.Clear();
-			    _rightPlatformLayout?.Clear();
+				if (layout == 0)
+				{
+					_layout.Clear();
+					PlatformLayout_left_1?.Clear();
+					PlatformLayout_right_1?.Clear();
+					PlatformLayout_left_2?.Clear();
+					PlatformLayout_right_2?.Clear();
+					PlatformLayout_left_3?.Clear();
+					PlatformLayout_right_3?.Clear();
+					PlatformLayout_left_4?.Clear();
+					PlatformLayout_right_4?.Clear();
+					PlatformLayout_left_5?.Clear();
+					PlatformLayout_right_5?.Clear();
+				}
+				else if (layout == 1)
+				{
+					Second_layout.Clear();
+					Second_PlatformLayout_left_1?.Clear();
+					Second_PlatformLayout_right_1?.Clear();
+					Second_PlatformLayout_left_2?.Clear();
+					Second_PlatformLayout_right_2?.Clear();
+					Second_PlatformLayout_left_3?.Clear();
+					Second_PlatformLayout_right_3?.Clear();
+					Second_PlatformLayout_left_4?.Clear();
+					Second_PlatformLayout_right_4?.Clear();
+					Second_PlatformLayout_left_5?.Clear();
+					Second_PlatformLayout_right_5?.Clear();
+				}
 			}
 			else
 			{
-				var components = _layout.Components.Where(item => !item.Locked).ToArray();
-				foreach (var item in components)
+				if (layout == 0)
 				{
-					_components.Add(item.Info);
-					_layout.RemoveComponent(item);
-				}
-
-				if (_leftPlatformLayout != null)
-				{
-					components = _leftPlatformLayout.Components.Where(item => !item.Locked).ToArray();
+					var components = _layout.Components.Where(item => !item.Locked).ToArray();
 					foreach (var item in components)
 					{
 						_components.Add(item.Info);
-						_leftPlatformLayout.RemoveComponent(item);
+						_layout.RemoveComponent(item);
+					}
+
+					if (Second_layout != null)
+					{
+						components = Second_layout.Components.Where(item => !item.Locked).ToArray();
+						foreach (var item in components)
+						{
+							_components.Add(item.Info);
+							Second_layout.RemoveComponent(item);
+						}
+					}
+
+					if (PlatformLayout_left_1 != null)
+					{
+						components = PlatformLayout_left_1.Components.Where(item => !item.Locked).ToArray();
+						foreach (var item in components)
+						{
+							_components.Add(item.Info);
+							PlatformLayout_left_1.RemoveComponent(item);
+						}
+					}
+
+					if (PlatformLayout_right_1 != null)
+					{
+						components = PlatformLayout_right_1.Components.Where(item => !item.Locked).ToArray();
+						foreach (var item in components)
+						{
+							_components.Add(item.Info);
+							PlatformLayout_right_1.RemoveComponent(item);
+						}
+					}
+
+					if (PlatformLayout_left_2 != null)
+					{
+						components = PlatformLayout_left_2.Components.Where(item => !item.Locked).ToArray();
+						foreach (var item in components)
+						{
+							_components.Add(item.Info);
+							PlatformLayout_left_2.RemoveComponent(item);
+						}
+					}
+
+					if (PlatformLayout_right_2 != null)
+					{
+						components = PlatformLayout_right_2.Components.Where(item => !item.Locked).ToArray();
+						foreach (var item in components)
+						{
+							_components.Add(item.Info);
+							PlatformLayout_right_2.RemoveComponent(item);
+						}
+					}
+
+					if (PlatformLayout_left_3 != null)
+					{
+						components = PlatformLayout_left_3.Components.Where(item => !item.Locked).ToArray();
+						foreach (var item in components)
+						{
+							_components.Add(item.Info);
+							PlatformLayout_left_3.RemoveComponent(item);
+						}
+					}
+
+					if (PlatformLayout_right_3 != null)
+					{
+						components = PlatformLayout_right_3.Components.Where(item => !item.Locked).ToArray();
+						foreach (var item in components)
+						{
+							_components.Add(item.Info);
+							PlatformLayout_right_3.RemoveComponent(item);
+						}
+					}
+
+					if (PlatformLayout_left_4 != null)
+					{
+						components = PlatformLayout_left_4.Components.Where(item => !item.Locked).ToArray();
+						foreach (var item in components)
+						{
+							_components.Add(item.Info);
+							PlatformLayout_left_4.RemoveComponent(item);
+						}
+					}
+
+					if (PlatformLayout_right_4 != null)
+					{
+						components = PlatformLayout_right_4.Components.Where(item => !item.Locked).ToArray();
+						foreach (var item in components)
+						{
+							_components.Add(item.Info);
+							PlatformLayout_right_4.RemoveComponent(item);
+						}
+					}
+
+					if (PlatformLayout_left_5 != null)
+					{
+						components = PlatformLayout_left_5.Components.Where(item => !item.Locked).ToArray();
+						foreach (var item in components)
+						{
+							_components.Add(item.Info);
+							PlatformLayout_left_5.RemoveComponent(item);
+						}
+					}
+
+					if (PlatformLayout_right_5 != null)
+					{
+						components = PlatformLayout_right_5.Components.Where(item => !item.Locked).ToArray();
+						foreach (var item in components)
+						{
+							_components.Add(item.Info);
+							PlatformLayout_right_5.RemoveComponent(item);
+						}
 					}
 				}
-
-				if (_rightPlatformLayout != null)
+				else if (layout == 1)
 				{
-					components = _rightPlatformLayout.Components.Where(item => !item.Locked).ToArray();
-					foreach (var item in components)
+					var components = new IntegratedComponent[0];
+
+                    if (Second_PlatformLayout_left_1 != null)
 					{
-						_components.Add(item.Info);
-						_rightPlatformLayout.RemoveComponent(item);
+						components = Second_PlatformLayout_left_1.Components.Where(item => !item.Locked).ToArray();
+						foreach (var item in components)
+						{
+							_components.Add(item.Info);
+							Second_PlatformLayout_left_1.RemoveComponent(item);
+						}
+					}
+
+					if (Second_PlatformLayout_right_1 != null)
+					{
+						components = Second_PlatformLayout_right_1.Components.Where(item => !item.Locked).ToArray();
+						foreach (var item in components)
+						{
+							_components.Add(item.Info);
+							Second_PlatformLayout_right_1.RemoveComponent(item);
+						}
+					}
+
+					if (Second_PlatformLayout_left_2 != null)
+					{
+						components = Second_PlatformLayout_left_2.Components.Where(item => !item.Locked).ToArray();
+						foreach (var item in components)
+						{
+							_components.Add(item.Info);
+							Second_PlatformLayout_left_2.RemoveComponent(item);
+						}
+					}
+
+					if (Second_PlatformLayout_right_2 != null)
+					{
+						components = Second_PlatformLayout_right_2.Components.Where(item => !item.Locked).ToArray();
+						foreach (var item in components)
+						{
+							_components.Add(item.Info);
+							Second_PlatformLayout_right_2.RemoveComponent(item);
+						}
+					}
+
+					if (Second_PlatformLayout_left_3 != null)
+					{
+						components = Second_PlatformLayout_left_3.Components.Where(item => !item.Locked).ToArray();
+						foreach (var item in components)
+						{
+							_components.Add(item.Info);
+							Second_PlatformLayout_left_3.RemoveComponent(item);
+						}
+					}
+
+					if (Second_PlatformLayout_right_3 != null)
+					{
+						components = Second_PlatformLayout_right_3.Components.Where(item => !item.Locked).ToArray();
+						foreach (var item in components)
+						{
+							_components.Add(item.Info);
+							Second_PlatformLayout_right_3.RemoveComponent(item);
+						}
+					}
+
+					if (Second_PlatformLayout_left_4 != null)
+					{
+						components = Second_PlatformLayout_left_4.Components.Where(item => !item.Locked).ToArray();
+						foreach (var item in components)
+						{
+							_components.Add(item.Info);
+							Second_PlatformLayout_left_4.RemoveComponent(item);
+						}
+					}
+
+					if (Second_PlatformLayout_right_4 != null)
+					{
+						components = Second_PlatformLayout_right_4.Components.Where(item => !item.Locked).ToArray();
+						foreach (var item in components)
+						{
+							_components.Add(item.Info);
+							Second_PlatformLayout_right_4.RemoveComponent(item);
+						}
+					}
+
+					if (Second_PlatformLayout_left_5 != null)
+					{
+						components = Second_PlatformLayout_left_5.Components.Where(item => !item.Locked).ToArray();
+						foreach (var item in components)
+						{
+							_components.Add(item.Info);
+							Second_PlatformLayout_left_5.RemoveComponent(item);
+						}
+					}
+
+					if (Second_PlatformLayout_right_5 != null)
+					{
+						components = Second_PlatformLayout_right_5.Components.Where(item => !item.Locked).ToArray();
+						foreach (var item in components)
+						{
+							_components.Add(item.Info);
+							Second_PlatformLayout_right_5.RemoveComponent(item);
+						}
 					}
 				}
 			}
@@ -471,16 +1196,77 @@ namespace ViewModel
 		
 		private void UpdateStats()
 		{
+			var builder = new ShipBuilder(Ship.Model, Second_layout != null ? _layout.Components.Concat(Second_layout.Components) : _layout.Components);
+			if (PlatformLayout_left_1 != null)
+				builder.AddSatellite(new CommonSatellite(Ship.Satellite_Left_1.Information, Second_PlatformLayout_left_1 != null ? PlatformLayout_left_1.Components.Concat(Second_PlatformLayout_left_1.Components) : PlatformLayout_left_1.Components), CompanionLocation.Left);
+			if (PlatformLayout_right_1 != null)
+				builder.AddSatellite(new CommonSatellite(Ship.Satellite_Right_1.Information, Second_PlatformLayout_right_1 != null ? PlatformLayout_right_1.Components.Concat(Second_PlatformLayout_right_1.Components): PlatformLayout_right_1.Components), CompanionLocation.Right);
+			if (PlatformLayout_left_2 != null)
+				builder.AddSatellite(new CommonSatellite(Ship.Satellite_Left_2.Information, Second_PlatformLayout_left_2 != null ? PlatformLayout_left_2.Components.Concat(Second_PlatformLayout_left_2.Components): PlatformLayout_left_2.Components), CompanionLocation.Left_2);
+			if (PlatformLayout_right_2 != null)
+				builder.AddSatellite(new CommonSatellite(Ship.Satellite_Right_2.Information, Second_PlatformLayout_right_2 != null ? PlatformLayout_right_2.Components.Concat(Second_PlatformLayout_right_2.Components): PlatformLayout_right_2.Components), CompanionLocation.Right_2);
+			if (PlatformLayout_left_3 != null)
+				builder.AddSatellite(new CommonSatellite(Ship.Satellite_Left_3.Information, Second_PlatformLayout_left_3 != null ? PlatformLayout_left_3.Components.Concat(Second_PlatformLayout_left_3.Components): PlatformLayout_left_3.Components), CompanionLocation.Left_3);
+			if (PlatformLayout_right_3 != null)
+				builder.AddSatellite(new CommonSatellite(Ship.Satellite_Right_3.Information, Second_PlatformLayout_right_3 != null ? PlatformLayout_right_3.Components.Concat(Second_PlatformLayout_right_3.Components): PlatformLayout_right_3.Components), CompanionLocation.Right_3);
+			if (PlatformLayout_left_4 != null)
+				builder.AddSatellite(new CommonSatellite(Ship.Satellite_Left_4.Information, Second_PlatformLayout_left_4 != null ? PlatformLayout_left_4.Components.Concat(Second_PlatformLayout_left_4.Components): PlatformLayout_left_4.Components), CompanionLocation.Left_4);
+			if (PlatformLayout_right_4 != null)
+				builder.AddSatellite(new CommonSatellite(Ship.Satellite_Right_4.Information, Second_PlatformLayout_right_4 != null ? PlatformLayout_right_4.Components.Concat(Second_PlatformLayout_right_4.Components): PlatformLayout_right_4.Components), CompanionLocation.Right_4);
+			if (PlatformLayout_left_5 != null)
+				builder.AddSatellite(new CommonSatellite(Ship.Satellite_Left_5.Information, Second_PlatformLayout_left_5 != null ? PlatformLayout_left_5.Components.Concat(Second_PlatformLayout_left_5.Components): PlatformLayout_left_5.Components), CompanionLocation.Left_5);
+			if (PlatformLayout_right_5 != null)
+				builder.AddSatellite(new CommonSatellite(Ship.Satellite_Right_5.Information, Second_PlatformLayout_right_5 != null ? PlatformLayout_right_5.Components.Concat(Second_PlatformLayout_right_5.Components): PlatformLayout_right_5.Components), CompanionLocation.Right_5);
+/*
+			if (Second_PlatformLayout_left_1 != null)
+				builder.AddSatellite(new CommonSatellite(Ship.Satellite_Left_1.Information, Second_PlatformLayout_left_1.Components), CompanionLocation.Left);
+			if (Second_PlatformLayout_right_1 != null)
+				builder.AddSatellite(new CommonSatellite(Ship.Satellite_Right_1.Information, Second_PlatformLayout_right_1.Components), CompanionLocation.Right);
+			if (Second_PlatformLayout_left_2 != null)
+				builder.AddSatellite(new CommonSatellite(Ship.Satellite_Left_2.Information, Second_PlatformLayout_left_2.Components), CompanionLocation.Left_2);
+			if (Second_PlatformLayout_right_2 != null)
+				builder.AddSatellite(new CommonSatellite(Ship.Satellite_Right_2.Information, Second_PlatformLayout_right_2.Components), CompanionLocation.Right_2);
+			if (Second_PlatformLayout_left_3 != null)
+				builder.AddSatellite(new CommonSatellite(Ship.Satellite_Left_3.Information, Second_PlatformLayout_left_3.Components), CompanionLocation.Left_3);
+			if (Second_PlatformLayout_right_3 != null)
+				builder.AddSatellite(new CommonSatellite(Ship.Satellite_Right_3.Information, Second_PlatformLayout_right_3.Components), CompanionLocation.Right_3);
+			if (Second_PlatformLayout_left_4 != null)
+				builder.AddSatellite(new CommonSatellite(Ship.Satellite_Left_4.Information, Second_PlatformLayout_left_4.Components), CompanionLocation.Left_4);
+			if (Second_PlatformLayout_right_4 != null)
+				builder.AddSatellite(new CommonSatellite(Ship.Satellite_Right_4.Information, Second_PlatformLayout_right_4.Components), CompanionLocation.Right_4);
+			if (Second_PlatformLayout_left_5 != null)
+				builder.AddSatellite(new CommonSatellite(Ship.Satellite_Left_5.Information, Second_PlatformLayout_left_5.Components), CompanionLocation.Left_5);
+			if (Second_PlatformLayout_right_5 != null)
+				builder.AddSatellite(new CommonSatellite(Ship.Satellite_Right_5.Information, Second_PlatformLayout_right_5.Components), CompanionLocation.Right_5);
+*/
+/*
 			var builder = new ShipBuilder(Ship.Model, _layout.Components);
-			if (_leftPlatformLayout != null)
-				builder.AddSatellite(new CommonSatellite(Ship.FirstSatellite.Information, _leftPlatformLayout.Components), CompanionLocation.Left);
-			if (_rightPlatformLayout != null)
-				builder.AddSatellite(new CommonSatellite(Ship.SecondSatellite.Information, _rightPlatformLayout.Components), CompanionLocation.Right);
+			if (PlatformLayout_left_1 != null)
+				builder.AddSatellite(new CommonSatellite(Ship.Satellite_Left_1.Information, PlatformLayout_left_1.Components), CompanionLocation.Left);
+			if (PlatformLayout_right_1 != null)
+				builder.AddSatellite(new CommonSatellite(Ship.Satellite_Right_1.Information, PlatformLayout_right_1.Components), CompanionLocation.Right);
+			if (PlatformLayout_left_2 != null)
+				builder.AddSatellite(new CommonSatellite(Ship.Satellite_Left_2.Information, PlatformLayout_left_2.Components), CompanionLocation.Left_2);
+			if (PlatformLayout_right_2 != null)
+				builder.AddSatellite(new CommonSatellite(Ship.Satellite_Right_2.Information, PlatformLayout_right_2.Components), CompanionLocation.Right_2);
+			if (PlatformLayout_left_3 != null)
+				builder.AddSatellite(new CommonSatellite(Ship.Satellite_Left_3.Information, PlatformLayout_left_3.Components), CompanionLocation.Left_3);
+			if (PlatformLayout_right_3 != null)
+				builder.AddSatellite(new CommonSatellite(Ship.Satellite_Right_3.Information, PlatformLayout_right_3.Components), CompanionLocation.Right_3);
+			if (PlatformLayout_left_4 != null)
+				builder.AddSatellite(new CommonSatellite(Ship.Satellite_Left_4.Information, PlatformLayout_left_4.Components), CompanionLocation.Left_4);
+			if (PlatformLayout_right_4 != null)
+				builder.AddSatellite(new CommonSatellite(Ship.Satellite_Right_4.Information, PlatformLayout_right_4.Components), CompanionLocation.Right_4);
+			if (PlatformLayout_left_5 != null)
+				builder.AddSatellite(new CommonSatellite(Ship.Satellite_Left_5.Information, PlatformLayout_left_5.Components), CompanionLocation.Left_5);
+			if (PlatformLayout_right_5 != null)
+				builder.AddSatellite(new CommonSatellite(Ship.Satellite_Right_5.Information, PlatformLayout_right_5.Components), CompanionLocation.Right_5);
+*/
 
 			Stats.UpdateStats(builder.Build(_database.ShipSettings));
+			Score.UpdateStats(builder.Build(_database.ShipSettings), _database.ShipSettings);
 		    _rollbackButton.interactable = _commands.Count > 0;
 		}
-
 		private void UpdateComponentList()
 		{
             ShowComponentList();
@@ -496,11 +1282,35 @@ namespace ViewModel
 			else
 				Exit();
 		}
+		public IDatabase Database => _database;
 
-		private readonly InventoryComponents _components = new InventoryComponents();
+        private readonly InventoryComponents _components = new InventoryComponents();
 	    private ShipLayout _layout;
-		private ShipLayout _leftPlatformLayout;
-		private ShipLayout _rightPlatformLayout;
+		private ShipLayout PlatformLayout_left_1;
+		private ShipLayout PlatformLayout_right_1;
+		private ShipLayout PlatformLayout_left_2;
+		private ShipLayout PlatformLayout_right_2;
+		private ShipLayout PlatformLayout_left_3;
+		private ShipLayout PlatformLayout_right_3;
+		private ShipLayout PlatformLayout_left_4;
+		private ShipLayout PlatformLayout_right_4;
+		private ShipLayout PlatformLayout_left_5;
+		private ShipLayout PlatformLayout_right_5;
+
+        [SerializeField] private ShipLayout Second_layout;
+		private ShipLayout Second_PlatformLayout_left_1;
+		private ShipLayout Second_PlatformLayout_right_1;
+		private ShipLayout Second_PlatformLayout_left_2;
+		private ShipLayout Second_PlatformLayout_right_2;
+		private ShipLayout Second_PlatformLayout_left_3;
+		private ShipLayout Second_PlatformLayout_right_3;
+		private ShipLayout Second_PlatformLayout_left_4;
+		private ShipLayout Second_PlatformLayout_right_4;
+		private ShipLayout Second_PlatformLayout_left_5;
+		private ShipLayout Second_PlatformLayout_right_5;
         private Stack<ICommand> _commands = new Stack<ICommand>();
-	}
+
+		//private IEnumerable<Barrel> emptybarrels;
+
+    }
 }

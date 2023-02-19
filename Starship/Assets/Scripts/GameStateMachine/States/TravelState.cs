@@ -3,7 +3,6 @@ using GameServices.LevelManager;
 using GameServices.Player;
 using Services.Gui;
 using Services.Messenger;
-using Utils;
 using Zenject;
 
 namespace GameStateMachine.States
@@ -44,7 +43,7 @@ namespace GameStateMachine.States
             }
             else
             {
-                OptimizedDebug.Log("FlightState: Finished");
+                UnityEngine.Debug.Log("FlightState: Finished");
 
                 _session.StarMap.PlayerPosition = _destination;
                 StateMachine.UnloadActiveState();
@@ -55,13 +54,13 @@ namespace GameStateMachine.States
 
         protected override void OnLoad()
         {
-            OptimizedDebug.Log("FlightState: Started - " + _destination);
+            UnityEngine.Debug.Log("FlightState: Started - " + _destination);
 
             var requiredFuel = _motherShip.CalculateRequiredFuel(_source, _destination);
 
             if (!_playerResources.TryConsumeFuel(requiredFuel))
             {
-				OptimizedDebug.Log("FlightState: not enough fuel");
+				UnityEngine.Debug.Log("FlightState: not enough fuel");
                 StateMachine.UnloadActiveState();
                 return;
             }

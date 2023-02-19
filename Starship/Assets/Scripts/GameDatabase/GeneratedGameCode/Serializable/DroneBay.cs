@@ -23,6 +23,7 @@ namespace GameDatabase.Serializable
 		public float SpeedMultiplier;
 		public bool ImprovedAi;
 		public int Capacity;
+		public int Squadron;
 		public ActivationType ActivationType;
 		public string LaunchSound;
 		public string LaunchEffectPrefab;

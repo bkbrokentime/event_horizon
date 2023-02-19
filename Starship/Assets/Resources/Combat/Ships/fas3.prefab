@@ -20,6 +20,7 @@ GameObject:
   - component: {fileID: 70225205649041988}
   - component: {fileID: 70387523759710726}
   - component: {fileID: 70387186918618614}
+  - component: {fileID: 114798145943592446}
   m_Layer: 0
   m_Name: fas3
   m_TagString: Untagged
@@ -66,7 +67,6 @@ SpriteRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -243,3 +243,19 @@ CapsuleCollider2D:
   m_Offset: {x: -0.09538509, y: -0.2421854}
   m_Size: {x: 0.50726396, y: 0.14831544}
   m_Direction: 1
+--- !u!114 &114798145943592446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000011603998486}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f8c6fe8fc912254b83cf553c9281a9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ArmorPoints: 0
+  EnergyPoints: 0
+  ShieldPoints: 0
+  EnergyShieldPoints: 0

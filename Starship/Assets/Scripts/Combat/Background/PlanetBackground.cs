@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using Game.Exploration;
 using Services.Reources;
 using UnityEngine;
@@ -12,6 +13,8 @@ namespace Combat.Background
         [SerializeField] private Material _gasPlanetMaterial;
         [SerializeField] private Material _barrenPlanetMaterial;
         [SerializeField] private Material _infectedPlanetMaterial;
+        [SerializeField] private Material _moltenPlanetMaterial;
+        [SerializeField] private Material _frozenPlanetMaterial;
 
         [Inject]
         public void Initialize(IResourceLocator resourceLocator, Planet planet)
@@ -19,7 +22,7 @@ namespace Combat.Background
             _width = _height = _size * Screen.width / Screen.height;
             _planet = planet;
 
-            Primitives.CreatePlane(gameObject.GetMesh(), _width, _height, 8);
+            Primitives.CreatePlane(gameObject.GetMesh(), _width, _height, 6);
 
             switch (planet.Type)
             {
@@ -32,6 +35,12 @@ namespace Combat.Background
                 case PlanetType.Barren:
                 case PlanetType.Terran:
                     InitializeBarrenMaterial(resourceLocator);
+                    break;
+                case PlanetType.Molten:
+                    InitializeMoltenMaterial(resourceLocator);
+                    break;
+                case PlanetType.Frozen:
+                    InitializeFrozenMaterial(resourceLocator);
                     break;
                 default:
                     throw new ArgumentException("PlanetBackground: Wrong planet type - " + planet.Type);
@@ -47,7 +56,7 @@ namespace Combat.Background
             //var random = new System.Random(planet.Seed);
             //_material.SetTexture("_DecalTex", resourceLocator.GetNebulaTexture(random.Next()));
             //_material.SetTexture("_CloudsTex", resourceLocator.GetNebulaTexture(random.Next()));
-            _gasPlanetMaterial.color = Color.Lerp(_planet.Color, Color.black, 0.75f);
+            _planet.TypeColor = _gasPlanetMaterial.color = Color.Lerp(_planet.Color, Color.black, 0.75f);
         }
 
         private void InitializeBarrenMaterial(IResourceLocator resourceLocator)
@@ -57,8 +66,30 @@ namespace Combat.Background
             gameObject.AddComponent<MeshRenderer>().sharedMaterial = _barrenPlanetMaterial;
 
             var random = new System.Random(_planet.Seed);
-            _barrenPlanetMaterial.SetTexture(CloudsTex, resourceLocator.GetNebulaTexture(random.Next()));
-            _barrenPlanetMaterial.color = Color.Lerp(_planet.Color, Color.black, 0.3f);
+            _barrenPlanetMaterial.SetTexture("_CloudsTex", resourceLocator.GetNebulaTexture(random.Next()));
+            _planet.TypeColor = _barrenPlanetMaterial.color = Color.Lerp(_planet.Color, Color.black, 0.3f);
+        }
+
+        private void InitializeMoltenMaterial(IResourceLocator resourceLocator)
+        {
+            // Copy material to avoid modifying global material at runtime
+            _moltenPlanetMaterial = new Material(_moltenPlanetMaterial);
+            gameObject.AddComponent<MeshRenderer>().sharedMaterial = _moltenPlanetMaterial;
+
+            var random = new System.Random(_planet.Seed);
+            _moltenPlanetMaterial.SetTexture("_CloudsTex", resourceLocator.GetNebulaTexture(random.Next()));
+            _planet.TypeColor = _moltenPlanetMaterial.color = Color.Lerp(_planet.Color, Color.red, 0.7f);
+        }
+
+        private void InitializeFrozenMaterial(IResourceLocator resourceLocator)
+        {
+            // Copy material to avoid modifying global material at runtime
+            _frozenPlanetMaterial = new Material(_frozenPlanetMaterial);
+            gameObject.AddComponent<MeshRenderer>().sharedMaterial = _frozenPlanetMaterial;
+
+            var random = new System.Random(_planet.Seed);
+            _frozenPlanetMaterial.SetTexture("_CloudsTex", resourceLocator.GetNebulaTexture(random.Next()));
+            _planet.TypeColor = _frozenPlanetMaterial.color = Color.Lerp(_planet.Color, Color.white, 0.5f);
         }
 
         private void InitializeInfectedMaterial(IResourceLocator resourceLocator)
@@ -68,8 +99,8 @@ namespace Combat.Background
             gameObject.AddComponent<MeshRenderer>().sharedMaterial = _infectedPlanetMaterial;
 
             var random = new System.Random(_planet.Seed);
-            _infectedPlanetMaterial.SetTexture(CloudsTex, resourceLocator.GetNebulaTexture(random.Next()));
-            _infectedPlanetMaterial.color = Color.Lerp(_planet.Color, Color.black, 0.3f);
+            _infectedPlanetMaterial.SetTexture("_CloudsTex", resourceLocator.GetNebulaTexture(random.Next()));
+            _planet.TypeColor = _infectedPlanetMaterial.color = Color.Lerp(_planet.Color, Color.black, 0.3f);
         }
 
         private void LateUpdate()
@@ -86,6 +117,13 @@ namespace Combat.Background
                 case PlanetType.Terran:
                     UpdateBarrenMaterial();
                     break;
+                case PlanetType.Molten:
+                    UpdateMoltenMaterial();
+                    break;
+                case PlanetType.Frozen:
+                    UpdateFrozenMaterial();
+                    break;
+
             }
         }
 
@@ -98,6 +136,28 @@ namespace Combat.Background
             offset.x -= Mathf.FloorToInt(offset.x);
             offset.y -= Mathf.FloorToInt(offset.y);
             _barrenPlanetMaterial.mainTextureOffset = offset;
+        }
+
+        private void UpdateMoltenMaterial()
+        {
+            var offset = transform.position;
+
+            offset.x /= _width;
+            offset.y /= _height;
+            offset.x -= Mathf.FloorToInt(offset.x);
+            offset.y -= Mathf.FloorToInt(offset.y);
+            _moltenPlanetMaterial.mainTextureOffset = offset;
+        }
+
+        private void UpdateFrozenMaterial()
+        {
+            var offset = transform.position;
+
+            offset.x /= _width;
+            offset.y /= _height;
+            offset.x -= Mathf.FloorToInt(offset.x);
+            offset.y -= Mathf.FloorToInt(offset.y);
+            _frozenPlanetMaterial.mainTextureOffset = offset;
         }
 
         private void UpdateInfectedMaterial()
@@ -124,18 +184,16 @@ namespace Combat.Background
             var decalOffset = offset * 2;
             decalOffset.x -= Mathf.FloorToInt(offset.x);
             decalOffset.y -= Mathf.FloorToInt(offset.y);
-            _gasPlanetMaterial.SetTextureOffset(DecalTex, decalOffset);
+            _gasPlanetMaterial.SetTextureOffset("_DecalTex", decalOffset);
 
             var cloudOffset = offset * 3;
             cloudOffset.x -= Mathf.FloorToInt(offset.x);
             cloudOffset.y -= Mathf.FloorToInt(offset.y);
-            _gasPlanetMaterial.SetTextureOffset(CloudsTex, cloudOffset);
+            _gasPlanetMaterial.SetTextureOffset("_CloudsTex", cloudOffset);
         }
 
         private Planet _planet;
         private float _width;
         private float _height;
-        private static readonly int CloudsTex = Shader.PropertyToID("_CloudsTex");
-        private static readonly int DecalTex = Shader.PropertyToID("_DecalTex");
     }
 }

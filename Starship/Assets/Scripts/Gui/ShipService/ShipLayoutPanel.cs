@@ -22,6 +22,10 @@ namespace Gui.ShipService
         public BlockViewModel OuterBlock;
         public BlockViewModel IoBlock;
         public BlockViewModel EngineBlock;
+        public BlockViewModel SpecialBlock;
+        public BlockViewModel UAVPlatformBlock;
+        public BlockViewModel IsBlock;
+        public BlockViewModel OUAVBlock;
         public BlockViewModel CustomBlock;
         public BlockViewModel Selection;
         public Image BackgroundImage;
@@ -83,6 +87,10 @@ namespace Gui.ShipService
             OuterBlock.gameObject.SetActive(false);
             IoBlock.gameObject.SetActive(false);
             EngineBlock.gameObject.SetActive(false);
+            SpecialBlock.gameObject.SetActive(false);
+            UAVPlatformBlock.gameObject.SetActive(false);
+            IsBlock.gameObject.SetActive(false);
+            OUAVBlock.gameObject.SetActive(false);
             CustomBlock.gameObject.SetActive(false);
             Cleanup();
         }
@@ -130,6 +138,14 @@ namespace Gui.ShipService
                     return item;
                 case CellType.Engine:
                     return GameObject.Instantiate<BlockViewModel>(EngineBlock);
+                case CellType.Special:
+                    return GameObject.Instantiate<BlockViewModel>(SpecialBlock);
+                case CellType.UAVPlatform:
+                    return GameObject.Instantiate<BlockViewModel>(UAVPlatformBlock);
+                case CellType.InnerSpecial:
+                    return GameObject.Instantiate<BlockViewModel>(IsBlock);
+                case CellType.OuterUAVPlatform:
+                    return GameObject.Instantiate<BlockViewModel>(OUAVBlock);
                 case CellType.Custom:
                     return GameObject.Instantiate<BlockViewModel>(CustomBlock);
             }
@@ -156,6 +172,10 @@ namespace Gui.ShipService
                     child == OuterBlock.transform ||
                     child == EngineBlock.transform ||
                     child == IoBlock.transform ||
+                    child == SpecialBlock.transform ||
+                    child == UAVPlatformBlock.transform ||
+                    child == IsBlock.transform ||
+                    child == OUAVBlock.transform ||
                     child == CustomBlock.transform ||
                     child == Selection.transform ||
                     child == BackgroundImage.transform)

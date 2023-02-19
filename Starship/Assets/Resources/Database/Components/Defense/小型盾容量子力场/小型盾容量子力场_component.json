@@ -1,0 +1,18 @@
+{
+  "ItemType": 1,
+  "Id": 312,
+  "Name": "小型盾容量子力场",
+  "DisplayCategory": 2,
+  "Availability": 1,
+  "ComponentStatsId": 312,
+  "Faction": 7,
+  "Level": 10,
+  "Icon": "armor11",
+  "Color": "#7F00FF",
+  "Layout": "1",
+  "CellType": "1",
+  "PossibleModifications": [
+    1,
+    3
+  ]
+}

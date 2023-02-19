@@ -18,7 +18,7 @@ namespace GameStateMachine
 
         public void Initialize()
         {
-            OptimizedDebug.Log("StateMachine.Initialize");
+            UnityEngine.Debug.Log("StateMachine.Initialize");
             LoadState(_initializationStateFactory.Create());
         }
 

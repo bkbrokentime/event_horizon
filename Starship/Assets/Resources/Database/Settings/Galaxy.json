@@ -1,6 +1,7 @@
 {
   "ItemType": 101,
   "AbandonedStarbaseFaction": 9,
+  "MotherShip": 220,
   "StartingShipBuilds": [
     39,
     45,

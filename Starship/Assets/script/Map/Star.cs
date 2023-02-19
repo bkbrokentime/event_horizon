@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using System.Collections.Generic;
 using Galaxy;
@@ -6,7 +5,6 @@ using GameServices.Player;
 using Services.Localization;
 using Services.ObjectPool;
 using Zenject;
-using Random = UnityEngine.Random;
 
 public class Star : MonoBehaviour
 {
@@ -16,8 +14,10 @@ public class Star : MonoBehaviour
 	public float Size = 1.0f;
 	public GameObject StarNamePrefab;
     public GameObject HomeIconPrefab;
+	public GameObject FortificationIconPrefab;
 	public GameObject QuestIconPrefab;
 	public GameObject DangerIconPrefab;
+	public GameObject EndlessnessIconPrefab;
 	public GameObject FactionIconPrefab;
 	public GameObject WormholeIconPrefab;
 	public GameObject MultiplayerIconPrefab;
@@ -26,6 +26,8 @@ public class Star : MonoBehaviour
 	public GameObject RuinsIconPrefab;
     public GameObject XmasIconPrefab;
 	public GameObject BossIconPrefab;
+	public GameObject BossIconPrefab1;
+	public GameObject BossIconPrefab2;
 	public GameObject MilitaryIconPrefab;
 	public GameObject ChallengeIconPrefab;
 	public GameObject StarBorderPrefab;
@@ -35,6 +37,8 @@ public class Star : MonoBehaviour
     public GameObject QuestObjective;
 	public GameObject StarInfo;
     public GameObject MiniBossIcon;
+    public GameObject MiniBossIcon1;
+    public GameObject MiniBossIcon2;
     public GameObject MiniShopIcon;
     public GameObject MiniArenaIcon;
     public GameObject MiniQuestObjective;
@@ -120,46 +124,93 @@ public class Star : MonoBehaviour
 		    {
 		        AddIcon(QuestIconPrefab);
 		    }
-		    if (objects.Contain(StarObjectType.Survival))
+			if (objects.Contain(StarObjectType.Survival))
 			{
 				AddIcon(DangerIconPrefab);
 			}
+			if (objects.Contain(StarObjectType.Endlessness))
+			{
+				AddIcon(EndlessnessIconPrefab);
+			}
 			else if (objects.Contain(StarObjectType.Boss) && !star.Boss.IsDefeated)
 			{
-				AddIcon(BossIconPrefab);
-			    if (_starMap.ShowBosses)
-			    {
-			        AddIcon(MiniBossIcon).GetComponent<StarIcon>().SetColor(Color.Lerp(color, Color.white, 0.3f));
-			        _showMiniStarOnGalaxyMap = false;
-			    }
-			}
+				if (star.boss_level == 1)
+				{
+					AddIcon(BossIconPrefab);
+					if (_starMap.ShowBosses)
+					{
+						AddIcon(MiniBossIcon).GetComponent<StarIcon>().SetColor(Color.Lerp(color, Color.white, 0.3f));
+						_showMiniStarOnGalaxyMap = false;
+					}
+				}
+				else if (star.boss_level == 2)
+				{
+					AddIcon(BossIconPrefab1);
+					if (_starMap.ShowBosses)
+					{
+						AddIcon(MiniBossIcon1).GetComponent<StarIcon>().SetColor(Color.Lerp(color, Color.white, 0.3f));
+						_showMiniStarOnGalaxyMap = false;
+					}
+				}
+				else if (star.boss_level == 3)
+				{
+					AddIcon(BossIconPrefab2);
+					if (_starMap.ShowBosses)
+					{
+						AddIcon(MiniBossIcon2).GetComponent<StarIcon>().SetColor(Color.Lerp(color, Color.white, 0.3f));
+						_showMiniStarOnGalaxyMap = false;
+					}
+				}
+            }
+			//else if (objects.Contain(StarObjectType.Boss2) && !star.Boss2.IsDefeated)
+			//{
+			//	AddIcon(BossIconPrefab1);
+			//    if (_starMap.ShowBosses)
+			//    {
+			//        AddIcon(MiniBossIcon1).GetComponent<StarIcon>().SetColor(Color.Lerp(color, Color.white, 0.3f));
+			//        _showMiniStarOnGalaxyMap = false;
+			//    }
+			//}
+			//else if (objects.Contain(StarObjectType.Boss3) && !star.Boss3.IsDefeated)
+			//{
+			//	AddIcon(BossIconPrefab2);
+			//    if (_starMap.ShowBosses)
+			//    {
+			//        AddIcon(MiniBossIcon2).GetComponent<StarIcon>().SetColor(Color.Lerp(color, Color.white, 0.3f));
+			//        _showMiniStarOnGalaxyMap = false;
+			//    }
+			//}
 			else if (objects.Contain(StarObjectType.Ruins) && !star.Ruins.IsDefeated)
 			{
 				AddIcon(RuinsIconPrefab);
 			}
-            else if (objects.Contain(StarObjectType.Xmas))
-            {
-                AddIcon(XmasIconPrefab);
-                if (_starMap.ShowXmas)
-                {
-                    AddIcon(MiniXmasIcon);
-                    _showMiniStarOnGalaxyMap = false;
-                }
-            }
-            else if (objects.Contain(StarObjectType.Wormhole))
+			else if (objects.Contain(StarObjectType.Fortification) && !star.Fortification.IsDefeated)
+			{
+				AddIcon(FortificationIconPrefab);
+			}
+			else if (objects.Contain(StarObjectType.Xmas))
+			{
+				AddIcon(XmasIconPrefab);
+				if (_starMap.ShowXmas)
+				{
+					AddIcon(MiniXmasIcon);
+					_showMiniStarOnGalaxyMap = false;
+				}
+			}
+			else if (objects.Contain(StarObjectType.Wormhole))
 			{
 				AddIcon(WormholeIconPrefab);
 			}
-			else if (objects.Contain(StarObjectType.Arena))
-			{
-				AddIcon(ArenaIconPrefab);
-                if (_starMap.ShowArenas)
-                {
-                    AddIcon(MiniArenaIcon).GetComponent<StarIcon>().SetColor(Color.Lerp(color, Color.white, 0.3f));
-                    _showMiniStarOnGalaxyMap = false;
-                }
-            }
-            else if (objects.Contain(StarObjectType.Challenge) && !star.Challenge.IsCompleted)
+			//else if (objects.Contain(StarObjectType.Arena))
+			//{
+			//	AddIcon(ArenaIconPrefab);
+			//	if (_starMap.ShowArenas)
+			//	{
+			//		AddIcon(MiniArenaIcon).GetComponent<StarIcon>().SetColor(Color.Lerp(color, Color.white, 0.3f));
+			//		_showMiniStarOnGalaxyMap = false;
+			//	}
+			//}
+			else if (objects.Contain(StarObjectType.Challenge) && !star.Challenge.IsCompleted)
 			{
 				AddIcon(ChallengeIconPrefab);
 			}
@@ -167,22 +218,22 @@ public class Star : MonoBehaviour
 			//{
 			//	AddIcon(LabIconPrefab);
 			//}
-            else if (objects.Contain(StarObjectType.Military))
-            {
-                AddIcon(MilitaryIconPrefab);
-            }
-            else if (objects.Contain(StarObjectType.Hive) && !star.Pandemic.IsDefeated)
-            {
-                AddIcon(PandemicIcon);
-            }
+			else if (objects.Contain(StarObjectType.Military))
+			{
+				AddIcon(MilitaryIconPrefab);
+			}
+			else if (objects.Contain(StarObjectType.Hive) && !star.Pandemic.IsDefeated)
+			{
+				AddIcon(PandemicIcon);
+			}
 			else if (objects.Contain(StarObjectType.BlackMarket))
 			{
 				AddIcon(BlackMarketIconPrefab);
-			    if (_starMap.ShowStores)
-			    {
-			        AddIcon(MiniShopIcon);
-			        _showMiniStarOnGalaxyMap = false;
-			    }
+				if (_starMap.ShowStores)
+				{
+					AddIcon(MiniShopIcon);
+					_showMiniStarOnGalaxyMap = false;
+				}
 			}
 		}
 
@@ -206,7 +257,7 @@ public class Star : MonoBehaviour
 
 	void Update()
 	{
-		var size = _mainCamera.orthographicSize;
+		var size = Camera.main.orthographicSize;
 
 	    State state;
 		if (size >= SwitchToGalaxyDistance)
@@ -351,16 +402,10 @@ public class Star : MonoBehaviour
 		return color;
 	}
 
-	private void Start()
-	{
-		_mainCamera = Camera.main;
-	}
-
-	private bool _showMiniStarOnGalaxyMap;
+    private bool _showMiniStarOnGalaxyMap;
     private Vector3 _miniObjectScale;
     private int _starId;
 	private float _scale;
 	private float _blinkSpeed;
 	private State _state;
-	private Camera _mainCamera;
 }

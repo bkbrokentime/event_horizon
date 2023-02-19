@@ -52,8 +52,12 @@ MonoBehaviour:
   Size: 3
   StarNamePrefab: {fileID: 100000, guid: f3ec3556cd696a541be61c58ade445dd, type: 3}
   HomeIconPrefab: {fileID: 104178, guid: 521c9900779788b4c8b55228032dea71, type: 3}
+  FortificationIconPrefab: {fileID: 111628, guid: 479b595c9f9802f47894692b92ad71b9,
+    type: 3}
   QuestIconPrefab: {fileID: 188242, guid: e5d11d131cfb3db44bc72a6a0cdbed9a, type: 3}
   DangerIconPrefab: {fileID: 100000, guid: f8d4dd7b821cc8c43a5fa66d20bfd758, type: 3}
+  EndlessnessIconPrefab: {fileID: 100000, guid: 065de6526e83d0a47960a91dbad932ce,
+    type: 3}
   FactionIconPrefab: {fileID: 100000, guid: 2beb3d9085ac783419f9364cf5136eab, type: 3}
   WormholeIconPrefab: {fileID: 171850, guid: d28aa507747075545949eefdce15510e, type: 3}
   MultiplayerIconPrefab: {fileID: 103250, guid: 3abf3a0ea49167f43b49d7b63cfb066d,
@@ -64,6 +68,8 @@ MonoBehaviour:
   XmasIconPrefab: {fileID: 1000012594009094, guid: ffd50bb8ca7d3a344aad1ce429fc3578,
     type: 3}
   BossIconPrefab: {fileID: 130062, guid: 69c6026e039c2a243bb35cac6a1d5823, type: 3}
+  BossIconPrefab1: {fileID: 130062, guid: 0f07ca1d75270e54c8f2b03770d2e4a7, type: 3}
+  BossIconPrefab2: {fileID: 130062, guid: 6b0e6931648a1a54e8b4a347d183c362, type: 3}
   MilitaryIconPrefab: {fileID: 189392, guid: 2331308dbba2bc64f9f36f7e9578283b, type: 3}
   ChallengeIconPrefab: {fileID: 126218, guid: 48fcea90a400f904994619e0fb39d012, type: 3}
   StarBorderPrefab: {fileID: 159240, guid: 7a33f7a394eee37428b5d2422d05c672, type: 3}
@@ -76,6 +82,10 @@ MonoBehaviour:
     type: 3}
   StarInfo: {fileID: 158774, guid: bde29830f998ff6499d590a92391012c, type: 3}
   MiniBossIcon: {fileID: 1000013651314478, guid: df7e9ab96e8d47948a5104f64c5ebf42,
+    type: 3}
+  MiniBossIcon1: {fileID: 1000013651314478, guid: e9a86810feff62545a3817162d0993e9,
+    type: 3}
+  MiniBossIcon2: {fileID: 1000013651314478, guid: 30b0192b483b22b44ab9ee44392fd51c,
     type: 3}
   MiniShopIcon: {fileID: 1000012415260514, guid: 68b8b7c8eb8a55c41a2c40c6ff31ed20,
     type: 3}

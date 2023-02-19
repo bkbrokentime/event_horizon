@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using GameModel.Serialization;
-using Utils;
 using Zenject;
 
 namespace Session.Content
@@ -72,7 +71,7 @@ namespace Session.Content
 			var version = Helpers.DeserializeInt(buffer, ref index);
 			if (version != CurrentVersion)
 			{
-				OptimizedDebug.Log("WormholeData: incorrect data version");
+				UnityEngine.Debug.Log("WormholeData: incorrect data version");
                 throw new ArgumentException();
             }
 

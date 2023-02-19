@@ -9,7 +9,7 @@ namespace Constructor.Modification
     {
         public Lightweight(ModificationQuality quality)
         {
-            _weightMultiplier = quality.PowerMultiplier(2.0f, 1.5f, 1.2f, 0.8f, 0.6f, 0.5f);
+            _weightMultiplier = quality.PowerMultiplier(3.0f, 2.5f, 2.0f, 1.5f, 1.2f, 0.8f, 0.6f, 0.5f, 0.4f, 0.2f);
             Quality = quality;
         }
 

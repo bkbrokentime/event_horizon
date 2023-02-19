@@ -9,19 +9,32 @@ namespace Constructor.Model
         public float ArmorPoints;
         public float ArmorRepairRate;
         public StatMultiplier ArmorRepairCooldownMultiplier;
+        public float ArmorPointsAttenuatableRate;
+        public float ArmorRepairAttenuatableRate;
 
         public float EnergyPoints;
         public float EnergyRechargeRate;
         public StatMultiplier EnergyRechargeCooldownMultiplier;
+        public float EnergyPointsAttenuatableRate;
+        public float EnergyRechargeAttenuatableRate;
 
         public float ShieldPoints;
         public float ShieldRechargeRate;
         public StatMultiplier ShieldRechargeCooldownMultiplier;
+        public float ShieldPointsAttenuatableRate;
+        public float ShieldRechargeAttenuatableRate;
+
+        public float EnergyShieldPoints;
+        public float EnergyShieldRechargeRate;
+        public StatMultiplier EnergyShieldRechargeCooldownMultiplier;
+        public float EnergyShieldPointsAttenuatableRate;
+        public float EnergyShieldRechargeAttenuatableRate;
 
         public float ArmorRepairBaseCooldown;
         public float HullRepairBaseCooldown;
         public float EnergyRechargeBaseCooldown;
         public float ShieldRechargeBaseCooldown;
+        public float EnergyShieldRechargeBaseCooldown;
 
         public float Weight;
 
@@ -32,6 +45,17 @@ namespace Constructor.Model
         public float KineticResistance;
         public float EnergyResistance;
         public float ThermalResistance;
+        public float QuantumResistance;
+
+        public float ShieldKineticResistance;
+        public float ShieldEnergyResistance;
+        public float ShieldThermalResistance;
+        public float ShieldQuantumResistance;
+
+        public float EnergyShieldKineticResistance;
+        public float EnergyShieldEnergyResistance;
+        public float EnergyShieldThermalResistance;
+        public float EnergyShieldQuantumResistance;
 
         public float EnginePower;
         public float TurnRate;
@@ -59,14 +83,26 @@ namespace Constructor.Model
             stats.ArmorPoints = component.ArmorPoints * multiplier;
             stats.ArmorRepairRate = component.ArmorRepairRate * multiplier;
             stats.ArmorRepairCooldownMultiplier = new StatMultiplier(component.ArmorRepairCooldownModifier * multiplier);
+            stats.ArmorPointsAttenuatableRate = component.ArmorPointsAttenuatableRate * multiplier;
+            stats.ArmorRepairAttenuatableRate = component.ArmorRepairAttenuatableRate * multiplier;
 
             stats.EnergyPoints = component.EnergyPoints * multiplier;
             stats.EnergyRechargeRate = component.EnergyRechargeRate * multiplier;
             stats.EnergyRechargeCooldownMultiplier = new StatMultiplier(component.EnergyRechargeCooldownModifier * multiplier);
+            stats.EnergyPointsAttenuatableRate = component.EnergyPointsAttenuatableRate * multiplier;
+            stats.EnergyRechargeAttenuatableRate = component.EnergyRechargeAttenuatableRate * multiplier;
 
             stats.ShieldPoints = component.ShieldPoints * multiplier;
             stats.ShieldRechargeRate = component.ShieldRechargeRate * multiplier;
             stats.ShieldRechargeCooldownMultiplier = new StatMultiplier(component.ShieldRechargeCooldownModifier * multiplier);
+            stats.ShieldPointsAttenuatableRate = component.ShieldPointsAttenuatableRate * multiplier;
+            stats.ShieldRechargeAttenuatableRate = component.ShieldRechargeAttenuatableRate * multiplier;
+
+            stats.EnergyShieldPoints = component.EnergyShieldPoints * multiplier;
+            stats.EnergyShieldRechargeRate = component.EnergyShieldRechargeRate * multiplier;
+            stats.EnergyShieldRechargeCooldownMultiplier = new StatMultiplier(component.EnergyShieldRechargeCooldownModifier * multiplier);
+            stats.EnergyShieldPointsAttenuatableRate = component.EnergyShieldPointsAttenuatableRate * multiplier;
+            stats.EnergyShieldRechargeAttenuatableRate = component.EnergyShieldRechargeAttenuatableRate * multiplier;
 
             stats.Weight = multiplier * component.Weight;
 
@@ -76,6 +112,17 @@ namespace Constructor.Model
             stats.KineticResistance = component.KineticResistance * multiplier;
             stats.EnergyResistance = component.EnergyResistance * multiplier;
             stats.ThermalResistance = component.ThermalResistance * multiplier;
+            stats.QuantumResistance = component.QuantumResistance * multiplier;
+
+            stats.ShieldKineticResistance = component.ShieldKineticResistance * multiplier;
+            stats.ShieldEnergyResistance = component.ShieldEnergyResistance * multiplier;
+            stats.ShieldThermalResistance = component.ShieldThermalResistance * multiplier;
+            stats.ShieldQuantumResistance = component.ShieldQuantumResistance * multiplier;
+
+            stats.EnergyShieldKineticResistance = component.EnergyShieldKineticResistance * multiplier;
+            stats.EnergyShieldEnergyResistance = component.EnergyShieldEnergyResistance * multiplier;
+            stats.EnergyShieldThermalResistance = component.EnergyShieldThermalResistance * multiplier;
+            stats.EnergyShieldQuantumResistance = component.EnergyShieldQuantumResistance * multiplier;
 
             stats.EnginePower = component.EnginePower * multiplier;
             stats.TurnRate = component.TurnRate * multiplier;
@@ -102,14 +149,26 @@ namespace Constructor.Model
             first.ArmorPoints += second.ArmorPoints;
             first.ArmorRepairRate += second.ArmorRepairRate;
             first.ArmorRepairCooldownMultiplier += second.ArmorRepairCooldownMultiplier;
+            first.ArmorPointsAttenuatableRate += second.ArmorPointsAttenuatableRate;
+            first.ArmorRepairAttenuatableRate += second.ArmorRepairAttenuatableRate;
 
             first.EnergyPoints += second.EnergyPoints;
             first.EnergyRechargeRate += second.EnergyRechargeRate;
             first.EnergyRechargeCooldownMultiplier += second.EnergyRechargeCooldownMultiplier;
+            first.EnergyPointsAttenuatableRate += second.EnergyPointsAttenuatableRate;
+            first.EnergyRechargeAttenuatableRate += second.EnergyRechargeAttenuatableRate;
 
             first.ShieldPoints += second.ShieldPoints;
             first.ShieldRechargeRate += second.ShieldRechargeRate;
             first.ShieldRechargeCooldownMultiplier += second.ShieldRechargeCooldownMultiplier;
+            first.ShieldPointsAttenuatableRate += second.ShieldPointsAttenuatableRate;
+            first.ShieldRechargeAttenuatableRate += second.ShieldRechargeAttenuatableRate;
+
+            first.EnergyShieldPoints += second.EnergyShieldPoints;
+            first.EnergyShieldRechargeRate += second.EnergyShieldRechargeRate;
+            first.EnergyShieldRechargeCooldownMultiplier += second.EnergyShieldRechargeCooldownMultiplier;
+            first.EnergyShieldPointsAttenuatableRate += second.EnergyShieldPointsAttenuatableRate;
+            first.EnergyShieldRechargeAttenuatableRate += second.EnergyShieldRechargeAttenuatableRate;
 
             first.Weight += second.Weight;
 
@@ -120,6 +179,17 @@ namespace Constructor.Model
             first.KineticResistance += second.KineticResistance;
             first.EnergyResistance += second.EnergyResistance;
             first.ThermalResistance += second.ThermalResistance;
+            first.QuantumResistance += second.QuantumResistance;
+
+            first.ShieldKineticResistance += second.ShieldKineticResistance;
+            first.ShieldEnergyResistance += second.ShieldEnergyResistance;
+            first.ShieldThermalResistance += second.ShieldThermalResistance;
+            first.ShieldQuantumResistance += second.ShieldQuantumResistance;
+
+            first.EnergyShieldKineticResistance += second.EnergyShieldKineticResistance;
+            first.EnergyShieldEnergyResistance += second.EnergyShieldEnergyResistance;
+            first.EnergyShieldThermalResistance += second.EnergyShieldThermalResistance;
+            first.EnergyShieldQuantumResistance += second.EnergyShieldQuantumResistance;
 
             first.EnginePower += second.EnginePower;
             first.TurnRate += second.TurnRate;

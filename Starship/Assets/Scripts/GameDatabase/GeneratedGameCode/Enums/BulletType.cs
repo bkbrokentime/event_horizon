@@ -14,5 +14,7 @@ namespace GameDatabase.Enums
 		Homing,
 		Static,
 		Continuous,
+		RandomSteering,
+		IntelligentHoming,
 	}
 }

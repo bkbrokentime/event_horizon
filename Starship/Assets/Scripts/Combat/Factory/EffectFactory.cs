@@ -5,8 +5,8 @@ using Combat.Scene;
 using GameDatabase.Enums;
 using GameDatabase.Model;
 using Services.ObjectPool;
+using System;
 using UnityEngine;
-using Utils;
 using Zenject;
 
 namespace Combat.Factory
@@ -61,7 +61,7 @@ namespace Combat.Factory
         {
             var gameObject = CreateGameObject("DamageText");
 
-            var direction = RotationHelpers.Direction(Random.Range(0f, 360f));
+            var direction = RotationHelpers.Direction(UnityEngine.Random.Range(0f, 360f));
 
             string damageText;
             if (damage < 1e3f)
@@ -71,11 +71,10 @@ namespace Combat.Factory
             else if (damage < 1e9f)
                 damageText = (int)(damage / 1e6f) + "M";
             else if (damage < 1e12f)
-                damageText = (long)(damage / 1e9f) + "B";
+                damageText = (int)(damage / 1e9f) + "B";
             else
-                damageText = ((double)damage).ToInGameString(BigFormat.Truncated);
+                damageText = (int)(damage / 1e12f) + "T";
             
-
             gameObject.Name = damageText;
             var effect = CreateEffect(gameObject, parent);
             effect.Position = position;
@@ -96,7 +95,7 @@ namespace Combat.Factory
             var prefab = _prefabCache.LoadResourcePrefab("Combat/Effects/" + name);
             if (prefab == null)
             {
-                OptimizedDebug.Log("Effect not found: Combat/Effects/" + name);
+                UnityEngine.Debug.Log("Effect not found: Combat/Effects/" + name);
                 return null;
             }
 
@@ -108,7 +107,7 @@ namespace Combat.Factory
             var prefab = _prefabCache.LoadPrefab(prefabId);
             if (prefab == null)
             {
-                OptimizedDebug.Log("Effect not found: " + prefabId);
+                UnityEngine.Debug.Log("Effect not found: " + prefabId);
                 return null;
             }
 

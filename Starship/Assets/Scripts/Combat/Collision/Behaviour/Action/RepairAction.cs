@@ -16,14 +16,14 @@ namespace Combat.Collision.Behaviour.Action
         {
             if (_impactType == BulletImpactType.DamageOverTime)
             {
-                targetImpact.Repair += _power * collisionData.TimeInterval;
+                targetImpact.AllDamageData.Repair.UpDateDamage(_power * collisionData.TimeInterval);
             }
             else
             {
                 if (!collisionData.IsNew || !_isAlive)
                     return;
 
-                targetImpact.Repair += _power;
+                targetImpact.AllDamageData.Repair.UpDateDamage(_power);
                 _isAlive = _impactType == BulletImpactType.HitAllTargets;
             }
         }

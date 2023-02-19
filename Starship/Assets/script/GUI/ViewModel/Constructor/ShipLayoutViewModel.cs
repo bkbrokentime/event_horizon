@@ -11,6 +11,7 @@ using Services.Reources;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
 using Zenject;
+using DebugLogSetting;
 
 namespace ViewModel
 {
@@ -23,6 +24,10 @@ namespace ViewModel
 		public BlockViewModel OuterBlock;
 		public BlockViewModel IoBlock;
 		public BlockViewModel EngineBlock;
+		public BlockViewModel SpecialBlock;
+		public BlockViewModel UAVPlatformBlock;
+		public BlockViewModel IsBlock;
+		public BlockViewModel OUAVBlock;
 		public RectTransform AllowedBlock;
 		public RectTransform DeniedBlock;
 		public RectTransform LockIcon;
@@ -61,7 +66,9 @@ namespace ViewModel
 		{
 			_layout = layout;
             _inventory = inventory;
-			Cleanup();
+            if (ShipDebugLogSetting.ShipLayoutDebugLog)
+                UnityEngine.Debug.Log("_layout Initialize set:  " + _layout.Size);
+            Cleanup();
 			CreateLayout();
 		}
 
@@ -78,19 +85,22 @@ namespace ViewModel
 			CreateSelection(info.Data, x, y);
 		}
 
-		public int InstallComponent(Vector2 position, ComponentInfo info, int keyBinding, int componentMode)
+		public int InstallComponent(Vector2 position, ComponentInfo info, int layout, int keyBinding, int componentMode)
 		{
 			if (_layout == null)
-				return -1;
-
+			{
+                if (ShipDebugLogSetting.ShipLayoutDebugLog)
+                    UnityEngine.Debug.Log("layout:  " + layout + "  _layout = null");
+                return -1;
+			}
 			int x, y;
 			var size = info.Data.Layout.Size;
 			GetComponentPosition(position, size, out x, out y);
 
-		    return InstallComponent(x, y, info, keyBinding, componentMode);
+			return InstallComponent(x, y, info, layout, keyBinding, componentMode);
 		}
 
-        public int InstallComponent(int x, int y, ComponentInfo info, int keyBinding, int componentMode, int desiredId = -1)
+        public int InstallComponent(int x, int y, ComponentInfo info,int layout, int keyBinding, int componentMode, int desiredId = -1)
         {
             if (_layout == null)
                 return -1;
@@ -98,15 +108,27 @@ namespace ViewModel
             ClearSelection();
             var size = info.Data.Layout.Size;
 
-            if (!_inventory.Contains(info)) 
+			if (!_inventory.Contains(info))
+			{
+                if (ShipDebugLogSetting.ShipLayoutDebugLog)
+                    UnityEngine.Debug.Log("_inventory.Contains = false");
                 return -1;
-
-            var id = _layout.InstallComponent(info, x, y, desiredId);
+			}
+            var id = _layout.InstallComponent(info, layout, x, y, desiredId);
 
             if (id >= 0)
             {
-                AddComponentIcon(id, _resourceLocator.GetSprite(info.Data.Icon), info.Data.Layout, size, info.Data.Color, x, y);
+				if (info.Data.GIFIcon)
+				{
+                    Sprite[] spr = _resourceLocator.GetGIFSprite(info.Data.Icon);
+                    if (ShipDebugLogSetting.ShipLayoutDebugLog)
+                        UnityEngine.Debug.Log("shiplayoutsprites = " + spr.Length);
+                    AddComponentGIFIcon(id, spr, spr.Length, info.Data.Layout, size, info.Data.Color, x, y);
+                }
+                else
+					AddComponentIcon(id, _resourceLocator.GetSprite(info.Data.Icon), info.Data.Layout, size, info.Data.Color, x, y);
                 var component = _layout.GetComponent(id);
+				component.Layout = layout;
                 component.KeyBinding = keyBinding;
                 component.Behaviour = componentMode;
                 UpdateLayout();
@@ -193,11 +215,15 @@ namespace ViewModel
 			OuterBlock.gameObject.SetActive(false);
 			IoBlock.gameObject.SetActive(false);
 			EngineBlock.gameObject.SetActive(false);
+			SpecialBlock.gameObject.SetActive(false);
+			UAVPlatformBlock.gameObject.SetActive(false);
+			IsBlock.gameObject.SetActive(false);
+			OUAVBlock.gameObject.SetActive(false);
 			AllowedBlock.gameObject.SetActive(false);
 			DeniedBlock.gameObject.SetActive(false);
 			ComponentIcon.gameObject.SetActive(false);
 			LockIcon.gameObject.SetActive(false);
-			Cleanup();
+			//Cleanup();
 		}
 
 	    private int GetComponentAtPoint(Vector2 position)
@@ -284,7 +310,15 @@ namespace ViewModel
 				var id = item.Key;
 				var component = item.Value;
 				int size = component.Info.Data.Layout.Size;
-				AddComponentIcon(id, _resourceLocator.GetSprite(component.Info.Data.Icon), component.Info.Data.Layout, size, component.Info.Data.Color, component.X, component.Y);
+				if (component.Info.Data.GIFIcon)
+				{
+                    Sprite[] spr = _resourceLocator.GetGIFSprite(component.Info.Data.Icon);
+                    if (ShipDebugLogSetting.ShipLayoutDebugLog)
+                        UnityEngine.Debug.Log("shiplayoutspr = " + spr.Length);
+                    AddComponentGIFIcon(id, spr, spr.Length, component.Info.Data.Layout, size, component.Info.Data.Color, component.X, component.Y);
+				}
+				else
+					AddComponentIcon(id, _resourceLocator.GetSprite(component.Info.Data.Icon), component.Info.Data.Layout, size, component.Info.Data.Color, component.X, component.Y);
 
 				if (component.Locked)
 					CreateLockIcons(_components[id].RectTransform, component.Info.Data.Layout, size);
@@ -312,6 +346,13 @@ namespace ViewModel
 		{
 			var item = GameObject.Instantiate<ComponentIconViewModel>(ComponentIcon);
 			item.SetIcon(icon, layout.Data, size, color);
+			SetBlockLayout(item.RectTransform, x, y, size);
+			_components.Add(id, item);
+		}
+		private void AddComponentGIFIcon(int id, Sprite[] icon, int num, Layout layout, int size, Color color, int x, int y)
+		{
+			var item = GameObject.Instantiate<ComponentIconViewModel>(ComponentIcon);
+			item.SetGIFIcon(icon, num, layout.Data, size, color);
 			SetBlockLayout(item.RectTransform, x, y, size);
 			_components.Add(id, item);
 		}
@@ -353,8 +394,16 @@ namespace ViewModel
 				return item;
 			case CellType.Engine:
 				return GameObject.Instantiate<BlockViewModel>(EngineBlock);
+			case CellType.Special:
+				return GameObject.Instantiate<BlockViewModel>(SpecialBlock);
+			case CellType.UAVPlatform:
+				return GameObject.Instantiate<BlockViewModel>(UAVPlatformBlock);
+			case CellType.InnerSpecial:
+				return GameObject.Instantiate<BlockViewModel>(IsBlock);
+			case CellType.OuterUAVPlatform:
+				return GameObject.Instantiate<BlockViewModel>(OUAVBlock);
 			}
-
+			//SpecialBlock
 			return null;
 		}
 
@@ -375,9 +424,13 @@ namespace ViewModel
 				if (child == WeaponBlock.transform ||
 				    child == InnerBlock.transform ||
 				    child == OuterBlock.transform ||
-				    child == EngineBlock.transform ||
-				    child == IoBlock.transform ||
-				    child == AllowedBlock.transform ||
+					child == EngineBlock.transform ||
+					child == IoBlock.transform ||
+					child == SpecialBlock.transform ||
+					child == UAVPlatformBlock.transform ||
+					child == IsBlock.transform ||
+					child == OUAVBlock.transform ||
+					child == AllowedBlock.transform ||
 				    child == DeniedBlock.transform ||
 				    child == ComponentIcon.transform ||
 				    child == LockIcon.transform ||

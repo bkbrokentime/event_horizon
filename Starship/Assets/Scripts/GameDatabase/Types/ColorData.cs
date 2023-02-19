@@ -1,5 +1,4 @@
 ﻿using System;
-using Utils;
 
 namespace GameDatabase.Model
 {
@@ -43,7 +42,7 @@ namespace GameDatabase.Model
             }
             catch (Exception e)
             {
-                OptimizedDebug.LogException(e);
+                UnityEngine.Debug.LogException(e);
                 return UnityEngine.Color.white;
             }
 

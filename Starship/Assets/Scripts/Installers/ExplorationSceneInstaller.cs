@@ -20,6 +20,7 @@ namespace Installers
         [SerializeField] private ShipStatsPanel _enemyStatsPanel;
         [SerializeField] private ShipControlsPanel _shipControlsPanel;
         [SerializeField] private RadarPanel _radarPanel;
+        [SerializeField] private RadarMapPanel _radarMapPanel;
         [SerializeField] private Settings _settings;
         [SerializeField] private TrailRendererPool _trailRendererPool;
 
@@ -37,6 +38,7 @@ namespace Installers
             Container.Bind<ShipStatsPanel>().FromInstance(_enemyStatsPanel).When(context => context.MemberName.Contains("enemy"));
             Container.Bind<ShipControlsPanel>().FromInstance(_shipControlsPanel);
             Container.Bind<RadarPanel>().FromInstance(_radarPanel);
+            Container.Bind<RadarMapPanel>().FromInstance(_radarMapPanel);
             Container.Bind<Settings>().FromInstance(_settings);
             Container.Bind<WeaponFactory>().AsSingle();
             Container.Bind<ShipFactory>().AsSingle().WithArguments(new ShipFactory.Settings { Shadows = true, StaticWrecks = true });

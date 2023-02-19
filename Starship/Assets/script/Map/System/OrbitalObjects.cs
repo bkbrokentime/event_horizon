@@ -129,15 +129,15 @@ namespace StarSystem
 
 		private void CreateOrbit(Circle orbitObject)
 		{
-            orbitObject.transform.localPosition = Vector3.zero;
-            orbitObject.transform.localScale = Vector3.one*(_orbitRadius + orbitObject.Thickness/2);
+			orbitObject.transform.localPosition = Vector3.zero;
+			orbitObject.transform.localScale = Vector3.one * (_orbitRadius + orbitObject.Thickness / 2);
 		}
 
 		private Planet CreatePlanet(Planet planetObject, Game.Exploration.Planet model, Color color, System.Random random)
 		{
             planetObject.Image.sprite = model.Icon;
 
-            planetObject.transform.localScale = Vector3.one*0.5f*(model.Size + 1f)*MaxPlanetSize;
+			planetObject.transform.localScale = Vector3.one * 0.5f * (model.Size + 1f) * MaxPlanetSize;
 			_lastAngle += 60 + random.Next(240);
 			var localRotation = random.Next(360);
 
@@ -176,9 +176,17 @@ namespace StarSystem
 			var starbase = CreateStarBase(starBaseObject, StarBaseSize, color, new System.Random(region.GetHashCode()));
 
 			if (!region.IsCaptured)
-				GetComponent<FleetObjects>().CreateShips(Model.Factories.Fleet.Capital(region, _database).Ships.Take(20), starbase.transform.localPosition);
+				GetComponent<FleetObjects>().CreateShips(Model.Factories.Fleet.Capital(region, _database).Ships.Take(100), starbase.transform.localPosition);
 
 			_objects.Add(starbase.gameObject, Galaxy.StarObjectType.StarBase);
+		}
+
+		private void CreateFortification(StarBase starBaseObject, Galaxy.StarContent.Fortification.Facade fortification, Color color)
+		{
+			var starbase = CreateStarBase(starBaseObject, StarBaseSize, color, new System.Random(fortification.GetHashCode()));
+			GetComponent<FleetObjects>().CreateShips(fortification.CreateFleet().Ships, starbase.transform.localPosition);
+			
+			_objects.Add(starbase.gameObject, Galaxy.StarObjectType.Fortification);
 		}
 
 		private void CreateBoss(Galaxy.StarContent.Boss.Facade boss, Color color)
@@ -196,6 +204,24 @@ namespace StarSystem
 		    _objects.Add(flagshipObject.gameObject, Galaxy.StarObjectType.Boss);
 
             _orbitRadius += OrbitDistance;
+		}
+
+		private void CreateBosses(Galaxy.StarContent.Boss.Facade boss, Color color, int level)
+		{
+			var ships = GetComponent<FleetObjects>();
+			var fleet = boss.CreateFleet();
+			var flagship = fleet.Ships.FirstOrDefault(item => item.Model.Category == ShipCategory.Flagship) ?? fleet.Ships.First();
+
+			var random = new System.Random(boss.GetHashCode());
+			_lastAngle += 60 + random.Next(240);
+			var position = RotationHelpers.Direction(_lastAngle) * _orbitRadius;
+			ships.CreateShips(fleet.Ships.Where(item => item.Model.Category != ShipCategory.Flagship), position);
+
+			var flagshipObject = ships.CreateFlagship(_database.GetShip(flagship.Model.Id), position, random.Next(360));
+
+			_objects.Add(flagshipObject.gameObject, Galaxy.StarObjectType.Boss);
+
+			_orbitRadius += OrbitDistance;
 		}
 
 		private void CreateRuins(StarBase starBaseObject, Galaxy.StarContent.Ruins.Facade ruins, Color color)
@@ -258,8 +284,14 @@ namespace StarSystem
 		        CreateCapital(starBaseEnumerator.Current, star.Region, color);
 		    }
 
-		    if (objects.Contain(StarObjectType.Boss) && StarObjectType.Boss.IsActive(star))
-		        CreateBoss(star.Boss, color);
+			if (objects.Contain(StarObjectType.Boss) && StarObjectType.Boss.IsActive(star))
+			{
+				if (star.boss_level == 1)
+					CreateBoss(star.Boss, color);
+				else
+					CreateBosses(star.Boss, color, star.boss_level);
+			}
+
 		    if (objects.Contain(Galaxy.StarObjectType.Wormhole))
 		    {
                 WormholeObject.SetActive(true);
@@ -272,6 +304,13 @@ namespace StarSystem
                 starBaseEnumerator.MoveNext();
                 CreateRuins(starBaseEnumerator.Current, star.Ruins, color);
             }
+		    if (objects.Contain(Galaxy.StarObjectType.Fortification) && StarObjectType.Fortification.IsActive(star))
+		    {
+                orbitEnumerator.MoveNext();
+                CreateOrbit(orbitEnumerator.Current);
+                starBaseEnumerator.MoveNext();
+                CreateFortification(starBaseEnumerator.Current, star.Fortification, color);
+            }
             if (objects.Contain(Galaxy.StarObjectType.Xmas) && StarObjectType.Xmas.IsActive(star))
             {
                 orbitEnumerator.MoveNext();
@@ -279,11 +318,11 @@ namespace StarSystem
                 starBaseEnumerator.MoveNext();
                 CreateXmas(starBaseEnumerator.Current, star.Xmas, color);
             }
-            if (objects.Contain(Galaxy.StarObjectType.Arena) && StarObjectType.Arena.IsActive(star))
-		    {
-                starBaseEnumerator.MoveNext();
-                CreateCommonObject(starBaseEnumerator.Current, Galaxy.StarObjectType.Arena, color);
-		    }
+      //      if (objects.Contain(Galaxy.StarObjectType.Arena) && StarObjectType.Arena.IsActive(star))
+		    //{
+      //          starBaseEnumerator.MoveNext();
+      //          CreateCommonObject(starBaseEnumerator.Current, Galaxy.StarObjectType.Arena, color);
+		    //}
 		    if (objects.Contain(Galaxy.StarObjectType.Military) && StarObjectType.Military.IsActive(star))
 		    {
                 starBaseEnumerator.MoveNext();
@@ -298,6 +337,11 @@ namespace StarSystem
 		    {
                 starBaseEnumerator.MoveNext();
                 CreateCommonObject(starBaseEnumerator.Current, Galaxy.StarObjectType.Survival, color);
+		    }
+		    if (objects.Contain(Galaxy.StarObjectType.Endlessness) && StarObjectType.Endlessness.IsActive(star))
+		    {
+                starBaseEnumerator.MoveNext();
+                CreateCommonObject(starBaseEnumerator.Current, Galaxy.StarObjectType.Endlessness, color);
 		    }
 		    if (objects.Contain(Galaxy.StarObjectType.BlackMarket) && StarObjectType.BlackMarket.IsActive(star))
 		    {

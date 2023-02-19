@@ -4,7 +4,6 @@ using GameDatabase.Enums;
 using GameDatabase.Model;
 using GameServices.Quests;
 using Services.Localization;
-using Utils;
 
 namespace Domain.Quests
 {
@@ -72,7 +71,7 @@ namespace Domain.Quests
                 var transition = _transitionList[data.Id];
                 if (!transition.Requirements.IsMet)
                 {
-                    OptimizedDebug.LogError("TextNode: Requirements are not met - " + transition.Requirements.GetType().Name);
+                    UnityEngine.Debug.LogError("TextNode: Requirements are not met - " + transition.Requirements.GetType().Name);
                     target = this;
                     return false;
                 }

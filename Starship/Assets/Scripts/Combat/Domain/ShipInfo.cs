@@ -63,6 +63,7 @@ namespace Combat.Domain
         }
 
         public UnitSide Side { get { return _unitSide; } }
+        public void ChangeSide(UnitSide NewSide) { _unitSide = NewSide; }
 
         public void Create(Factory.ShipFactory factory, IControllerFactory controllerFactory, Vector2 position)
         {
@@ -93,7 +94,7 @@ namespace Combat.Domain
             ShipUnit = new DeadShip();
         }
 
-        private readonly UnitSide _unitSide;
+        private UnitSide _unitSide;
         private readonly Constructor.Ships.IShip _shipData;
         private readonly IShipSpecification _shipSpec;
 

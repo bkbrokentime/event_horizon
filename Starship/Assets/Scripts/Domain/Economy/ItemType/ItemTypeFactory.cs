@@ -24,9 +24,9 @@ namespace Economy.ItemType
             return _container.Instantiate<EmptyShipItem>(new object[] { ship });
         }
 
-        public IItemType CreateShipItem(IShip ship, bool premium = false, bool fuzzy = false)
+        public IItemType CreateShipItem(IShip ship, bool premium = false)
         {
-            return _container.Instantiate<ShipItem>(new object[] { this, ship, premium, fuzzy });
+            return _container.Instantiate<ShipItem>(new object[] { ship, premium });
         }
 
         public IItemType CreateDamagedShipItem(ShipBuild build, int seed)
@@ -79,6 +79,7 @@ namespace Economy.ItemType
             y += _random.RandomInt(starId + 20, -25, 25);
             int id = StarLayout.PositionToId(x, y);
             var region = _regionMap.GetStarRegion(id);
+            //var region = _regionMap.GetRandomSizeStarRegion(id);
             if (region.Id == Region.UnoccupiedRegionId || region.Id == Region.PlayerHomeRegionId)
                 return null;
             if (_starData.IsVisited(starId))
@@ -105,6 +106,25 @@ namespace Economy.ItemType
         public IItemType CreateResearchItem(Faction faction)
         {
             return _container.Instantiate<ResearchItem>(new object[] { faction });
+        }
+        public IItemType CreatePurchasedStarsItem()
+        {
+            return _container.Instantiate<PurchasedStarsItem>();
+        }
+
+        public IItemType CreateSupporterPackItem()
+        {
+            return _container.Instantiate<SupporterPackItem>();
+        }
+
+        public IItemType CreateRewardedAdItem()
+        {
+            return _container.Instantiate<RewardedAdItem>();
+        }
+
+        public IItemType CreateRewardedFacebookPostItem()
+        {
+            return _container.Instantiate<RewardedFacebookPostItem>();
         }
 
         public IItemType CreateXmasBoxItem(int seed = -1)

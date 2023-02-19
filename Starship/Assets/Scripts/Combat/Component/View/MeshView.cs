@@ -8,10 +8,7 @@ namespace Combat.Component.View
         [SerializeField] private Color _baseColor = Color.white;
         [SerializeField] private float _rotationSpeed = 1.0f;
 
-        public override void Dispose()
-        {
-            _renderer = null;
-        }
+        public override void Dispose() { }
 
         public override void UpdateView(float elapsedTime)
         {
@@ -39,12 +36,9 @@ namespace Combat.Component.View
 
         protected override void UpdateColor(Color color)
         {
-            Renderer.material.color = color * _baseColor;
+            gameObject.GetComponent<MeshRenderer>().material.color = color * _baseColor;
         }
 
-        private MeshRenderer _renderer;
-        // ReSharper disable once Unity.NoNullCoalescing
-        private MeshRenderer Renderer => _renderer ?? (_renderer = GetComponent<MeshRenderer>());
         private float _time;
         private Vector3 _rotationVector;
     }

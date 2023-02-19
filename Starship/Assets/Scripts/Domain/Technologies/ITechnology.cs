@@ -16,6 +16,8 @@ namespace DataModel.Technology
         Improved,
         Excellent,
         Superior,
+        Top,
+        Ultra,
     }
 
     public static class CraftItemQualityExtensions
@@ -32,6 +34,10 @@ namespace DataModel.Technology
                     return defaultLevel + Mathf.Max(3, defaultLevel/7);
                 case CraftItemQuality.Superior:
                     return defaultLevel + Mathf.Max(5, defaultLevel/5);
+                case CraftItemQuality.Top :
+                    return defaultLevel + Mathf.Max(10, defaultLevel/3);
+                case CraftItemQuality.Ultra :
+                    return defaultLevel + Mathf.Max(20, defaultLevel/2);
                 default:
                     throw new InvalidEnumArgumentException();
             }

@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using GameDatabase.DataModel;
 using GameDatabase.Enums;
+using ModestTree;
 
 namespace Constructor.Component
 {
@@ -13,6 +14,12 @@ namespace Constructor.Component
             if (!component.Restrictions.ShipSizes.IsEmpty && !component.Restrictions.ShipSizes.Contains(ship.SizeClass)) return false;
             if (component.Restrictions.NotForMechanicShips && !ship.IsBionic) return false;
             if (component.Restrictions.NotForOrganicShips && ship.IsBionic) return false;
+
+            if(!component.Restrictions.NotForShipId.IsEmpty() && component.Restrictions.NotForShipId.Contains(ship.OriginalShip)) return false;
+            if(!component.Restrictions.OnlyForShipId.IsEmpty() && !component.Restrictions.OnlyForShipId.Contains(ship.OriginalShip)) return false;
+
+            if (component.Restrictions.MinCellAmount > 0 && ship.Layout.CellCount + ship.SecondLayout.CellCount < component.Restrictions.MinCellAmount) return false;
+            if (component.Restrictions.MaxCellAmount > 0 && ship.Layout.CellCount + ship.SecondLayout.CellCount > component.Restrictions.MaxCellAmount) return false;
 
             if (component.Device != null && !IsCompatibleDevice(component.Device, ship)) return false;
             if (component.Weapon != null && !IsCompatibleWeapon(component, ship)) return false;

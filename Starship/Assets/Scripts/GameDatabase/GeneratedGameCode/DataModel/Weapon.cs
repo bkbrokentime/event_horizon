@@ -42,7 +42,8 @@ namespace GameDatabase.DataModel
 			WeaponClass = serializable.WeaponClass;
 			FireRate = UnityEngine.Mathf.Clamp(serializable.FireRate, 0f, 100f);
 			Spread = UnityEngine.Mathf.Clamp(serializable.Spread, 0f, 360f);
-			Magazine = UnityEngine.Mathf.Clamp(serializable.Magazine, 0, 2147483647);
+			SwingRate = UnityEngine.Mathf.Clamp(serializable.SwingRate, -1f, 1f);
+			Magazine = UnityEngine.Mathf.Clamp(serializable.Magazine, 0, 999999999);
 			ActivationType = serializable.ActivationType;
 			ShotSound = new AudioClipId(serializable.ShotSound);
 			ChargeSound = new AudioClipId(serializable.ChargeSound);
@@ -55,6 +56,7 @@ namespace GameDatabase.DataModel
 		public WeaponClass WeaponClass;
 		public float FireRate;
 		public float Spread;
+		public float SwingRate;
 		public int Magazine;
 		public ActivationType ActivationType;
 		public AudioClipId ShotSound;

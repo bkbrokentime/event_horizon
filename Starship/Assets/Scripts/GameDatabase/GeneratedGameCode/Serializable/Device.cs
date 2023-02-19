@@ -19,6 +19,7 @@ namespace GameDatabase.Serializable
 		public float EnergyConsumption;
 		public float PassiveEnergyConsumption;
 		public float Power;
+		public int Quantity;
 		public float Range;
 		public float Size;
 		public float Cooldown;
@@ -29,6 +30,12 @@ namespace GameDatabase.Serializable
 		public string Sound;
 		public string EffectPrefab;
 		public string ObjectPrefab;
+		public bool UseMyIcon;
+		public string ObjectIconImage;
+		public UnityEngine.Vector2 ObjectOffset;
+		public string SecondObjectIconImage;
+		public UnityEngine.Vector2 SecondObjectOffset;
 		public string ControlButtonIcon;
+		public int EquipmentStatsId;
 	}
 }

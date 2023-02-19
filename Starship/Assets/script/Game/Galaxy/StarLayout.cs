@@ -5,47 +5,47 @@ using System.Collections.Generic;
 namespace GameModel
 {
 	public static class StarLayout
-	{
-		public static int PositionToId(int x, int y)
+    {
+        public static int PositionToId(int x, int y)
 		{
 			var distance = Math.Max(Math.Abs(x), Math.Abs(y));
-			var length = distance*2 + 1;
-			var id = length*length - 1;
-			
+			var length = distance * 2 + 1;
+			var id = length * length - 1;
+
 			if (y == -distance)
 				id -= distance + x;
 			else if (y == distance)
 				id -= distance + length + x;
 			else if (x == -distance)
-				id -= 2*length + (y + distance - 1)*2;
+				id -= 2 * length + (y + distance - 1) * 2;
 			else if (x == distance)
-				id -= 2*length + (y + distance - 1)*2 + 1;
-			
+				id -= 2 * length + (y + distance - 1) * 2 + 1;
+
 			return id;
 		}
-		
+
 		public static void IdToPosition(int id, out int x, out int y)
 		{
 			var length = (int)Math.Floor(Math.Sqrt(id)) + 1;
 			if (length % 2 == 0) length++;
-			var distance = (length - 1)/2;
-			
-			id = length*length - 1 - id;
-			
+			var distance = (length - 1) / 2;
+
+			id = length * length - 1 - id;
+
 			if (id < length)
 			{
 				y = -distance;
 				x = id - distance;
 			}
-			else if (id < 2*length)
+			else if (id < 2 * length)
 			{
 				y = distance;
 				x = id - distance - length;
 			}
 			else
 			{
-				x = (id - 2*length) % 2 == 0 ? -distance : distance;
-				y = (id - 2*length) / 2 - distance + 1;
+				x = (id - 2 * length) % 2 == 0 ? -distance : distance;
+				y = (id - 2 * length) / 2 - distance + 1;
 			}
 		}
 
@@ -53,8 +53,8 @@ namespace GameModel
 		{
 			int x,y;
 			StarLayout.IdToPosition(id, out x, out y);
-			var offset = y % 2 == 0 ? 0.0f : 0.5f;
-			return new Vector2((x+offset)*_stepX, y*_stepY) + GetStarOffset(id, gameseed);
+			var offset = nooffset ? 0 : y % 2 == 0 ? 0.0f : 0.5f;
+			return new Vector2((x + offset) * _stepX, y * (nooffset ? 1.0f : _stepY)) + GetStarOffset(id, gameseed);
 		}
 
         public static int GetStarLevel(int id, int gameseed)
@@ -148,24 +148,32 @@ namespace GameModel
 
 		public static int Distance(int x0, int y0, int x1, int y1)
 		{
+            
 			var dy = Math.Abs(y0-y1);
 			var odd = y0 % 2 == 0;
-			var dx = x1 >= x0 ? x1-x0 + (odd ? dy + 1 : dy)/2 : x0-x1 + (odd ? dy : dy + 1)/2;
-
-			return Math.Max(dx,dy);
+			var dx = x1 >= x0 ? x1 - x0 + (odd ? dy + 1 : dy) / 2 : x0 - x1 + (odd ? dy : dy + 1) / 2;
+			return Math.Max(dx, dy);
+			
+			/*
+            var dy = Math.Abs(y0 - y1);
+			var dx = Math.Abs(x0 - x1) + dy / 2 + dy % 2;
+            return Math.Max(dx, dy);
+			*/
 		}
 
 		public static float DistanceX { get { return _stepX; } }
-		public static float DistanceY { get { return _stepY; } }
+		public static float DistanceY { get { return nooffset ? 1.0f : _stepY; } }
 
 		private static Vector2 GetStarOffset(int id, int gameseed)
 		{
             UnityEngine.Random.InitState(gameseed + id);
-            return UnityEngine.Random.insideUnitCircle * _offset;
+			return nooffset ? Vector2.zero : UnityEngine.Random.insideUnitCircle * _offset;
         }
 
+
+		private const bool nooffset = false;
 	    private const float _offset = 0.3f;
 	    private const float _stepX = 1.0f;
-	    private static readonly float _stepY = Mathf.Sqrt(3)/2;
+		private static readonly float _stepY = Mathf.Sqrt(3)/2;
 	}
 }

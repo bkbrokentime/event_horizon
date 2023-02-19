@@ -3,7 +3,6 @@ using GameServices.LevelManager;
 using GameServices.Player;
 using Services.Gui;
 using Services.Messenger;
-using Utils;
 using Zenject;
 
 namespace GameStateMachine.States
@@ -42,7 +41,7 @@ namespace GameStateMachine.States
 			}
 			else
 			{
-				OptimizedDebug.Log("RetreatState: Finished");
+				UnityEngine.Debug.Log("RetreatState: Finished");
 
 				_session.StarMap.PlayerPosition = _destination;
 				StateMachine.UnloadActiveState();
@@ -53,7 +52,7 @@ namespace GameStateMachine.States
 
 		protected override void OnLoad()
 		{
-            OptimizedDebug.Log("RetreatState: Started - " + _destination);
+            UnityEngine.Debug.Log("RetreatState: Started - " + _destination);
             var starId = _starMap.GetNearestVisited(_source, true);
 			_destination = starId < 0 ? _session.StarMap.LastPlayerPosition : starId;
 			_motherShip.ViewMode = ViewMode.StarMap;

@@ -68,6 +68,7 @@ namespace Domain.Quests
                 TimeoutBehaviour = Model.Military.TimeoutBehaviour.NextEnemy,
                 CanSelectShips = true,
                 CanCallEnemies = true,
+                CanCallAllies = true,
                 AsteroidsEnabled = true,
                 PlanetEnabled = true,
                 InitialEnemies = 1,

@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 114000010069122448}
   - component: {fileID: 114000010859888800}
   - component: {fileID: 60000010857374654}
+  - component: {fileID: 114174053076160710}
   m_Layer: 0
   m_Name: f0s2
   m_TagString: Untagged
@@ -62,7 +63,6 @@ SpriteRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -209,3 +209,19 @@ PolygonCollider2D:
       - {x: -0.27148438, y: -0.16992188}
       - {x: -0.26428223, y: -0.31170654}
       - {x: -0.18164062, y: -0.16992188}
+--- !u!114 &114174053076160710
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000012209423772}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f8c6fe8fc912254b83cf553c9281a9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ArmorPoints: 0
+  EnergyPoints: 0
+  ShieldPoints: 0
+  EnergyShieldPoints: 0

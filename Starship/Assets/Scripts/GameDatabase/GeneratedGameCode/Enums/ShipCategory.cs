@@ -17,5 +17,6 @@ namespace GameDatabase.Enums
 		Starbase,
 		Hidden,
 		Drone,
+		SuperFlagship,
 	}
 }

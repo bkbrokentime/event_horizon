@@ -25,7 +25,7 @@ namespace Combat.Factory
 
         public ISystem Create(IWeaponPlatform platform, IDroneBayData droneBayData, IShip mothership, IDroneReplicator droneReplicator)
         {
-            var dronebay = new DroneBay(platform, mothership, droneBayData, _shipFactory, _database.ShipSettings, droneReplicator);
+            var dronebay = new DroneBay(platform, mothership, droneBayData, _shipFactory, _database.ShipSettings, droneReplicator, mothership);
             var stats = droneBayData.DroneBay;
 
             if (stats.LaunchEffectPrefab)

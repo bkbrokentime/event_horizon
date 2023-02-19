@@ -1,5 +1,4 @@
-﻿using System;
-using Combat.Collision;
+﻿using Combat.Collision;
 using Combat.Collision.Behaviour;
 using Combat.Collision.Manager;
 using Combat.Component.Features;
@@ -18,7 +17,6 @@ using Combat.Component.Unit.Classification;
 using Combat.Component.Triggers;
 using Combat.Unit;
 using Constructor;
-using UnityEngine;
 
 namespace Combat.Component.Ship
 {
@@ -37,10 +35,7 @@ namespace Combat.Component.Ship
         protected Ship(IShipSpecification spec, UnitType type, IBody body, IView view, IStats stats, ICollider collider, PhysicsManager physics)
             : base(type, body, view, collider, physics)
         {
-            // TODO: make them moddable? or constants?
-            body.SetVelocityLimit(50f);
-            // 7 rotations per second
-            body.SetAngularVelocityLimit(360 * 7);
+            body.SetVelocityLimit(50f); // TODO
             AddResource(_systems = new ShipSystems(this));
             AddResource(_effects = new ShipEffects(this));
             AddResource(_collisionBehaviour = new DefaultCollisionBehaviour(spec.Stats.RammingDamageMultiplier));
@@ -135,6 +130,14 @@ namespace Combat.Component.Ship
             if (statsModification != null)
                 Stats.Modifications.Add(statsModification);
 
+            var statsWeaponModification = system.StatsWeaponModification;
+            if (statsWeaponModification != null)
+                Stats.WeaponModifications.Add(statsWeaponModification);
+
+            var statsAttenuationModification = system.StatsAttenuationModifications;
+            if (statsAttenuationModification != null)
+                Stats.StatsAttenuationModifications.Add(statsAttenuationModification);
+
             var trigger = system.UnitAction;
             if (trigger != null)
                 AddTrigger(trigger);
@@ -160,6 +163,14 @@ namespace Combat.Component.Ship
             var statsModification = shipEffect.StatsModification;
             if (statsModification != null)
                 Stats.Modifications.Add(statsModification);
+
+            var statsWeaponModification = shipEffect.StatsWeaponModification;
+            if (statsWeaponModification != null)
+                Stats.WeaponModifications.Add(statsWeaponModification);
+
+            var statsAttenuationModification = shipEffect.StatsAttenuationModifications;
+            if (statsAttenuationModification != null)
+                Stats.StatsAttenuationModifications.Add(statsAttenuationModification);
 
             var trigger = shipEffect.UnitAction;
             if (trigger != null)

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DebugLogSetting;
+using GameDatabase.DataModel;
 using GameModel.Serialization;
 using Utils;
 using Zenject;
@@ -25,11 +27,16 @@ namespace Session.Content
             _specialResourcesChangedTrigger = specialResourcesChangedTrigger;
 
             IsChanged = true;
-			_money = 100;
-			_stars = 0;
+			_money = 5000;
+            _stars = 20;
             _tokens = 0;
-			_fuel = GameServices.Player.MotherShip.FuelMinimum;
+            _fuel = GameServices.Player.MotherShip.FuelMinimum;
 
+			Statsbackup(5000, out _moneybackup);
+            Statsbackup(20, out _starsbackup);
+            Statsbackup(0, out _tokensbackup);
+			Statsbackup(GameServices.Player.MotherShip.FuelMinimum, out _fuelbackup);
+			
             if (buffer != null && buffer.Length > 0)
                 Deserialize(buffer);
 
@@ -40,65 +47,140 @@ namespace Session.Content
         public const string Name = "resources";
 
         public bool IsChanged { get; private set; }
-		public static int CurrentVersion { get { return 5; } }
+		public static int CurrentVersion { get { return 6; } }
 
 		public int Money 
 		{
-			get { return _money; }
+			get 
+			{
+				if (_money == Statsgetbackup(_moneybackup))
+				{
+					return _money;
+				}
+				else
+				{
+					return 0;
+				}
+			}
 			set
 			{
                 if (_money == value)
                     return;
-
-			    IsChanged = true;
-				_money = value; 
-                _moneyValueChangedTrigger.Fire(_money);
-			}
+				if (_money == Statsgetbackup(_moneybackup))
+				{
+					IsChanged = true;
+					_money = value;
+                    Statsbackup(_money, out _moneybackup);
+                    _moneyValueChangedTrigger.Fire(_money);
+				}
+				else
+				{
+					_money = 0;
+                    //Statsbackup(_money, out _moneybackup);
+                }
+            }
 		}
 		
 		public int Fuel
 		{
-			get { return _fuel; }
+            get
+            {
+                if (_fuel == Statsgetbackup(_fuelbackup))
+                {
+                    return _fuel;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
 			set
 			{
-                if (_fuel == value)
-                    return;
+				if (_fuel == value)
+					return;
+				if (_fuel == Statsgetbackup(_fuelbackup))
+				{
 
-				IsChanged = true;
-				_fuel = value;
-                _fuelValueChangedTrigger.Fire(_fuel);
-			}
-		}
+					IsChanged = true;
+					_fuel = value;
+					Statsbackup(_fuel, out _fuelbackup);
+					_fuelValueChangedTrigger.Fire(_fuel);
+				}
+                else
+                {
+                    _fuel = 0;
+                    //Statsbackup(_fuel, out _fuelbackup);
+                }
+            }
+        }
 
         public int Tokens
         {
-            get { return _tokens; }
+            get
+            {
+                if (_tokens == Statsgetbackup(_tokensbackup))
+                {
+                    return _fuel;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
             set
             {
                 if (_tokens == value)
                     return;
+                if (_tokens == Statsgetbackup(_tokensbackup))
+                {
 
-                IsChanged = true;
-                _tokens = value;
-                _tokensValueChangedTrigger.Fire(_tokens);
+                    IsChanged = true;
+                    _tokens = value;
+                    Statsbackup(_tokens, out _tokensbackup);
+                    _tokensValueChangedTrigger.Fire(_tokens);
+                }
+                else
+                {
+                    _tokens = 0;
+                    //Statsbackup(_tokens, out _tokensbackup);
+                }
             }
         }
 
         public int Stars
 		{
-			get { return _stars; }
-			set
-			{
+            get
+            {
+                if (_stars == Statsgetbackup(_starsbackup))
+                {
+                    return _stars;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+            set
+            {
                 if (_stars == value)
                     return;
+                if (_stars == Statsgetbackup(_starsbackup))
+                {
 
-			    IsChanged = true;
-				_stars = value; 
-                _starsValueChangedTrigger.Fire();
-			}
-		}
+                    IsChanged = true;
+                    _stars = value;
+                    Statsbackup(_stars, out _starsbackup);
+                    _starsValueChangedTrigger.Fire();
+                }
+                else
+                {
+                    _stars = 0;
+                    //Statsbackup(_stars, out _starsbackup);
+                }
+            }
+        }
 
-	    public IGameItemCollection<int> Resources { get { return _resources; } }
+        public IGameItemCollection<int> Resources { get { return _resources; } }
 
 		public IEnumerable<byte> Serialize()
 		{
@@ -118,6 +200,15 @@ namespace Session.Content
 		    foreach (var value in Helpers.Serialize(_resources))
 		        yield return value;
 
+		    foreach (var value in Helpers.Serialize(_moneybackup)) // 备份
+		        yield return value;
+		    foreach (var value in Helpers.Serialize(_fuelbackup))
+		        yield return value;
+		    foreach (var value in Helpers.Serialize(_starsbackup))
+		        yield return value;
+		    foreach (var value in Helpers.Serialize(_tokensbackup))
+		        yield return value;
+
 		    foreach (var value in Helpers.Serialize(0)) // reserved
 		        yield return value;
 		    foreach (var value in Helpers.Serialize(0))
@@ -128,33 +219,44 @@ namespace Session.Content
 		        yield return value;
         }
 
-        private void Deserialize(byte[] buffer)
+		private void Deserialize(byte[] buffer)
 		{
 			if (buffer == null || buffer.Length == 0)
-                throw new ArgumentException();
+				throw new ArgumentException();
 
 			int index = 0;
 			var version = Helpers.DeserializeInt(buffer, ref index);
 			if (version != CurrentVersion && !TryUpgrade(ref buffer, version))
 			{
-				OptimizedDebug.Log("ResourcesData: incorrect data version");
-                throw new ArgumentException();
-            }
+				UnityEngine.Debug.Log("ResourcesData: incorrect data version");
+				throw new ArgumentException();
+			}
 
 			_money = Helpers.DeserializeInt(buffer, ref index);
 			_fuel = Helpers.DeserializeInt(buffer, ref index);
 			_stars = Helpers.DeserializeInt(buffer, ref index);
-            _tokens = Helpers.DeserializeInt(buffer, ref index);
-		    _resources.Assign(Helpers.DeserializeDictionary(buffer, ref index));
+			_tokens = Helpers.DeserializeInt(buffer, ref index);
 
-#if UNITY_EDITOR
-			OptimizedDebug.Log("ResourcesData: money = " + _money);
-			OptimizedDebug.Log("ResourcesData: fuel = " + _fuel);
-			OptimizedDebug.Log("ResourcesData: stars = " + _stars);
-            OptimizedDebug.Log("ResourcesData: tokens = " + _tokens);
-#endif
+			_resources.Assign(Helpers.DeserializeDictionary(buffer, ref index));
 
-            IsChanged = false;
+			_moneybackup = Helpers.DeserializeInt(buffer, ref index);
+			_fuelbackup = Helpers.DeserializeInt(buffer, ref index);
+			_starsbackup = Helpers.DeserializeInt(buffer, ref index);
+			_tokensbackup = Helpers.DeserializeInt(buffer, ref index);
+
+			if (OtherDebugLogSetting.ResourceDebugLog)
+			{
+				UnityEngine.Debug.Log("ResourcesData: money = " + _money);
+				UnityEngine.Debug.Log("ResourcesData: fuel = " + _fuel);
+				UnityEngine.Debug.Log("ResourcesData: stars = " + _stars);
+				UnityEngine.Debug.Log("ResourcesData: tokens = " + _tokens);
+				UnityEngine.Debug.Log("ResourcesData: moneybackup = " + _moneybackup);
+				UnityEngine.Debug.Log("ResourcesData: fuelbackup = " + _fuelbackup);
+				UnityEngine.Debug.Log("ResourcesData: starsbackup = " + _starsbackup);
+				UnityEngine.Debug.Log("ResourcesData: tokensbackup = " + _tokensbackup);
+			}
+
+			IsChanged = false;
 		}
 
 		private static bool TryUpgrade(ref byte[] data, int version)
@@ -182,6 +284,12 @@ namespace Session.Content
 		        data = Upgrade_4_5(data).ToArray();
 		        version = 5;
 		    }
+
+			if(version == 5)
+            {
+                data = Upgrade_5_6(data).ToArray();
+                version = 6;
+            }
 
             return version == CurrentVersion;
 		}
@@ -274,6 +382,7 @@ namespace Session.Content
 	        var stars = Helpers.DeserializeInt(buffer, ref index);
 	        var tokens = Helpers.DeserializeInt(buffer, ref index);
 
+
 	        foreach (var value in Helpers.Serialize(money))
 	            yield return value;
 	        foreach (var value in Helpers.Serialize(fuel))
@@ -298,7 +407,56 @@ namespace Session.Content
 	        foreach (var value in Helpers.Serialize(resources))
 	            yield return value;
 
+            foreach (var value in Helpers.Serialize(0)) // reserved
+	            yield return value;
 	        foreach (var value in Helpers.Serialize(0)) // reserved
+	            yield return value;
+	        foreach (var value in Helpers.Serialize(0)) // reserved
+	            yield return value;
+	        foreach (var value in Helpers.Serialize(0)) // reserved
+	            yield return value;
+        }
+	    private static IEnumerable<byte> Upgrade_5_6(byte[] buffer)
+	    {
+	        int index = 0;
+
+	        Helpers.DeserializeInt(buffer, ref index); // version
+	        foreach (var value in Helpers.Serialize(6))
+	            yield return value;
+
+	        var money = Helpers.DeserializeInt(buffer, ref index);
+	        var fuel = Helpers.DeserializeInt(buffer, ref index);
+	        var stars = Helpers.DeserializeInt(buffer, ref index);
+	        var tokens = Helpers.DeserializeInt(buffer, ref index);
+
+
+	        foreach (var value in Helpers.Serialize(money))
+	            yield return value;
+	        foreach (var value in Helpers.Serialize(fuel))
+	            yield return value;
+	        foreach (var value in Helpers.Serialize(stars))
+	            yield return value;
+	        foreach (var value in Helpers.Serialize(tokens))
+	            yield return value;
+
+			var resources = Helpers.DeserializeDictionary(buffer, ref index);
+            foreach (var value in Helpers.Serialize(resources))
+	            yield return value;
+
+            Statsbackup(money, out var _moneybackup);
+            Statsbackup(fuel, out var _fuelbackup);
+            Statsbackup(stars, out var _starsbackup);
+            Statsbackup(tokens, out var _tokensbackup);
+            foreach (var value in Helpers.Serialize(_moneybackup)) // 备份
+                yield return value;
+            foreach (var value in Helpers.Serialize(_fuelbackup))
+                yield return value;
+            foreach (var value in Helpers.Serialize(_starsbackup))
+                yield return value;
+            foreach (var value in Helpers.Serialize(_tokensbackup))
+                yield return value;
+
+            foreach (var value in Helpers.Serialize(0)) // reserved
 	            yield return value;
 	        foreach (var value in Helpers.Serialize(0)) // reserved
 	            yield return value;
@@ -314,6 +472,15 @@ namespace Session.Content
 	        _specialResourcesChangedTrigger.Fire();
 	    }
 
+		private static void Statsbackup(int stats,out int backupstats)
+		{
+			backupstats = stats ^ 0x12345678;
+        }
+		private static int Statsgetbackup(int backupstats)
+		{
+			return backupstats ^ 0x12345678;
+        }
+
         private ObscuredInt _money;
 		private ObscuredInt _fuel;
 		private ObscuredInt _stars;
@@ -328,6 +495,11 @@ namespace Session.Content
 	    private readonly ResourcesChangedSignal.Trigger _specialResourcesChangedTrigger;
 
         private static readonly int _mask = new System.Random((int)DateTime.Now.Ticks).Next();
+
+		private int _moneybackup;
+		private int _fuelbackup;
+		private int _starsbackup;
+		private int _tokensbackup;
 	}
 
     public class MoneyValueChangedSignal : SmartWeakSignal<int> { public class Trigger : TriggerBase { } }

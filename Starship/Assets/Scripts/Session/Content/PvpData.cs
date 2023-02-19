@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using GameModel.Serialization;
 using UnityEngine;
-using Utils;
 using Zenject;
 
 namespace Session.Content
@@ -87,7 +86,7 @@ namespace Session.Content
             var version = Helpers.DeserializeInt(buffer, ref index);
             if (version != CurrentVersion && !TryUpgrade(ref buffer, version))
             {
-                OptimizedDebug.LogError("PvpData: incorrect data version");
+                Debug.LogError("PvpData: incorrect data version");
                 throw new ArgumentException();
             }
 
@@ -116,7 +115,7 @@ namespace Session.Content
 
         private static IEnumerable<byte> Upgrade_1_2(byte[] buffer)
         {
-            OptimizedDebug.Log("PvpData.Upgrade_1_2");
+            UnityEngine.Debug.Log("PvpData.Upgrade_1_2");
 
             var index = 0;
             Helpers.DeserializeInt(buffer, ref index);

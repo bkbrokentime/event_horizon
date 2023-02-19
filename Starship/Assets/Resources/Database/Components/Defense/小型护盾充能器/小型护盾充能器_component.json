@@ -1,0 +1,17 @@
+{
+  "ItemType": 1,
+  "Id": 333,
+  "Name": "小型护盾充能器",
+  "DisplayCategory": 2,
+  "Availability": 1,
+  "ComponentStatsId": 333,
+  "Level": 25,
+  "Icon": "shield_generator1",
+  "Color": "#99DCFF",
+  "Layout": "1",
+  "CellType": "2",
+  "PossibleModifications": [
+    1,
+    12
+  ]
+}

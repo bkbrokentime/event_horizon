@@ -1,5 +1,7 @@
 ﻿using Constructor;
+using DebugLogSetting;
 using GameServices.Player;
+using Model;
 using Services.Localization;
 using Services.Reources;
 using UnityEngine;
@@ -19,7 +21,7 @@ namespace Economy.ItemType
         }
 
         public string Id { get { return "c" + Component.SerializeToInt64(); } }
-        public string Name { get { return Component.GetName(_localization); } }
+        public string Name { get { return Component.GetName(_localization, true); } }
         public string Description { get { return Component.CreateModification().GetDescription(_localization); } }
         public Sprite GetIcon(IResourceLocator resourceLocator) { return resourceLocator.GetSprite(Component.Data.Icon); }
         public Color Color { get { return Component.Data.Color; } }

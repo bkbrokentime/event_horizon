@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Utils;
 using Zenject;
 
 namespace Combat.Ai
@@ -26,7 +25,7 @@ namespace Combat.Ai
 
 		public void Dispose()
 		{
-			OptimizedDebug.Log("AiManager.Dispose");
+            UnityEngine.Debug.Log("AiManager.Dispose");
 			StopTask();
 		}
 

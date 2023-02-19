@@ -53,6 +53,26 @@ namespace GameServices.Database
             {
                 return _session.Fleet.Ships.Any(item => item.Experience >= Maths.Experience.MaxPlayerExperience);
             }
+            if (type == SkillType.RequierementMaxLevel2)
+            {
+                return _session.Fleet.Ships.Any(item => item.Experience >= Maths.Experience.MaxPlayerExperience2);
+            }
+            if (type == SkillType.RequierementLevel_80)
+            {
+                return _session.Fleet.Ships.Any(item => item.Experience >= Maths.Experience.PlayerExperience_80);
+            }
+            if (type == SkillType.RequierementLevel_100)
+            {
+                return _session.Fleet.Ships.Any(item => item.Experience >= Maths.Experience.PlayerExperience_100);
+            }
+            if (type == SkillType.RequierementLevel_120)
+            {
+                return _session.Fleet.Ships.Any(item => item.Experience >= Maths.Experience.PlayerExperience_120);
+            }
+            if (type == SkillType.RequierementLevel_30)
+            {
+                return _session.Fleet.Ships.Any(item => item.Experience >= Maths.Experience.PlayerExperience_30);
+            }
 
             if (type == SkillType.RequierementBeatAllEnemies)
             {

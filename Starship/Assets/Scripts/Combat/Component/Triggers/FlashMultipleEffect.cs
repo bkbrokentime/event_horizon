@@ -1,10 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Combat.Component.Body;
-using Combat.Component.Systems.Devices;
+﻿using Combat.Component.Body;
 using Combat.Factory;
 using GameDatabase.Model;
-using Gui.Utils;
 using UnityEngine;
 
 namespace Combat.Component.Triggers
@@ -28,17 +24,12 @@ namespace Combat.Component.Triggers
 
         public bool TryInvokeEffect(ConditionType condition)
         {
-            IEnumerable<IBody> bodies;
-            bodies = WormTailDevice.Dependencies.TryGetValue(_body, out var values) ? values.Alive() : new[] { _body };
-            foreach (var body in bodies)
-            {
-                var effect = _effectFactory.CreateEffect(_effectId);
-                effect.Position = body.WorldPosition();
-                effect.Rotation = body.WorldRotation();
-                effect.Size = _size * body.Scale / _body.Scale;
-                effect.Color = _color;
-                effect.Run(_lifetime, body.WorldVelocity()*_velocityMultiplier, body.WorldAngularVelocity());
-            }
+            var effect = _effectFactory.CreateEffect(_effectId);
+            effect.Position = _body.WorldPosition();
+            effect.Rotation = _body.WorldRotation();
+            effect.Size = _size;
+            effect.Color = _color;
+            effect.Run(_lifetime, _body.WorldVelocity()*_velocityMultiplier, _body.WorldAngularVelocity());
             return false;
         }
 

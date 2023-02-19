@@ -4,24 +4,57 @@ using Database.Legacy;
 using GameDatabase.DataModel;
 using GameDatabase.Enums;
 
+
 namespace Constructor.Ships
 {
     public class ShipValidator
     {
         public static bool IsAvailableForPlayer(IShip ship)
         {
-            if (ship.ExtraThreatLevel != DifficultyClass.Default)
+            if (ship.ExtraThreatLevel != DifficultyClass.Default || ship.ExtraEnhanceLevel != EnhancementLevel.Default)
                 return false;
 
             if (ship.Components.Any(item => item.Info.Data.Availability == Availability.None))
                 return false;
 
-            if (ship.FirstSatellite != null)
-                if (ship.FirstSatellite.Components.Any(item => item.Info.Data.Availability == Availability.None))
+            if (ship.Satellite_Left_1 != null)
+                if (ship.Satellite_Left_1.Components.Any(item => item.Info.Data.Availability == Availability.None))
                     return false;
 
-            if (ship.SecondSatellite != null)
-                if (ship.SecondSatellite.Components.Any(item => item.Info.Data.Availability == Availability.None))
+            if (ship.Satellite_Right_1 != null)
+                if (ship.Satellite_Right_1.Components.Any(item => item.Info.Data.Availability == Availability.None))
+                    return false;
+
+            if (ship.Satellite_Left_2 != null)
+                if (ship.Satellite_Left_2.Components.Any(item => item.Info.Data.Availability == Availability.None))
+                    return false;
+
+            if (ship.Satellite_Right_2 != null)
+                if (ship.Satellite_Right_2.Components.Any(item => item.Info.Data.Availability == Availability.None))
+                    return false;
+
+            if (ship.Satellite_Left_3 != null)
+                if (ship.Satellite_Left_3.Components.Any(item => item.Info.Data.Availability == Availability.None))
+                    return false;
+
+            if (ship.Satellite_Right_3 != null)
+                if (ship.Satellite_Right_3.Components.Any(item => item.Info.Data.Availability == Availability.None))
+                    return false;
+
+            if (ship.Satellite_Left_4 != null)
+                if (ship.Satellite_Left_4.Components.Any(item => item.Info.Data.Availability == Availability.None))
+                    return false;
+
+            if (ship.Satellite_Right_4 != null)
+                if (ship.Satellite_Right_4.Components.Any(item => item.Info.Data.Availability == Availability.None))
+                    return false;
+
+            if (ship.Satellite_Left_5 != null)
+                if (ship.Satellite_Left_5.Components.Any(item => item.Info.Data.Availability == Availability.None))
+                    return false;
+
+            if (ship.Satellite_Right_5 != null)
+                if (ship.Satellite_Right_5.Components.Any(item => item.Info.Data.Availability == Availability.None))
                     return false;
 
             return true;
@@ -41,6 +74,7 @@ namespace Constructor.Ships
                 {
                     if (item.Ammunition.EnergyCost > stats.EnergyPoints)
                         return false;
+
                     weaponCount++;
                 }
 
@@ -72,11 +106,35 @@ namespace Constructor.Ships
                 return false;
             if (ship.Components.Any(item => IsForbiddenOnArena(ship, item)))
                 return false;
-            if (ship.FirstSatellite != null)
-                if (ship.FirstSatellite.Components.Any(item => IsForbiddenOnArena(ship, item)))
+            if (ship.Satellite_Left_1 != null)
+                if (ship.Satellite_Left_1.Components.Any(item => IsForbiddenOnArena(ship, item)))
                     return false;
-            if (ship.SecondSatellite != null)
-                if (ship.SecondSatellite.Components.Any(item => IsForbiddenOnArena(ship, item)))
+            if (ship.Satellite_Right_1 != null)
+                if (ship.Satellite_Right_1.Components.Any(item => IsForbiddenOnArena(ship, item)))
+                    return false;
+            if (ship.Satellite_Left_2 != null)
+                if (ship.Satellite_Left_2.Components.Any(item => IsForbiddenOnArena(ship, item)))
+                    return false;
+            if (ship.Satellite_Right_2 != null)
+                if (ship.Satellite_Right_2.Components.Any(item => IsForbiddenOnArena(ship, item)))
+                    return false;
+            if (ship.Satellite_Left_3 != null)
+                if (ship.Satellite_Left_3.Components.Any(item => IsForbiddenOnArena(ship, item)))
+                    return false;
+            if (ship.Satellite_Right_3 != null)
+                if (ship.Satellite_Right_3.Components.Any(item => IsForbiddenOnArena(ship, item)))
+                    return false;
+            if (ship.Satellite_Left_4 != null)
+                if (ship.Satellite_Left_4.Components.Any(item => IsForbiddenOnArena(ship, item)))
+                    return false;
+            if (ship.Satellite_Right_4 != null)
+                if (ship.Satellite_Right_4.Components.Any(item => IsForbiddenOnArena(ship, item)))
+                    return false;
+            if (ship.Satellite_Left_5 != null)
+                if (ship.Satellite_Left_5.Components.Any(item => IsForbiddenOnArena(ship, item)))
+                    return false;
+            if (ship.Satellite_Right_5 != null)
+                if (ship.Satellite_Right_5.Components.Any(item => IsForbiddenOnArena(ship, item)))
                     return false;
             
             return IsShipViable(ship, settings);

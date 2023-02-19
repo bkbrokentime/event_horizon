@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using GameModel.Serialization;
 using UnityEngine;
-using Utils;
 using Zenject;
 
 namespace Services.Storage
@@ -35,7 +34,7 @@ namespace Services.Storage
             }
             catch (Exception e)
             {
-                OptimizedDebug.Log("Failed to load from local copy");
+                UnityEngine.Debug.Log("Failed to load from local copy");
             }
 #endif
             return false;
@@ -66,7 +65,7 @@ namespace Services.Storage
             }
             catch (Exception e)
             {
-                OptimizedDebug.Log(e.Message);
+                UnityEngine.Debug.Log(e.Message);
             }
         }
 

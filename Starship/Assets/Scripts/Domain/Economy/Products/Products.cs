@@ -62,7 +62,7 @@ namespace Economy.Products
     public class RandomComponentProduct : IProduct
     {
         public RandomComponentProduct(IDatabase database, ItemTypeFactory factory, ISessionData session, PlayerResources resources, int marketId, int itemId, int itemLevel,
-            Constructor.ComponentQuality maxQuality, Faction itemFaction, bool allowRare, long renewalTime, bool premium = false, float priceScale = 2f)
+            Constructor.ComponentQuality maxQuality, Faction itemFaction, bool allowRare, bool blackmarket, long renewalTime, bool premium = false, float priceScale = 2f)
         {
             _factory = factory;
             _session = session;
@@ -75,7 +75,7 @@ namespace Economy.Products
             Quantity = 1 - purchase.CalculateQuantity(renewalTime, System.DateTime.UtcNow.Ticks);
 
             var random = new System.Random(marketId + 123456789 * itemId + (int)purchase.Time);
-            _type = _factory.CreateComponentItem(Constructor.ComponentInfo.CreateRandom(database, itemLevel, itemFaction, random, allowRare, maxQuality), premium);
+            _type = _factory.CreateComponentItem(Constructor.ComponentInfo.CreateRandom(database, itemLevel, itemFaction, random, allowRare, blackmarket, maxQuality), premium);
         }
 
         public void Buy(int amount)
@@ -129,7 +129,7 @@ namespace Economy.Products
             if (!price.TryWithdraw(_playerResources))
             	throw new System.InvalidOperationException();
 
-            if (price.Currency != Currency.None)
+            if (price.Currency != Currency.Money && price.Currency != Currency.None)
                 _purchasedCount += amount;
 
             Type.Consume(amount);
@@ -224,7 +224,8 @@ namespace Economy.Products
             if (!price.TryWithdraw(_playerResources))
             	throw new System.InvalidOperationException();
 
-            _purchasedCount += amount;
+            if (price.Currency != Currency.Money)
+                _purchasedCount += amount;
 
             _session.Shop.SetPurchase(_marketId, Type.Id, _purchasedCount);
 

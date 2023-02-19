@@ -14,9 +14,12 @@
     <string name="MilitaryPower">军力</string>
     <string name="Paused">暂停</string>
     <string name="Resume">返回</string>
+    <string name="HideRadarMap">隐藏小地图</string>
+    <string name="OpenRadarMap">显示小地图</string>
     <string name="Surrender">逃跑</string>
     <string name="ChangeShip">更换飞船</string>
     <string name="NextEnemy">下个敌人</string>
+    <string name="NextAlly">请求支援</string>
     <string name="LeaveCombatConfirmation">如果你离开战斗，你的飞船会损毁，你确定要继续吗？</string>
     <string name="FleetPanelHeader">机库</string>
     <string name="ModulePanelHeader">组件</string>
@@ -76,10 +79,12 @@
     <string name="CivilianUnderAttackEventAction1">援助他们</string>
     <string name="WelcomeText">欢迎来到\nEvent Horizon!</string>
     <string name="ChallengePanelHeader">挑战</string>
-    <string name="ChallengeDescription">挑战比一般的战斗要难，你不能自己选择出战飞船。</string>
     <string name="ChallengeCompleted">挑战完成</string>
     <string name="SurvivalPanelHeader">生存</string>
     <string name="SurvivalDescription">你生存的时间越长，获得的奖励越丰厚。</string>
+    <string name="EndlessnessPanelHeader">无尽</string>
+    <string name="EndlessnessDescription">无限制舰队战，你的所有舰船都将参战，当然，敌人数量也十分庞大。</string>
+	
     <string name="ArenaPanelHeader">竞技场</string>
     <string name="ArenaDescription">如果你想在这里战斗，你不得不付费。注意！只能选一艘船进行战斗。</string>
     <string name="BossPanelHeader">旗舰</string>
@@ -89,6 +94,9 @@
     <string name="RuinsDescription">你找到了一个废弃的空间站.</string>
     <string name="EnterRuins">探索</string>
     <string name="RuinsExplored">完成</string>
+    <string name="FortificationDescription">发现一处防御要塞.</string>
+    <string name="AttackFortification">摧毁</string>
+    <string name="FortificationExplored">已被摧毁</string>
     <string name="EmptyPanelHeader">信息</string>
     <string name="EmtySystemDescription">这里什么都没有.</string>
     <string name="MultiplayerPanelHeader">决斗</string>
@@ -142,7 +150,6 @@
     <string name="RequiredFuel">需要燃料：</string>
     <string name="MilitaryBase">$1军事基地</string>
     <string name="MilitaryBaseDescription">你可以在这里提升你的飞船等级，但是不能超过这个基地的等级。</string>
-    <string name="MaxLevelReached">到达最高等级！</string>
     <string name="ResearchPanelHeader">科技</string>
     <string name="LabHeader">实验室</string>
     <string name="LabDescription">你可以在这里购买临时的增益。</string>
@@ -157,6 +164,7 @@
     <string name="SpeedUp">加速</string>
     <string name="LoadDatabase">载入外部数据库</string>
     <string name="RestoreDatabase">还原数据库</string>
+    <string name="ReloadDatabase">重载数据库</string>
     <string name="DatabaseLoaded">模组载入成功</string>
     <string name="DatabaseLoadingError">错误: $1</string>
     <string name="DailyReward">每日奖励</string>

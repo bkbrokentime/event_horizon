@@ -26,6 +26,7 @@ namespace Domain.Quests
                     return 0;
                 case QuestOriginType.CurrentFactionBase:
                     return _regionMap.GetStarRegion(currentStarId).HomeStar;
+                    //return _regionMap.GetRandomSizeStarRegion(currentStarId).HomeStar;
                 case QuestOriginType.RandomStar:
                     return GetRandomStar(currentStarId, seed);
                 case QuestOriginType.RandomFactionBase:

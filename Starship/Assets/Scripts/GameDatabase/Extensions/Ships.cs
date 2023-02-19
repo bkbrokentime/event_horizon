@@ -12,20 +12,64 @@ namespace GameDatabase.Extensions
         {
             return ships.Where(item => !item.NotAvailableInGame);
         }
+        public static IEnumerable<ShipBuild> NotAvailable(this IEnumerable<ShipBuild> ships)
+        {
+            return ships.Where(item => item.NotAvailableInGame);
+        }
 
         public static IEnumerable<ShipBuild> Playable(this IEnumerable<ShipBuild> ships)
         {
             return ships.Where(item => !item.NotAvailableInGame && item.DifficultyClass == DifficultyClass.Default);
         }
+        public static IEnumerable<ShipBuild> NotPlayable(this IEnumerable<ShipBuild> ships)
+        {
+            return ships.Where(item => !item.NotAvailableInGame && item.DifficultyClass > DifficultyClass.Default);
+        }
 
+        public static IEnumerable<ShipBuild> Drones(this IEnumerable<ShipBuild> ships)
+        {
+            return ships.Where(item => item.Ship.ShipCategory == ShipCategory.Drone);
+        }
         public static IEnumerable<ShipBuild> Flagships(this IEnumerable<ShipBuild> ships)
         {
             return ships.Where(item => item.Ship.ShipCategory == ShipCategory.Flagship);
         }
+        public static IEnumerable<ShipBuild> SuperFlagship(this IEnumerable<ShipBuild> ships)
+        {
+            return ships.Where(item => item.Ship.ShipCategory == ShipCategory.SuperFlagship);
+        }
+        public static IEnumerable<ShipBuild> FlagshipsandSuperFlagship(this IEnumerable<ShipBuild> ships)
+        {
+            return ships.Where(item => item.Ship.ShipCategory == ShipCategory.SuperFlagship || item.Ship.ShipCategory == ShipCategory.Flagship);
+        }
 
+        public static IEnumerable<ShipBuild> Frigates(this IEnumerable<ShipBuild> ships)
+        {
+            return ships.Where(item => item.Ship.SizeClass == SizeClass.Frigate);
+        }
+        public static IEnumerable<ShipBuild> Destroyers(this IEnumerable<ShipBuild> ships)
+        {
+            return ships.Where(item => item.Ship.SizeClass == SizeClass.Destroyer);
+        }
+        public static IEnumerable<ShipBuild> Cruisers(this IEnumerable<ShipBuild> ships)
+        {
+            return ships.Where(item => item.Ship.SizeClass == SizeClass.Cruiser);
+        }
+        public static IEnumerable<ShipBuild> Battleships(this IEnumerable<ShipBuild> ships)
+        {
+            return ships.Where(item => item.Ship.SizeClass == SizeClass.Battleship);
+        }
         public static IEnumerable<ShipBuild> Titans(this IEnumerable<ShipBuild> ships)
         {
             return ships.Where(item => item.Ship.SizeClass == SizeClass.Titan);
+        }
+        public static IEnumerable<ShipBuild> Dominates(this IEnumerable<ShipBuild> ships)
+        {
+            return ships.Where(item => item.Ship.SizeClass == SizeClass.Dominate);
+        }
+        public static IEnumerable<ShipBuild> TitansandDominate(this IEnumerable<ShipBuild> ships)
+        {
+            return ships.Where(item => item.Ship.SizeClass == SizeClass.Dominate || item.Ship.SizeClass == SizeClass.Titan);
         }
 
         public static IEnumerable<ShipBuild> Common(this IEnumerable<ShipBuild> ships)
@@ -99,10 +143,6 @@ namespace GameDatabase.Extensions
         {
             return ships.Where(item => item.Ship.SizeClass <= maxSize && item.Ship.SizeClass >= minSize);
         }
-        public static IEnumerable<ShipBuild> OfCategory(this IEnumerable<ShipBuild> ships, ShipCategory category)
-        {
-            return ships.Where(item => item.Ship.ShipCategory == category);
-        }
 
         public static IEnumerable<ShipBuild> LessOrEqualClass(this IEnumerable<ShipBuild> ships,
             DifficultyClass shipClass)
@@ -120,7 +160,7 @@ namespace GameDatabase.Extensions
         {
             var maxSize = Maths.Distance.ToShipSize(distance);
             return ships.Where(item =>
-                item.Ship.Layout.CellCount <=
+                item.Ship.Layout.CellCount + item.Ship.SecondLayout.CellCount <=
                 Mathf.Max(maxSize, DatabaseStatistics.SmallestShipSize(item.Ship.Faction)));
         }
 
@@ -130,9 +170,11 @@ namespace GameDatabase.Extensions
             var maxShipClass = Maths.Distance.MaxShipClass(distance);
             var minShipClass = Maths.Distance.MinShipClass(distance);
             return ships.Where(item =>
-                item.Ship.Layout.CellCount <=
+                item.Ship.Layout.CellCount + item.Ship.SecondLayout.CellCount <=
                 Mathf.Max(maxSize, DatabaseStatistics.SmallestShipSize(item.Ship.Faction)) &&
                 item.DifficultyClass <= maxShipClass && item.DifficultyClass >= minShipClass);
         }
+
+
     }
 }

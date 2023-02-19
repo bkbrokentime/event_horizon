@@ -29,5 +29,10 @@ namespace GameDatabase.Enums
 		ClonningCenter,
 		TimeMachine,
 		Jammer,
+		CombustionInhibition,
+		EnergyDiversion,
+		Denseshield,
+		FireAssault,
+		Equipment,
 	}
 }

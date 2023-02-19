@@ -15,6 +15,7 @@ using GameDatabase.DataModel;
 using GameModel.Quests;
 using Session.Content;
 using UniRx;
+using Constructor.Satellites;
 
 namespace GameStateMachine.States
 {
@@ -252,7 +253,7 @@ namespace GameStateMachine.States
 
 		    if (guardian.IsAggressive)
 		    {
-		        OptimizedDebug.Log("Attacked by occupants");
+		        UnityEngine.Debug.Log("Attacked by occupants");
 		        guardian.Attack();
                 return true;
             }
@@ -396,6 +397,10 @@ namespace GameStateMachine.States
     }
 
     public class OpenConstructorSignal : SmartWeakSignal<IShip>
+    {
+        public class Trigger : TriggerBase { }
+    }
+    public class OpenSatelliteConstructorSignal : SmartWeakSignal<ISatellite>
     {
         public class Trigger : TriggerBase { }
     }

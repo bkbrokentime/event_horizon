@@ -24,7 +24,7 @@ namespace Economy.ItemType
         public string Name { get { return _localization.GetString(_ship.OriginalName); } }
         public string Description { get { return string.Empty; } }
         public Sprite GetIcon(IResourceLocator resourceLocator) { return resourceLocator.GetSprite(_ship.ModelImage); }
-        public Price Price { get { return Price.Common(_ship.Layout.CellCount * _ship.Layout.CellCount); } }
+        public Price Price { get { return Price.Common(_ship.Layout.CellCount * _ship.Layout.CellCount + _ship.SecondLayout.CellCount * _ship.SecondLayout.CellCount); } }
         public Color Color { get { return ColorTable.QualityColor(Quality); } }
         public ItemQuality Quality { get { return _ship.Quality(); } }
 

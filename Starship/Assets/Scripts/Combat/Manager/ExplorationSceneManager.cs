@@ -29,8 +29,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using Zenject;
 using IShip = Combat.Component.Ship.IShip;
-using Constructor.Ships;
-using Utils;
+
 
 namespace Combat.Manager
 {
@@ -76,19 +75,24 @@ namespace Combat.Manager
 
         [Inject] private readonly Settings _settings;
         [Inject] private readonly Gui.Combat.RadarPanel _radarPanel;
+        [Inject] private readonly Gui.Combat.RadarMapPanel _radarMapPanel;
 
         private void OnShipCreated(IShip ship)
         {
-            if (ship.Type.Class != UnitClass.Ship)
+            if (ship.Type.Class != UnitClass.Ship && ship.Type.Class != UnitClass.Drone)
                 return;
 
             switch (ship.Type.Side)
             {
                 case UnitSide.Player:
-                    _shipControlsPanel.Load(ship);
+                    if (ship.Type.Class == UnitClass.Ship)
+                        _shipControlsPanel.Load(ship);
+                    _radarMapPanel.Add(ship);
                     break;
                 case UnitSide.Enemy:
-                    _radarPanel.Add(ship);
+                    if (ship.Type.Class == UnitClass.Ship)
+                        _radarPanel.Add(ship);
+                    _radarMapPanel.Add(ship);
                     break;
             }
         }
@@ -104,7 +108,7 @@ namespace Combat.Manager
 
         private void OnPlayerDocked(int stationId)
         {
-            OptimizedDebug.Log("OnPlayerDocked - " + stationId);
+            Debug.Log("OnPlayerDocked - " + stationId);
 
             if (!_objectives.ContainsKey(stationId)) return;
             _guiManager.OpenWindow(Gui.Exploration.WindowNames.ScanningPanel, code => { if (code == WindowExitCode.Ok) OnScanCompleted(stationId); });
@@ -112,24 +116,25 @@ namespace Combat.Manager
 
         private void OnObjectiveDestroyed(int id)
         {
-            OptimizedDebug.Log("OnObjectiveDestroyed - " + id);
+            Debug.Log("OnObjectiveDestroyed - " + id);
             OnScanCompleted(id);
         }
 
         private void OnPlayerUndocked(int stationId)
         {
-            OptimizedDebug.Log("OnPlayerUndocked - " + stationId);
+            Debug.Log("OnPlayerUndocked - " + stationId);
         }
 
         private void OnScanCompleted(int stationId)
         {
-            OptimizedDebug.Log("OnScanCompleted- " + stationId);
+            Debug.Log("OnScanCompleted- " + stationId);
 
             if (!_objectives.TryGetValue(stationId, out var unit))
                 return;
 
             _objectives.Remove(stationId);
             _radarPanel.RemoveBeacon(unit);
+            _radarMapPanel.RemoveBeacon(unit);
             _exploration.Complete(stationId);
 
             var objective = _exploration.Objectives[stationId];
@@ -174,7 +179,9 @@ namespace Combat.Manager
         {
             foreach (var ship in _scene.Ships.Items)
                 if (ship.Type.Side.IsEnemy(UnitSide.Player))
-                    ship.Affect(new Impact { Effects = CollisionEffect.Destroy });
+                {
+                    ship.Affect(new Impact(new GameDatabase.Model.AllDamageData(), 0, 0, new Impulse(), CollisionEffect.Destroy));
+                }
         }
 
         public void Initialize()
@@ -182,6 +189,7 @@ namespace Combat.Manager
             CreatePlayerShip();
             //_guiManager.OpenWindow(Gui.Notifications.WindowNames.MessageBalloon, new WindowArgs(_localization.GetKey("$ExplorationLevelMessage")));
             _radarPanel.Initialize(_scene.Units.Items);
+            _radarMapPanel.Initialize(_scene.Units.Items);
             BuildLevel();
         }
 
@@ -191,7 +199,7 @@ namespace Combat.Manager
 
         private void CreatePlayerShip()
         {
-            var spec = _playerSkills != null ? _playerFleet.ExplorationShip.BuildSpecAndApplySkills(_playerSkills, _database.ShipSettings) : _playerFleet.ExplorationShip.CreateBuilder().Build(_database.ShipSettings);
+            var spec = _playerFleet.ExplorationShip.CreateBuilder().Build(_database.ShipSettings);
             var controllerFactory = new KeyboardController.Factory(_keyboard);
             var ship = _shipFactory.CreateShip(spec, controllerFactory, UnitSide.Player, Vector2.zero, new System.Random().Next(360));
 
@@ -206,16 +214,19 @@ namespace Combat.Manager
             CreateEnvironment(_exploration.Seed + 3);
         }
 
+        private float EnemyActivationDistance { get { return _enemyActivationDistance * (1 - _playerSkills.StealthRadar); } }
+        private float EnemyDeactivationDistance { get { return _enemyDeactivationDistance * (1 - _playerSkills.JammingRadar); } }
+
         private void CreateEnemies(int seed)
         {
             var random = new System.Random(seed);
             foreach (var enemy in _exploration.EnemyShips)
             {
                 var position = Vector2.zero;
-                while (position.SqrDistance(Vector2.zero) < _enemyActivationDistance * _enemyActivationDistance)
+                while (position.SqrDistance(Vector2.zero) < EnemyActivationDistance * EnemyActivationDistance)
                     position = new Vector2(random.NextFloatSigned() * 0.5f * _scene.Settings.AreaWidth, random.NextFloatSigned() * 0.5f * _scene.Settings.AreaHeight);
 
-                var spawner = new EnemySpawner(position, _enemyActivationDistance, _enemyDeactivationDistance, _scene, enemy, _shipFactory, _effectFactory, _spaceObjectFactory);
+                var spawner = new EnemySpawner(position, EnemyActivationDistance, EnemyDeactivationDistance, _scene, enemy, _shipFactory, _effectFactory, _spaceObjectFactory);
                 _scene.AddUnit(spawner);
                 _sceneObjects.Add(spawner);
             }
@@ -228,8 +239,8 @@ namespace Combat.Manager
             Assert.IsTrue(objectives.Count < mapSize * mapSize);
 
             var random = new System.Random(seed);
-            var positions = EnumerableExtension.RandomUniqueNumbers(1, mapSize * mapSize, objectives.Count, random).Shuffle(random);
-            for (var i = 0; i < positions.Count; ++i)
+            var positions = EnumerableExtension.RandomUniqueNumbers(1, mapSize * mapSize, objectives.Count, random).ToArray();
+            for (var i = 0; i < positions.Length; ++i)
             {
                 var objective = objectives[i];
                 if (_exploration.IsCompleted(objective)) continue;
@@ -279,7 +290,7 @@ namespace Combat.Manager
                         {
                             var size = 5 + random.NextFloat()*10;
                             var item = _exploration.HasSolidGround
-                                ? _spaceObjectFactory.CreatePlanetaryVolcano(position, rotation, size, Color.Lerp(_exploration.PlanetColor, Color.black, 0.1f))
+                                ? _spaceObjectFactory.CreatePlanetaryVolcano(position, rotation, size, /*Color.Lerp(_exploration.PlanetColor, Color.black, 0.1f)*/_exploration.PlanetTypeColor)
                                 : _spaceObjectFactory.CreatePlanetaryVortex(position, size, _exploration.GetGasCloudColor(i));
 
                             item.AddTrigger(new PlayerDockingAction(_messenger, i));
@@ -290,7 +301,7 @@ namespace Combat.Manager
                         {
                             var size = 5 + random.NextFloat() * 10;
                             var item = _exploration.HasSolidGround
-                                ? _spaceObjectFactory.CreatePlanetaryVolcano2(position, rotation, size, Color.Lerp(_exploration.PlanetColor, Color.black, 0.1f))
+                                ? _spaceObjectFactory.CreatePlanetaryVolcano2(position, rotation, size,/* Color.Lerp(_exploration.PlanetColor, Color.black, 0.1f)*/_exploration.PlanetTypeColor)
                                 : _spaceObjectFactory.CreatePlanetaryVortex(position, size, _exploration.GetGasCloudColor(i));
 
                             item.AddTrigger(new PlayerDockingAction(_messenger, i));
@@ -301,16 +312,26 @@ namespace Combat.Manager
                         {
                             var builder = _exploration.GetOutpost(objective.Seed);
                             var action = new UnitDestroyedAction(_messenger, i);
-                            unit = new EnemySpawner(position, _enemyActivationDistance, _enemyDeactivationDistance, _scene, builder, _shipFactory, _effectFactory, _spaceObjectFactory, action);
+                            unit = new EnemySpawner(position, EnemyActivationDistance, EnemyDeactivationDistance, _scene, builder, _shipFactory, _effectFactory, _spaceObjectFactory, action);
                             _scene.AddUnit(unit);
 
-                            var turretCount = 1 + random.Next(4);
-                            for (var j = 0; j < turretCount; ++j)
+                            int turretgroup = 1 + random.Next(3);
+                            int[] turretCount = new int[4];
+                            turretCount[0] = 1 + random.Next(5);
+                            turretCount[1] = turretCount[0] + 2 + random.Next(4);
+                            turretCount[2] = turretCount[1] + 3 + random.Next(3);
+                            turretCount[3] = turretCount[2] + 4 + random.Next(2);
+                            for (int k = 0; k < turretgroup; k++)
                             {
-                                var turretPosition = position + RotationHelpers.Direction(rotation + j*360/turretCount) * 10;
-                                var turretBuilder = _exploration.GetTurret(objective.Seed + j);
-                                var turret = new EnemySpawner(turretPosition, _enemyActivationDistance, _enemyDeactivationDistance, _scene, turretBuilder, _shipFactory, _effectFactory, _spaceObjectFactory);
-                                _scene.AddUnit(turret);
+                                for (var j = 0; j < turretCount[k]; ++j)
+                                {
+                                    var turretPosition = position + RotationHelpers.Direction(rotation + j * 360 / turretCount[k]) * 10 * (1 + (float)k / 2);
+                                    var turretBuilder = _exploration.GetTurret(objective.Seed + j);
+                                    var turret = new EnemySpawner(turretPosition, EnemyActivationDistance, EnemyDeactivationDistance, _scene, turretBuilder, _shipFactory, _effectFactory, _spaceObjectFactory);
+                                    turret.RecoveryTıme = 30;
+                                    turret.Parent = unit;
+                                    _scene.AddUnit(turret);
+                                }
                             }
                         }
                         break;
@@ -318,18 +339,26 @@ namespace Combat.Manager
                         {
                             var builder = _exploration.GetHive(objective.Seed);
                             var action = new UnitDestroyedAction(_messenger, i);
-                            unit = new EnemySpawner(position, _enemyActivationDistance, _enemyDeactivationDistance, _scene, builder, _shipFactory, _effectFactory, _spaceObjectFactory, action);
+                            unit = new EnemySpawner(position, EnemyActivationDistance, EnemyDeactivationDistance, _scene, builder, _shipFactory, _effectFactory, _spaceObjectFactory, action);
                             _scene.AddUnit(unit);
 
-                            var guardianCount = 1 + random.Next(4);
-                            for (var j = 0; j < guardianCount; ++j)
+                            int guardiangroup = 1 + random.Next(3);
+                            int[] guardianCount = new int[4];
+                            guardianCount[0] = 1 + random.Next(5);
+                            guardianCount[1] = guardianCount[0] + 2 + random.Next(4);
+                            guardianCount[2] = guardianCount[1] + 3 + random.Next(3);
+                            guardianCount[3] = guardianCount[2] + 4 + random.Next(2);
+                            for (int k = 0; k < guardiangroup; k++)
                             {
-                                var turretPosition = position + RotationHelpers.Direction(rotation + j * 360 / guardianCount) * 10;
-                                var turretBuilder = _exploration.GetHiveGuardian(random);
-                                var guardian = new EnemySpawner(turretPosition, _enemyActivationDistance, _enemyDeactivationDistance, _scene, turretBuilder, _shipFactory, _effectFactory, _spaceObjectFactory);
-                                guardian.RecoveryTıme = 30;
-                                guardian.Parent = unit;
-                                _scene.AddUnit(guardian);
+                                for (var j = 0; j < guardianCount[k]; ++j)
+                                {
+                                    var turretPosition = position + RotationHelpers.Direction(rotation + j * 360 / guardianCount[k]) * 10 * (1 + (float)k / 2);
+                                    var turretBuilder = _exploration.GetHiveGuardian(random);
+                                    var guardian = new EnemySpawner(turretPosition, EnemyActivationDistance, EnemyDeactivationDistance, _scene, turretBuilder, _shipFactory, _effectFactory, _spaceObjectFactory);
+                                    guardian.RecoveryTıme = 10;
+                                    guardian.Parent = unit;
+                                    _scene.AddUnit(guardian);
+                                }
                             }
                         }
                         break;
@@ -337,7 +366,8 @@ namespace Combat.Manager
                         throw new ArgumentException();
                 }
 
-                _radarPanel.AddBeacon(unit);
+                _radarPanel.AddBeacon(unit, objective.Type);
+                _radarMapPanel.AddBeacon(unit, objective.Type);
                 _sceneObjects.Add(unit);
                 _objectives.Add(i, unit);
             }
@@ -354,7 +384,8 @@ namespace Combat.Manager
                 var position = new Vector2(x, y);
                 var size = 5 + random.Next(10);
                 var rotation = random.Next(360);
-                var color = Color.Lerp(_exploration.PlanetColor, Color.black, 0.1f);
+                //var color = Color.Lerp(_exploration.PlanetColor, Color.black, 0.1f);
+                var color = _exploration.PlanetTypeColor;
 
                 var type = _exploration.GetEnvironmentObject(random);
                 switch (type)
@@ -394,7 +425,7 @@ namespace Combat.Manager
         private readonly Dictionary<int, IUnit> _objectives = new Dictionary<int, IUnit>();
         private readonly List<IUnit> _sceneObjects = new List<IUnit>();
 
-        private const float _enemyActivationDistance = 75f;
-        private const float _enemyDeactivationDistance = 100f;
+        private const float _enemyActivationDistance = 150f;
+        private const float _enemyDeactivationDistance = 300f;
     }
 }

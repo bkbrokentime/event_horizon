@@ -46,13 +46,12 @@ namespace Gui.Exploration
             _shipSelectedEvent.Invoke(ship.Ship);
         }
 
-        private static bool IsShipAllowed(IShip ship)
+        private bool IsShipAllowed(IShip ship)
         {
-            if (ship.Model.SizeClass == SizeClass.Frigate) return true;
+            return _playerFleet.CanExploration(ship);
             //if (ship.Id.Value == 103) return true; // wormship
             //if (ship.Id.Value == 78) return true; // scavenger
 
-            return false;
         }
     }
 }

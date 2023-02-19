@@ -16,5 +16,17 @@ namespace GameDatabase.Enums
 		MashineGun,
 		MultiShot,
 		RequiredCharging,
+		BarrageCannon_Swing,
+		BarrageCannon_SwingUnilateral,
+		BarrageMultishot,
+		BarrageMultishot_Swing,
+		BarrageMultishot_SwingUnilateral,
+		BarrageMultishot_SwingBilateral,
+		BarrageMachineGun_Swing,
+		BarrageMachineGun_SwingUnilateral,
+		HeavyMachineGun,
+		HailOfBullets,
+		HailOfBullets_Multishot,
+		ChargeableMultishot,
 	}
 }

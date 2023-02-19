@@ -15,7 +15,6 @@ namespace Combat.Ai
 		{
 			var ship = context.Ship;
 			var enemy = context.Enemy;
-			if (AttackHelpers.CantDetectTarget(ship, enemy)) return;
 
 			Vector2 target;
 			float timeInterval;

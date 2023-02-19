@@ -106,7 +106,7 @@
 //			}
 //			catch (System.Exception e)
 //			{
-//				OptimizedDebug.Log(e.Message);
+//				UnityEngine.Debug.Log(e.Message);
 //				_builder.Create(name);
 //				continue;
 //			}
@@ -120,7 +120,7 @@
 //		Builder.TaskResult result;
 //		while (_builder.TryGetResult(out result))
 //		{
-//			OptimizedDebug.Log("BackgroundManager: texture generated for " + result.Type);
+//			UnityEngine.Debug.Log("BackgroundManager: texture generated for " + result.Type);
 //			_textures[result.Type] = result.Builder.Get();
 //		}
 //	}
@@ -138,7 +138,7 @@
 //			}
 //			catch (System.Exception e)
 //			{
-//				OptimizedDebug.Log(e.Message);
+//				UnityEngine.Debug.Log(e.Message);
 //				continue;
 //			}
 //		}*/

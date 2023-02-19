@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Utils;
 
 namespace Services.Unity
 {
@@ -26,7 +25,7 @@ namespace Services.Unity
             }
             catch (Exception e)
             {
-                OptimizedDebug.LogException(e);
+                UnityEngine.Debug.LogException(e);
             }
         }
 

@@ -8,12 +8,12 @@ PlayerSettings:
   AndroidProfiler: 0
   AndroidFilterTouchesWhenObscured: 0
   AndroidEnableSustainedPerformanceMode: 0
-  defaultScreenOrientation: 4
+  defaultScreenOrientation: 2
   targetDevice: 2
   useOnDemandResources: 0
   accelerometerFrequency: 60
-  companyName: ZipasGames
-  productName: Event Horizon
+  companyName: "\u788E"
+  productName: "\u788E\u788E\u89C6\u754C"
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0, g: 0, b: 0, a: 1}
@@ -43,6 +43,12 @@ PlayerSettings:
   - logo: {fileID: 21300000, guid: 8525ecd79bd54ab4d897bf0f086a02d0, type: 3}
     duration: 3
   m_VirtualRealitySplashScreen: {fileID: 0}
+  m_ShowUnitySplashAds: 0
+  m_AdsAndroidGameId: 
+  m_AdsIosGameId: 
+  m_ShowSplashAdsSlogan: 0
+  m_SloganImage: {fileID: 0}
+  m_SloganHeight: 150
   m_HolographicTrackingLossScreen: {fileID: 0}
   defaultScreenWidth: 1024
   defaultScreenHeight: 768
@@ -70,7 +76,7 @@ PlayerSettings:
   androidBlitType: 0
   defaultIsNativeResolution: 1
   macRetinaSupport: 1
-  runInBackground: 0
+  runInBackground: 1
   captureSingleScreen: 0
   muteOtherAudioSources: 0
   Prepare IOS For Recording: 0
@@ -117,13 +123,14 @@ PlayerSettings:
   switchNVNMaxPublicTextureIDCount: 0
   switchNVNMaxPublicSamplerIDCount: 0
   vulkanEnableSetSRGBWrite: 0
+  useSecurityBuild: 0
   m_SupportedAspectRatios:
     4:3: 1
     5:4: 1
     16:10: 1
     16:9: 1
     Others: 1
-  bundleVersion: 1.9.4
+  bundleVersion: 1.0.5
   preloadedAssets:
   - {fileID: 0}
   - {fileID: 0}
@@ -167,12 +174,13 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
-    Android: com.ZipasGames.EventHorizon
-    Standalone: unity.ZipasGames.Event Horizon
+    Android: com.suisui.EventHorizon
+    Standalone: unity.suisui.EventHorizon
     Tizen: com.ZipasGames.EventHorizon
     iPhone: com.ZipasGames.EventHorizon
     tvOS: com.ZipasGames.EventHorizon
   buildNumber:
+    Standalone: 1.0.5
     iPhone: 27
   AndroidBundleVersionCode: 109400
   AndroidMinSdkVersion: 19
@@ -261,11 +269,11 @@ PlayerSettings:
   clonedFromGUID: 00000000000000000000000000000000
   templatePackageId: 
   templateDefaultScene: 
-  AndroidTargetArchitectures: 3
+  AndroidTargetArchitectures: 1
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
-  AndroidKeystoreName: D:/Projects/EventHorizon/Starship/license.keystore
-  AndroidKeyaliasName: event_horizon
+  AndroidKeystoreName: "D:/unity\u9879\u76EE/\u788E\u788E\u89C6\u754C/user.keystore"
+  AndroidKeyaliasName: 
   AndroidBuildApkPerCpuArchitecture: 0
   AndroidTVCompatibility: 1
   AndroidIsGame: 1
@@ -282,7 +290,7 @@ PlayerSettings:
   - m_BuildTarget: 
     m_Icons:
     - serializedVersion: 2
-      m_Icon: {fileID: 2800000, guid: 307b9f1d5b44be247832b8e3a7fc2fad, type: 3}
+      m_Icon: {fileID: 2800000, guid: a5de042ddab798d4ea5b4584fe1a637e, type: 3}
       m_Width: 128
       m_Height: 128
       m_Kind: 0
@@ -383,6 +391,43 @@ PlayerSettings:
       m_Width: 1024
       m_Height: 1024
       m_Kind: 4
+  - m_BuildTarget: Standalone
+    m_Icons:
+    - serializedVersion: 2
+      m_Icon: {fileID: 2800000, guid: a5de042ddab798d4ea5b4584fe1a637e, type: 3}
+      m_Width: 1024
+      m_Height: 1024
+      m_Kind: 0
+    - serializedVersion: 2
+      m_Icon: {fileID: 0}
+      m_Width: 512
+      m_Height: 512
+      m_Kind: 0
+    - serializedVersion: 2
+      m_Icon: {fileID: 0}
+      m_Width: 256
+      m_Height: 256
+      m_Kind: 0
+    - serializedVersion: 2
+      m_Icon: {fileID: 0}
+      m_Width: 128
+      m_Height: 128
+      m_Kind: 0
+    - serializedVersion: 2
+      m_Icon: {fileID: 2800000, guid: a5de042ddab798d4ea5b4584fe1a637e, type: 3}
+      m_Width: 48
+      m_Height: 48
+      m_Kind: 0
+    - serializedVersion: 2
+      m_Icon: {fileID: 0}
+      m_Width: 32
+      m_Height: 32
+      m_Kind: 0
+    - serializedVersion: 2
+      m_Icon: {fileID: 0}
+      m_Width: 16
+      m_Height: 16
+      m_Kind: 0
   m_BuildTargetPlatformIcons:
   - m_BuildTarget: Android
     m_Icons:
@@ -598,6 +643,9 @@ PlayerSettings:
   - m_BuildTarget: iPhone
     m_StaticBatching: 1
     m_DynamicBatching: 1
+  m_BuildTargetEncrypting:
+  - m_BuildTarget: Android
+    m_UseSecurityBuild: 0
   m_BuildTargetGraphicsAPIs:
   - m_BuildTarget: AndroidPlayer
     m_APIs: 08000000
@@ -925,16 +973,18 @@ PlayerSettings:
     iPhone: 2
   scriptingBackend:
     Android: 0
-    Standalone: 0
+    Standalone: 1
     Windows Store Apps: 2
     iPhone: 1
   il2cppCompilerConfiguration: {}
-  managedStrippingLevel: {}
+  managedStrippingLevel:
+    Standalone: 1
   incrementalIl2cppBuild: {}
   allowUnsafeCode: 0
   additionalIl2CppArgs: 
   scriptingRuntimeVersion: 1
-  apiCompatibilityLevelPerPlatform: {}
+  apiCompatibilityLevelPerPlatform:
+    Standalone: 6
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
   metroPackageName: Starship

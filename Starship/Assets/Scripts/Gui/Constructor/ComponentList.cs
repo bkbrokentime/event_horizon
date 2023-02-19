@@ -65,6 +65,12 @@ namespace Gui.Constructor
             RefreshList();
         }
 
+        public void ShowEquipment()
+        {
+            _selectedNode = _rootNode.Equipment;
+            RefreshList();
+        }
+
         public void OnGroupSelected(GroupListItem item)
         {
             _selectedNode = item.Node;

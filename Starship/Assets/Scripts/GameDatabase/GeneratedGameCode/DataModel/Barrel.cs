@@ -26,13 +26,16 @@ namespace GameDatabase.DataModel
 		{
 			Position = serializable.Position;
 			Rotation = UnityEngine.Mathf.Clamp(serializable.Rotation, -360f, 360f);
-			Offset = UnityEngine.Mathf.Clamp(serializable.Offset, 0f, 3.402823E+38f);
+			Offset = UnityEngine.Mathf.Clamp(serializable.Offset, 0f, 1f);
 			PlatformType = serializable.PlatformType;
 			AutoAimingArc = UnityEngine.Mathf.Clamp(serializable.AutoAimingArc, 0f, 360f);
 			RotationSpeed = UnityEngine.Mathf.Clamp(serializable.RotationSpeed, 0f, 1000f);
 			WeaponClass = serializable.WeaponClass;
 			Image = new SpriteId(serializable.Image, SpriteId.Type.Satellite);
 			Size = UnityEngine.Mathf.Clamp(serializable.Size, 0f, 100f);
+			MoveCenterPosition = serializable.MoveCenterPosition;
+			MoveSpeed = UnityEngine.Mathf.Clamp(serializable.MoveSpeed, -360f, 360f);
+			MoveCenterRange = serializable.MoveCenterRange;
 
 			OnDataDeserialized(serializable, loader);
 		}
@@ -46,6 +49,9 @@ namespace GameDatabase.DataModel
 		public string WeaponClass { get; private set; }
 		public SpriteId Image { get; private set; }
 		public float Size { get; private set; }
+		public UnityEngine.Vector2 MoveCenterPosition { get; private set; }
+		public float MoveSpeed { get; private set; }
+		public UnityEngine.Vector2 MoveCenterRange { get; private set; }
 
 		public static Barrel DefaultValue { get; private set; }
 	}

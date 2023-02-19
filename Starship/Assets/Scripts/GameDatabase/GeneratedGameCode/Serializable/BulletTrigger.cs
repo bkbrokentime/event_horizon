@@ -29,5 +29,9 @@ namespace GameDatabase.Serializable
 		public float RandomFactor;
 		public float PowerMultiplier;
 		public int MaxNestingLevel;
+		public float Offset;
+		public float OffsetRandomFactor;
+		public float OffsetSpread;
+		public bool isShareOut;
 	}
 }

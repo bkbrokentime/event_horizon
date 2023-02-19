@@ -9,7 +9,7 @@ namespace Combat.Component.Systems.Devices
     public class BrakeDevice : SystemBase, IDevice, IEngineModification
     {
         public BrakeDevice(IShip ship, DeviceStats deviceSpec, float shipWeight)
-            : base(-1, SpriteId.Empty)
+            : base(-1, SpriteId.Empty, ship)
         {
             _power = deviceSpec.Power / Mathf.Sqrt(shipWeight);
             _ship = ship;

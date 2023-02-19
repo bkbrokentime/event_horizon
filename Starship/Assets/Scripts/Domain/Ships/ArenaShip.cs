@@ -13,8 +13,16 @@ namespace Constructor.Ships
             _name = ship.Name;
             _powerMultiplier = powerMultiplier;
             _components.Assign(ship.Components);
-            FirstSatellite = ship.FirstSatellite.CreateCopy();
-            SecondSatellite = ship.SecondSatellite.CreateCopy();
+            Satellite_Left_1 = ship.Satellite_Left_1.CreateCopy();
+            Satellite_Right_1 = ship.Satellite_Right_1.CreateCopy();
+            Satellite_Left_2 = ship.Satellite_Left_2.CreateCopy();
+            Satellite_Right_2 = ship.Satellite_Right_2.CreateCopy();
+            Satellite_Left_3 = ship.Satellite_Left_3.CreateCopy();
+            Satellite_Right_3 = ship.Satellite_Right_3.CreateCopy();
+            Satellite_Left_4 = ship.Satellite_Left_4.CreateCopy();
+            Satellite_Right_4 = ship.Satellite_Right_4.CreateCopy();
+            Satellite_Left_5 = ship.Satellite_Left_5.CreateCopy();
+            Satellite_Right_5 = ship.Satellite_Right_5.CreateCopy();
         }
 
         public override string Name
@@ -29,6 +37,7 @@ namespace Constructor.Ships
 
             builder.Bonuses.ArmorPointsMultiplier *= _powerMultiplier;
             builder.Bonuses.ShieldPointsMultiplier *= _powerMultiplier;
+            builder.Bonuses.EnergyShieldPointsMultiplier *= _powerMultiplier;
             builder.Bonuses.DamageMultiplier *= _powerMultiplier;
             builder.Bonuses.RammingDamageMultiplier *= _powerMultiplier;
 

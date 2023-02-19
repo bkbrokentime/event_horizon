@@ -15,10 +15,19 @@ namespace Constructor.Ships
         IShipModel Model { get; }
 
         IItemCollection<IntegratedComponent> Components { get; }
-        ISatellite FirstSatellite { get; set; }
-        ISatellite SecondSatellite { get; set; }
+        ISatellite Satellite_Left_1 { get; set; }
+        ISatellite Satellite_Right_1 { get; set; }
+        ISatellite Satellite_Left_2 { get; set; }
+        ISatellite Satellite_Right_2 { get; set; }
+        ISatellite Satellite_Left_3 { get; set; }
+        ISatellite Satellite_Right_3 { get; set; }
+        ISatellite Satellite_Left_4 { get; set; }
+        ISatellite Satellite_Right_4 { get; set; }
+        ISatellite Satellite_Left_5 { get; set; }
+        ISatellite Satellite_Right_5 { get; set; }
 
         DifficultyClass ExtraThreatLevel { get; }
+        EnhancementLevel ExtraEnhanceLevel { get; }
 
         Maths.Experience Experience { get; set; }
 

@@ -9,6 +9,7 @@ namespace GameDatabase.DataModel
         partial void OnDataDeserialized(SatelliteSerializable serializable, Database.Loader loader)
         {
             Barrels = new ImmutableCollection<Barrel>(BarrelConverter.Convert(Layout, serializable.Barrels));
+            UAVLaunchPlatforms = new ImmutableCollection<UAVLaunchPlatform>(UAVPlatformConverter.Convert(Layout, serializable.UAVLaunchPlatforms));
         }
     }
 }

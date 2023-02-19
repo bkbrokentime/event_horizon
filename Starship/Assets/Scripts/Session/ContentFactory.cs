@@ -16,6 +16,11 @@ namespace Session
         [Inject] private readonly PlayerSkillsResetSignal.Trigger _playerSkillResetTrigger;
         [Inject] private readonly ResourcesChangedSignal.Trigger _specialResourcesChangedTrigger;
 
+        public AchievementData CreateAchievementData(byte[] buffer)
+        {
+            return new AchievementData(buffer);
+        }
+
         public BossData CreateBossData(byte[] buffer)
         {
             return new BossData(buffer);
@@ -34,6 +39,11 @@ namespace Session
         public GameData CreateGameData(byte[] buffer)
         {
             return new GameData(buffer);
+        }
+
+        public InAppPurchasesData CreateInAppPurchasesData(byte[] buffer)
+        {
+            return new InAppPurchasesData(_starsValueChangedTrigger, buffer);
         }
 
         public InventoryData CreateInventoryData(byte[] buffer)
@@ -91,7 +101,12 @@ namespace Session
         {
             return new PvpData(buffer);
         }
-        
+
+        public SocialData CreateSocialData(byte[] buffer)
+        {
+            return new SocialData(buffer);
+        }
+
         public QuestData CreateQuestData(byte[] buffer)
         {
             return new QuestData(buffer);

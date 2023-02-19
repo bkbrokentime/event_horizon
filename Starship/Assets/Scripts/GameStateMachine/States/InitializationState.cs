@@ -10,10 +10,10 @@ using GameServices.Database;
 using GameServices.LevelManager;
 using GameServices.Settings;
 using Services.Account;
+using Services.Ads;
 using Services.Storage;
 using Session;
 using UnityEngine;
-using Utils;
 using Zenject;
 
 namespace GameStateMachine.States
@@ -23,7 +23,7 @@ namespace GameStateMachine.States
         [Inject]
         public InitializationState(IStateMachine stateMachine, GameStateFactory stateFactory, ILevelLoader levelLoader, 
             ISessionData sessionData, IDataStorage localStorage, GameSettings settings, IAccount account, IDatabase database, ITechnologies technologies, 
-            ISessionData session, IDebugManager debugManager)
+            IAdsManager adsManager, ISessionData session, IDebugManager debugManager)
             : base(stateMachine, stateFactory, levelLoader)
         {
             _sessionData = sessionData;
@@ -32,6 +32,7 @@ namespace GameStateMachine.States
             _localStorage = localStorage;
             _settings = settings;
             _account = account;
+            _adsManager = adsManager;
             _debugManager = debugManager;
         }
 
@@ -50,16 +51,16 @@ namespace GameStateMachine.States
             QualitySettings.SetQualityLevel(_settings.LowQualityMode ? 0 : 1);
 #endif
 
-            OptimizedDebug.Log (SystemInfo.operatingSystem);
-            OptimizedDebug.Log (SystemInfo.deviceModel);
-            OptimizedDebug.Log (SystemInfo.deviceType.ToString ());
-            OptimizedDebug.Log (SystemInfo.deviceName);
+            Debug.Log (SystemInfo.operatingSystem);
+            Debug.Log (SystemInfo.deviceModel);
+            Debug.Log (SystemInfo.deviceType.ToString ());
+            Debug.Log (SystemInfo.deviceName);
 
             var mod = _settings.ActiveMod;
             string error;
             if (!string.IsNullOrEmpty(mod) && _database.TryLoad(mod, out error))
             {
-                OptimizedDebug.Log("Mod loaded - " + mod);
+                Debug.Log("Mod loaded - " + mod);
             }
             else
             {
@@ -72,7 +73,7 @@ namespace GameStateMachine.States
 		{
 		    if (_database.IsEditable)
 		    {
-		        OptimizedDebug.Log("Checking ships...");
+		        Debug.Log("Checking ships...");
 
 		        //var ships = Resources.LoadAll<Constructor.ShipBuild> ("Prefabs/Constructor/Builds");
 		        //var drones = Resources.LoadAll<Constructor.ShipBuild> ("Prefabs/Constructor/DroneBuilds");
@@ -81,19 +82,25 @@ namespace GameStateMachine.States
 		            // TODO: move to database
 		            var ship = new CommonShip(item);
 		            var debug = _debugManager.CreateLog(item.Id.ToString());
-		            var layout = new Constructor.ShipLayout(item.Ship.Layout, item.Ship.Barrels, ship.Components, debug);
-		            if (layout.Components.Count() != ship.Components.Count)
+                    var layout = new Constructor.ShipLayout(item.Ship.Layout, item.Ship.Barrels, ship.Components.Where(component => component.Layout == 0), debug);
+                    var secondlayout = new Constructor.ShipLayout(item.Ship.SecondLayout, null, ship.Components.Where(component => component.Layout == 1), debug);
+		            if (layout.Components.Count() != ship.Components.Where(component => component.Layout == 0).Count())
 		            {
-		                OptimizedDebug.LogError("invalid ship layout: " + item.Id);
-		                OptimizedDebug.Break();
+		                Debug.LogError("invalid ship layout: " + item.Id);
+		                Debug.Break();
+		            }
+		            if (secondlayout.Components.Count() != ship.Components.Where(component => component.Layout == 1).Count())
+		            {
+		                Debug.LogError("invalid ship secondlayout: " + item.Id);
+		                Debug.Break();
 		            }
 
 		            if (item.Ship.ShipCategory != ShipCategory.Special &&
 		                item.Ship.ShipCategory != ShipCategory.Starbase && !item.NotAvailableInGame &&
 		                !ShipValidator.IsShipViable(new CommonShip(item), _database.ShipSettings))
 		            {
-		                OptimizedDebug.LogError("invalid build: " + item.Id);
-		                OptimizedDebug.Break();
+		                Debug.LogError("invalid build: " + item.Id);
+		                Debug.Break();
 		            }
 		        }
 
@@ -103,15 +110,21 @@ namespace GameStateMachine.States
 		            var debug = _debugManager.CreateLog(item.Id.ToString());
 		            var components = item.Components
 		                .Select<InstalledComponent, IntegratedComponent>(ComponentExtensions.FromDatabase).ToArray();
-		            var layout = new ShipLayout(item.Satellite.Layout, item.Satellite.Barrels, components, debug);
-		            if (layout.Components.Count() != components.Length)
+		            var layout = new ShipLayout(item.Satellite.Layout, item.Satellite.Barrels, components.Where(component => component.Layout == 0), debug);
+		            var secondlayout = new ShipLayout(item.Satellite.SecondLayout, null, components.Where(component => component.Layout == 1), debug);
+		            if (layout.Components.Count() != components.Where(component => component.Layout == 0).Count())
 		            {
-		                OptimizedDebug.LogError("invalid companion layout: " + item.Id);
-		                OptimizedDebug.Break();
+		                Debug.LogError("invalid companion layout: " + item.Id);
+		                Debug.Break();
+		            }
+		            if (secondlayout.Components.Count() != components.Where(component => component.Layout == 1).Count())
+		            {
+		                Debug.LogError("invalid companion secondlayout: " + item.Id);
+		                Debug.Break();
 		            }
 		        }
 
-		        OptimizedDebug.Log("Checking techs...");
+		        Debug.Log("Checking techs...");
 
 		        foreach (var tech in _database.TechnologyList)
 		        {
@@ -119,25 +132,27 @@ namespace GameStateMachine.States
                     if (index >= 0)
 		            {
 		                _debugManager.CreateLog(tech.Id.ToString()).Write("unknown dependency - " + index);
-		                OptimizedDebug.LogError("invalid tech: " + tech.Id);
+		                Debug.LogError("invalid tech: " + tech.Id);
 		            }
                 }
 
-		        OptimizedDebug.Log("...done");
+		        Debug.Log("...done");
 		    }
 
-		    OptimizedDebug.Log("InitializationState: signin - " + _settings.SignedIn);
+		    Debug.Log("InitializationState: signin - " + _settings.SignedIn);
 			if (_settings.SignedIn)
 			{
 				_account.SignIn();
 			}
 
 		    if (_localStorage.TryLoad(_sessionData, _database.Id))
-		        OptimizedDebug.Log("Saved game loaded");
+		        Debug.Log("Saved game loaded");
 		    else if (_database.IsEditable && _localStorage.TryImportOriginalSave(_sessionData, _database.Id))
-		        OptimizedDebug.Log("Original saved game imported");
+		        Debug.Log("Original saved game imported");
 		    else
 		        _sessionData.CreateNewGame(_database.Id);
+
+            _adsManager.ShowInterstital();
 
             StateMachine.LoadState(StateFactory.CreateMainMenuState());
         }
@@ -160,6 +175,7 @@ namespace GameStateMachine.States
         private readonly IDataStorage _localStorage;
         private readonly GameSettings _settings;
         private readonly IAccount _account;
+        private readonly IAdsManager _adsManager;
         private readonly IDebugManager _debugManager;
 
         public class Factory : Factory<InitializationState> { }

@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using UnityEngine;
 using Zenject;
+using DebugLogSetting;
 
 namespace Combat.Ai
 {
@@ -20,7 +21,7 @@ namespace Combat.Ai
     {
         public Keyboard()
         {
-            _actionKeys = new List<string> { "Fire1", "Fire2", "Fire3", "Fire4", "Fire5", "Fire6" };
+            _actionKeys = new List<string> { "Fire1", "Fire2", "Fire3", "Fire4", "Fire5", "Fire6", "Fire7", "Fire8", "Fire9", "Fire0" };
             _actions = new List<bool>(Enumerable.Repeat(false, _actionKeys.Count));
             Actions = _actions.AsReadOnly();
         }
@@ -51,7 +52,11 @@ namespace Combat.Ai
             Right = horizontal > 0;
 
             for (var i = 0; i < _actionKeys.Count; ++i)
+            {  
                 _actions[i] = Input.GetAxis(_actionKeys[i]) > 0;
+                if (_actions[i] && OtherDebugLogSetting.KeyPressDebugLog)
+                    Debug.Log("press " + _actionKeys[i]);
+            }  
         }
 
         private readonly List<bool> _actions;

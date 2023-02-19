@@ -16,6 +16,8 @@ namespace GameDatabase.Serializable
 	public class GalaxySettingsSerializable : SerializableItem
 	{
 		public int AbandonedStarbaseFaction;
+		public int InitialStarbaseFaction;
+		public int MotherShip;
 		public int[] StartingShipBuilds;
 	}
 }

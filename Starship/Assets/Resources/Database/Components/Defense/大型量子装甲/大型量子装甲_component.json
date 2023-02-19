@@ -1,0 +1,18 @@
+{
+  "ItemType": 1,
+  "Id": 302,
+  "Name": "大型量子装甲",
+  "DisplayCategory": 2,
+  "Availability": 1,
+  "ComponentStatsId": 302,
+  "Faction": 7,
+  "Level": 50,
+  "Icon": "armor13",
+  "Color": "#FF7FFE",
+  "Layout": "111111111",
+  "CellType": "1",
+  "PossibleModifications": [
+    1,
+    3
+  ]
+}

@@ -28,6 +28,8 @@ namespace Combat.Component.Systems
         IFeaturesModification FeaturesModification { get; }
         ISystemsModification SystemsModification { get; }
         IStatsModification StatsModification { get; }
+        IStatsWeaponModification StatsWeaponModification { get; }
+        IStatsAttenuationModification StatsAttenuationModifications { get; }
         IUnitAction UnitAction { get; }
 
         void UpdatePhysics(float elapsedTime);

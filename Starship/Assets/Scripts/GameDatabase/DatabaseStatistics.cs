@@ -32,7 +32,7 @@ namespace GameDatabase
             foreach (var ship in _database.ShipList)
             {
                 var faction = ship.Faction;
-                var shipSize = ship.Layout.CellCount;
+                var shipSize = ship.Layout.CellCount + ship.SecondLayout.CellCount;
 
                 int size;
                 if (_smallestFactionShips.TryGetValue(faction, out size) && size < shipSize)

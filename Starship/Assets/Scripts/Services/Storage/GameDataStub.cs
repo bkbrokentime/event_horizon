@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using GameModel.Serialization;
-using Utils;
 
 namespace Services.Storage
 {
@@ -54,14 +53,14 @@ namespace Services.Storage
             }
             catch (Exception e)
             {
-                OptimizedDebug.Log(e.Message);
+                UnityEngine.Debug.Log(e.Message);
                 return false;
             }
         }
 
         public void CreateNewGame(string modId, bool keepPurchases = true)
         {
-            throw new NotSupportedException();
+            throw new System.NotImplementedException();
         }
 
         private static byte[] GetSubArray(byte[] data, ref int index)

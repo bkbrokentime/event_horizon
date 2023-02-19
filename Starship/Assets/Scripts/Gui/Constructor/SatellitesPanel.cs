@@ -38,33 +38,136 @@ namespace Gui.Constructor
             UpdateItems();
         }
 
-        public void InstallOnLeft(SatelliteListItem item)
+        public void InstallOnLeft_1(SatelliteListItem item)
         {
             _installSatelliteEvent.Invoke(item.BuildId, item.Id, CompanionLocation.Left);
             UpdateItems();
         }
 
-        public void InstallOnRight(SatelliteListItem item)
+        public void InstallOnRight_1(SatelliteListItem item)
         {
             _installSatelliteEvent.Invoke(item.BuildId, item.Id, CompanionLocation.Right);
             UpdateItems();
         }
 
-        public void RemoveFromLeft()
+        public void InstallOnLeft_2(SatelliteListItem item)
+        {
+            _installSatelliteEvent.Invoke(item.BuildId, item.Id, CompanionLocation.Left_2);
+            UpdateItems();
+        }
+
+        public void InstallOnRight_2(SatelliteListItem item)
+        {
+            _installSatelliteEvent.Invoke(item.BuildId, item.Id, CompanionLocation.Right_2);
+            UpdateItems();
+        }
+
+        public void InstallOnLeft_3(SatelliteListItem item)
+        {
+            _installSatelliteEvent.Invoke(item.BuildId, item.Id, CompanionLocation.Left_3);
+            UpdateItems();
+        }
+
+        public void InstallOnRight_3(SatelliteListItem item)
+        {
+            _installSatelliteEvent.Invoke(item.BuildId, item.Id, CompanionLocation.Right_3);
+            UpdateItems();
+        }
+
+        public void InstallOnLeft_4(SatelliteListItem item)
+        {
+            _installSatelliteEvent.Invoke(item.BuildId, item.Id, CompanionLocation.Left_4);
+            UpdateItems();
+        }
+
+        public void InstallOnRight_4(SatelliteListItem item)
+        {
+            _installSatelliteEvent.Invoke(item.BuildId, item.Id, CompanionLocation.Right_4);
+            UpdateItems();
+        }
+
+        public void InstallOnLeft_5(SatelliteListItem item)
+        {
+            _installSatelliteEvent.Invoke(item.BuildId, item.Id, CompanionLocation.Left_5);
+            UpdateItems();
+        }
+
+        public void InstallOnRight_5(SatelliteListItem item)
+        {
+            _installSatelliteEvent.Invoke(item.BuildId, item.Id, CompanionLocation.Right_5);
+            UpdateItems();
+        }
+
+        public void RemoveFromLeft_1()
         {
             _installSatelliteEvent.Invoke(ItemId<SatelliteBuild>.Empty,  ItemId<Satellite>.Empty, CompanionLocation.Left);
             UpdateItems();
         }
 
-        public void RemoveFromRight()
+        public void RemoveFromRight_1()
         {
             _installSatelliteEvent.Invoke(ItemId<SatelliteBuild>.Empty, ItemId<Satellite>.Empty, CompanionLocation.Right);
+            UpdateItems();
+        }
+        public void RemoveFromLeft_2()
+        {
+            _installSatelliteEvent.Invoke(ItemId<SatelliteBuild>.Empty,  ItemId<Satellite>.Empty, CompanionLocation.Left_2);
+            UpdateItems();
+        }
+
+        public void RemoveFromRight_2()
+        {
+            _installSatelliteEvent.Invoke(ItemId<SatelliteBuild>.Empty, ItemId<Satellite>.Empty, CompanionLocation.Right_2);
+            UpdateItems();
+        }
+        public void RemoveFromLeft_3()
+        {
+            _installSatelliteEvent.Invoke(ItemId<SatelliteBuild>.Empty,  ItemId<Satellite>.Empty, CompanionLocation.Left_3);
+            UpdateItems();
+        }
+
+        public void RemoveFromRight_3()
+        {
+            _installSatelliteEvent.Invoke(ItemId<SatelliteBuild>.Empty, ItemId<Satellite>.Empty, CompanionLocation.Right_3);
+            UpdateItems();
+        }
+
+        public void RemoveFromLeft_4()
+        {
+            _installSatelliteEvent.Invoke(ItemId<SatelliteBuild>.Empty,  ItemId<Satellite>.Empty, CompanionLocation.Left_4);
+            UpdateItems();
+        }
+
+        public void RemoveFromRight_4()
+        {
+            _installSatelliteEvent.Invoke(ItemId<SatelliteBuild>.Empty, ItemId<Satellite>.Empty, CompanionLocation.Right_4);
+            UpdateItems();
+        }
+
+        public void RemoveFromLeft_5()
+        {
+            _installSatelliteEvent.Invoke(ItemId<SatelliteBuild>.Empty,  ItemId<Satellite>.Empty, CompanionLocation.Left_5);
+            UpdateItems();
+        }
+
+        public void RemoveFromRight_5()
+        {
+            _installSatelliteEvent.Invoke(ItemId<SatelliteBuild>.Empty, ItemId<Satellite>.Empty, CompanionLocation.Right_5);
             UpdateItems();
         }
 
         private void UpdateItems()
         {
-            _removeSatelliteItem.gameObject.SetActive(_selectedShip.FirstSatellite != null || _selectedShip.SecondSatellite != null);
+            _removeSatelliteItem.gameObject.SetActive(_selectedShip.Satellite_Left_1 != null
+                || _selectedShip.Satellite_Right_1 != null
+                || _selectedShip.Satellite_Left_2 != null
+                || _selectedShip.Satellite_Right_2 != null
+                || _selectedShip.Satellite_Left_3 != null
+                || _selectedShip.Satellite_Right_3 != null
+                || _selectedShip.Satellite_Left_4 != null
+                || _selectedShip.Satellite_Right_4 != null
+                || _selectedShip.Satellite_Left_5 != null
+                || _selectedShip.Satellite_Right_5 != null);
 
             if (_isEditorMode)
             {
@@ -90,7 +193,7 @@ namespace Gui.Constructor
             item.QuantityText.text = string.Empty;
             item.SizeText.text = build.Satellite.Layout.CellCount.ToString();
             item.WeaponText.text = build.Satellite.Barrels.Any() ? build.Satellite.Barrels.First().WeaponClass : "-";
-            item.ButtonsPanel.gameObject.SetActive(canBeInstalled);
+            item.ButtonsPanel.gameObject.SetActive(false);
             item.ClickToInstallText.gameObject.SetActive(canBeInstalled);
             item.CantBeInstalledText.gameObject.SetActive(!canBeInstalled);
         }
@@ -109,7 +212,7 @@ namespace Gui.Constructor
             item.SizeText.text = satellite.Layout.CellCount.ToString();
             item.WeaponText.text = satellite.Barrels.Any() ? satellite.Barrels.First().WeaponClass : "-";
 
-            item.ButtonsPanel.gameObject.SetActive(canBeInstalled);
+            item.ButtonsPanel.gameObject.SetActive(false);
             item.ClickToInstallText.gameObject.SetActive(canBeInstalled);
             item.CantBeInstalledText.gameObject.SetActive(!canBeInstalled);
         }

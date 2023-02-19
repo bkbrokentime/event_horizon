@@ -12,8 +12,7 @@ namespace Domain.Quests
         public RandomNode(int id, int seed, string description)
         {
             _id = id;
-            var random = new Random(seed + id);
-            _random = new Random(random.Next());
+            _seed = seed;
             _description = description;
         }
 
@@ -82,27 +81,31 @@ namespace Domain.Quests
                 return false;
             }
 
+            var random = new Random(_seed + _counter);
 
             if (totalWeight < 0.0001f)
             {
-                target = allowedTransitions.RandomElement(_random).TargetNode;
+                _counter++;
+                target = allowedTransitions.RandomElement(random).TargetNode;
                 return true;
             }
 
             if (totalWeight < 1.0f) totalWeight = 1.0f;
-            var value = _random.NextFloat()*totalWeight;
+            var value = random.NextFloat()*totalWeight;
 
             foreach (var transition in allowedTransitions)
             {
                 value -= transition.Weight;
                 if (value > 0.0001f) continue;
 
+                _counter++;
                 target = transition.TargetNode;
                 return true;
             }
             
             if (DefaultNode != null)
             {
+                _counter++;
                 target = DefaultNode;
                 return true;
             }
@@ -114,9 +117,10 @@ namespace Domain.Quests
         public bool ActionRequired { get { return false; } }
         public bool TryInvokeAction(IQuestActionProcessor processor) { return false; }
 
-        private Random _random;
+        private int _counter;
         private readonly string _description;
         private readonly int _id;
+        private readonly int _seed;
         private readonly List<Transition> _transitions = new List<Transition>();
 
         private struct Transition

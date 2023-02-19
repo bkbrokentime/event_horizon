@@ -28,6 +28,7 @@ namespace GameDatabase.DataModel
 			TurretShip = loader.GetShip(new ItemId<Ship>(serializable.TurretShip));
 			InfectedPlanetFaction = loader.GetFaction(new ItemId<Faction>(serializable.InfectedPlanetFaction));
 			HiveShipBuild = loader.GetShipBuild(new ItemId<ShipBuild>(serializable.HiveShipBuild));
+			ExplorationResource = new ImmutableCollection<ExplorationResourceItem>(serializable.ExplorationResource?.Select(item => ExplorationResourceItem.Create(item, loader)));
 
 			OnDataDeserialized(serializable, loader);
 		}
@@ -36,6 +37,7 @@ namespace GameDatabase.DataModel
 		public Ship TurretShip { get; private set; }
 		public Faction InfectedPlanetFaction { get; private set; }
 		public ShipBuild HiveShipBuild { get; private set; }
+		public ImmutableCollection<ExplorationResourceItem> ExplorationResource { get; private set; }
 
 		public static ExplorationSettings DefaultValue { get; private set; }
 	}

@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: 70441934017554030}
   - component: {fileID: 70545999557571278}
   - component: {fileID: 70482336961459442}
+  - component: {fileID: 114219016434597712}
   m_Layer: 0
   m_Name: f13s4
   m_TagString: Untagged
@@ -64,7 +65,6 @@ SpriteRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -209,3 +209,19 @@ CapsuleCollider2D:
   m_Offset: {x: -0.11728733, y: -0.1486596}
   m_Size: {x: 0.72061634, y: 0.32906133}
   m_Direction: 1
+--- !u!114 &114219016434597712
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1009724438018018}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f8c6fe8fc912254b83cf553c9281a9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ArmorPoints: 0
+  EnergyPoints: 0
+  ShieldPoints: 0
+  EnergyShieldPoints: 0

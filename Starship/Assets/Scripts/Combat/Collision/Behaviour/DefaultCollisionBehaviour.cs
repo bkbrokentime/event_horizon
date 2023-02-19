@@ -17,11 +17,13 @@ namespace Combat.Collision.Behaviour
         {
             if (collisionData.IsNew && self.Type.Side.IsEnemy(target.Type.Side))
             {
-                var impulse = Mathf.Min(self.Body.Weight, target.Body.Weight);
-                var damage = 0.1f * collisionData.RelativeVelocity.magnitude * impulse * _rammingDamageMultiplier;
+
+                var impulse = Mathf.Pow(Mathf.Min(self.Body.Weight, target.Body.Weight), 0.5f);
+                var damage = 0.2f * collisionData.RelativeVelocity.magnitude * impulse * _rammingDamageMultiplier;
 
                 if (damage > 1)
-                    targetImpact.AddDamage(DamageType.Impact, damage);
+                    targetImpact.AddDamage(DamageType.Impact, Mathf.Pow(damage, 0.5f));
+
             }
         }
 

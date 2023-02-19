@@ -58,6 +58,7 @@ namespace ViewModel
 				item.Icon.sprite = _resourceLocator.GetSprite(ship.Model.IconImage) ?? _resourceLocator.GetSprite(ship.Model.ModelImage);
 				item.Icon.rectTransform.localScale = Vector3.one*ship.Model.IconScale;
 				item.SetLevel(ship.Experience.Level);
+				item.SetEnhanceLevel(ship.ExtraEnhanceLevel);
 				item.SetClass(ship.ExtraThreatLevel);
 			}
 

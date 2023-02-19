@@ -19,6 +19,8 @@ public class CommonSpriteTable : MonoBehaviour
 	public static Sprite FactionStarMap { get { return _instance._factionStarMap; } }
 	public static Sprite Blueprint { get { return _instance._blueprint; } }
 	public static Sprite TechIcon { get { return _instance._techIcon; } }
+    public static Sprite RewardedAd { get { return _instance._rewardedAdIcon; } }
+    public static Sprite RewardedFacebookPost { get { return _instance._rewardedFacebookPostIcon; } }
 
     public static Sprite FactionFaceIcon { get { return _instance._factionFaceIcon; } }
 	public static Sprite StarCurrencyIcon { get { return _instance._starResource; } }
@@ -28,6 +30,8 @@ public class CommonSpriteTable : MonoBehaviour
 	public static Sprite GasPlanet(System.Random random) { return _instance._gasPlanets[random.Next(_instance._gasPlanets.Length)]; }
 	public static Sprite BarrenPlanet(System.Random random) { return _instance._barrenPlanets[random.Next(_instance._barrenPlanets.Length)]; }
 	public static Sprite TerranPlanet(System.Random random) { return _instance._terranPlanets[random.Next(_instance._terranPlanets.Length)]; }
+	public static Sprite MoltenPlanet(System.Random random) { return _instance._moltenPlanets[random.Next(_instance._moltenPlanets.Length)]; }
+	public static Sprite FrozenPlanet(System.Random random) { return _instance._frozenPlanets[random.Next(_instance._frozenPlanets.Length)]; }
     public static Sprite InfectedPlanet => _instance._infectedPlanet;
 
     public static Sprite SkillIcon(GameModel.Skills.SkillType type)
@@ -49,6 +53,7 @@ public class CommonSpriteTable : MonoBehaviour
 	public static Sprite SpeedUpgrade { get { return _instance._speedUpgrade; } }
 	public static Sprite EnergyUpgrade { get { return _instance._energyUpgrade; } }
 	public static Sprite MissileWeapon { get { return _instance._missileWeapon; } }
+	public static Sprite Lock_Icon { get { return _instance._lock_icon; } }
 
 	[SerializeField] Sprite _creditsIcon;
 	[SerializeField] Sprite _fuelIcon;
@@ -60,6 +65,8 @@ public class CommonSpriteTable : MonoBehaviour
 	[SerializeField] Sprite _blueprint;
     [SerializeField] Sprite _starIcon;
     [SerializeField] Sprite _techIcon;
+    [SerializeField] Sprite _rewardedAdIcon;
+    [SerializeField] Sprite _rewardedFacebookPostIcon;
 
     [SerializeField] Sprite _factionFaceIcon;
 	[SerializeField] Sprite _starResource;
@@ -70,6 +77,8 @@ public class CommonSpriteTable : MonoBehaviour
 	[SerializeField] Sprite[] _gasPlanets;
 	[SerializeField] Sprite[] _barrenPlanets;
 	[SerializeField] Sprite[] _terranPlanets;
+	[SerializeField] Sprite[] _moltenPlanets;
+	[SerializeField] Sprite[] _frozenPlanets;
 
 	[SerializeField] Sprite _attackUpgrade;
 	[SerializeField] Sprite _defenseUpgrade;
@@ -79,6 +88,10 @@ public class CommonSpriteTable : MonoBehaviour
 	[SerializeField] Sprite _speedUpgrade;
 	[SerializeField] Sprite _energyUpgrade;
 	[SerializeField] Sprite _missileWeapon;
+
+	[SerializeField] Sprite _lock_icon;
+
+
     [SerializeField] SkillData[] _skills;
 
     private void OnValidate()

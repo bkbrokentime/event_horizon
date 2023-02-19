@@ -28,6 +28,7 @@ namespace GameDatabase
         {
             _mods.Clear();
 
+
 #if UNITY_ANDROID && !UNITY_EDITOR
             var path = Application.persistentDataPath + "/Mods/";
 #elif UNITY_STANDALONE || UNITY_EDITOR
@@ -48,8 +49,8 @@ namespace GameDatabase
                     }
                     catch (Exception e)
                     {
-                        OptimizedDebug.LogError("invalid mod file - " + fileInfo.FullName);
-                        OptimizedDebug.LogException(e);
+                        Debug.LogError("invalid mod file - " + fileInfo.FullName);
+                        Debug.LogException(e);
                     }
                 }
 
@@ -62,14 +63,14 @@ namespace GameDatabase
                     }
                     catch (Exception e)
                     {
-                        OptimizedDebug.LogError("invalid database - " + directoryInfo.FullName);
-                        OptimizedDebug.LogException(e);
+                        Debug.LogError("invalid database - " + directoryInfo.FullName);
+                        Debug.LogException(e);
                     }
                 }
             }
             catch (Exception e)
             {
-                OptimizedDebug.LogError("Error loading mods - " + e.Message);
+                Debug.LogError("Error loading mods - " + e.Message);
             }
         }
 
@@ -81,7 +82,7 @@ namespace GameDatabase
             }
             catch (Exception e)
             {
-                OptimizedDebug.LogException(e);
+                Debug.LogException(e);
             }
         }
 
@@ -117,7 +118,7 @@ namespace GameDatabase
             }
             catch (Exception e)
             {
-                OptimizedDebug.LogError("Database.TryLoad() Error: " + e.Message);
+                UnityEngine.Debug.LogError("Database.TryLoad() Error: " + e.Message);
                 error = e.Message;
                 return false;
             }
@@ -141,6 +142,7 @@ namespace GameDatabase
         }
 
         public IEnumerable<ModInfo> AvailableMods => _mods;
+        public void Changemods(List<ModInfo> mods) { _mods = mods; }
 
         public string Name => DatabaseSettings.ModName ?? Storage.Name;
         public string Id => Storage.Id;
@@ -153,7 +155,7 @@ namespace GameDatabase
             var serializedBuild = _content.GetShipBuild(id.Value);
             if (serializedBuild == null)
             {
-                OptimizedDebug.LogError("SaveShipBuild: not found " + id);
+                Debug.LogError("SaveShipBuild: not found " + id);
                 return;
             }
 
@@ -167,7 +169,7 @@ namespace GameDatabase
             var serializedBuild = _content.GetSatelliteBuild(id.Value);
             if (serializedBuild == null)
             {
-                OptimizedDebug.LogError("SaveSatelliteBuild: not found " + id);
+                Debug.LogError("SaveSatelliteBuild: not found " + id);
                 return;
             }
 
@@ -185,7 +187,7 @@ namespace GameDatabase
         private readonly IDataStorage _defaultStorage;
         private readonly IJsonSerializer _jsonSerializer = new UnityJsonSerializer();
         private readonly GameDatabaseLoadedSignal.Trigger _dataLoadedTrigger;
-        private readonly List<ModInfo> _mods = new List<ModInfo>();
+        private List<ModInfo> _mods = new List<ModInfo>();
         private const string DefaultPath = "Database";
     }
 

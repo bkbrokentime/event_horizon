@@ -15,10 +15,7 @@ using GameDatabase.Extensions;
 using GameServices.Database;
 using Services.Localization;
 using Services.Reources;
-using UnityEngine;
 using UnityEngine.Assertions;
-using Utils;
-using Random = System.Random;
 
 namespace DataModel.Technology
 {
@@ -36,15 +33,21 @@ namespace DataModel.Technology
 
 		public ItemId<GameDatabase.DataModel.Technology> Id { get; private set; }
 
-	    public IEnumerable<ITechnology> Requirements => _requirementList ?? (_requirementList = _requirements.Select(_technologies.Get).ToList());
+	    public IEnumerable<ITechnology> Requirements
+	    {
+	        get
+	        {
+	            return _requirementList ?? (_requirementList = _requirements.Select<ItemId<GameDatabase.DataModel.Technology>, ITechnology>(_technologies.Get).ToList());
+	        }
+	    }
 
 	    public abstract CraftingPrice GetCraftPrice(CraftItemQuality quality);
         public abstract string GetName(ILocalization localization);
-	    public abstract Sprite GetImage(IResourceLocator resourceLocator);
+	    public abstract UnityEngine.Sprite GetImage(IResourceLocator resourceLocator);
 	    public abstract string GetDescription(ILocalization localization);
-		public abstract Color Color { get; }
+		public abstract UnityEngine.Color Color { get; }
 		public abstract Faction Faction { get; }
-		public abstract IProduct CreateItem(CraftItemQuality quality, Random random);
+		public abstract IProduct CreateItem(CraftItemQuality quality, System.Random random);
 		public bool Hidden { get; private set; }
 	    public bool Special { get; private set; }
         public int Price { get; private set; }
@@ -70,55 +73,62 @@ namespace DataModel.Technology
 		public override UnityEngine.Color Color { get { return UnityEngine.Color.white; } }
 		public override Faction Faction { get { return Ship.Faction; } }
 
-		public override CraftingPrice GetCraftPrice(CraftItemQuality quality)
-		{
-			double credits = Ship.Layout.CellCount * Ship.Layout.CellCount * 5;
-			double stars = 0;
-			double techs = 0;
+	    public override CraftingPrice GetCraftPrice(CraftItemQuality quality)
+	    {
+            var credits = Ship.Layout.CellCount * Ship.Layout.CellCount * 5 + Ship.SecondLayout.CellCount * Ship.SecondLayout.CellCount * 10;
+	        var stars = 0;
+	        var techs = 0;
 
-			switch (Ship.ShipCategory)
-			{
-				case ShipCategory.Common:
-					stars = Ship.Layout.CellCount / 70.0;
-					break;
-				case ShipCategory.Rare:
-					stars = 1 + (Ship.Layout.CellCount - 30) / 10;
-					credits = credits * 3 / 2;
-					break;
-				case ShipCategory.Flagship:
-					stars = Ship.Layout.CellCount / 10.0;
-					credits *= 3;
-					break;
-			}
+            switch (Ship.ShipCategory)
+            {
+                case ShipCategory.Common:
+                    stars = Ship.Layout.CellCount / 100 + Ship.SecondLayout.CellCount / 50;
+                    break;
+                case ShipCategory.Rare:
+                    stars = 1 + Ship.Layout.CellCount / 50 + Ship.SecondLayout.CellCount / 25;
+                    credits += credits / 2;
+                    break;
+                case ShipCategory.Flagship:
+                    stars = Ship.Layout.CellCount / 25 + Ship.SecondLayout.CellCount / 10;
+                    credits *= 3;
+                    break;
+                case ShipCategory.SuperFlagship:
+                    stars = Ship.Layout.CellCount / 10 + Ship.SecondLayout.CellCount / 5;
+                    credits *= 5;
+                    break;
+            }
 
-			switch (quality)
-			{
-				case CraftItemQuality.Improved:
-					credits += credits / 3;
-					stars += 3 + stars / 3;
-					techs = Ship.Layout.CellCount / 20.0;
-					break;
-				case CraftItemQuality.Excellent:
-					credits += 2 * credits / 3;
-					credits = credits * 2 / 3.0;
-					stars += 6 + 2 * stars / 3;
-					techs = Ship.Layout.CellCount / 10.0;
-					break;
-				case CraftItemQuality.Superior:
-					credits += credits;
-					stars += 10 + stars;
-					techs = Ship.Layout.CellCount / 5.0;
-					break;
-			}
+            switch (quality)
+            {
+                case CraftItemQuality.Improved:
+                    credits += credits / 5;
+                    stars += 1 + stars / 5;
+                    techs = Ship.Layout.CellCount / 50 + Ship.SecondLayout.CellCount / 40;
+                    break;
+                case CraftItemQuality.Excellent:
+                    credits += credits / 2;
+                    stars += 2 + stars / 2;
+                    techs = Ship.Layout.CellCount / 30 + Ship.SecondLayout.CellCount / 20;
+                    break;
+                case CraftItemQuality.Superior:
+                    credits += credits;
+                    stars += 3 + stars;
+                    techs = Ship.Layout.CellCount / 20 + Ship.SecondLayout.CellCount / 10;
+                    break;
+                case CraftItemQuality.Top:
+                    credits += 2 * credits;
+                    stars += 5 + 3 * stars / 2;
+                    techs = Ship.Layout.CellCount / 10 + Ship.SecondLayout.CellCount / 5;
+                    break;
+                case CraftItemQuality.Ultra:
+                    credits += 3 * credits;
+                    stars += 10 + 2 * stars;
+                    techs = Ship.Layout.CellCount / 5 + Ship.SecondLayout.CellCount / 3;
+                    break;
+            }
 
-			// TODO: these values should really be extended past int limits later on
-			const int fallback = 2_000_000_000;
-			return new CraftingPrice(
-				credits.RoundToIntChecked(fallback),
-				stars.RoundToIntChecked(fallback),
-				techs.RoundToIntChecked(fallback)
-			);
-		}
+            return new CraftingPrice(credits, stars, techs);
+	    }
 
         public override IProduct CreateItem(CraftItemQuality quality, System.Random random)
 		{
@@ -139,6 +149,21 @@ namespace DataModel.Technology
                     break;
                 case CraftItemQuality.Superior:
                     model = new ShipModel(Ship);
+                    model.Modifications.Add(new EmptyModification());
+                    model.Modifications.Add(new EmptyModification());
+                    model.Modifications.Add(new EmptyModification());
+                    break;
+                case CraftItemQuality.Top:
+                    model = new ShipModel(Ship);
+                    model.Modifications.Add(new EmptyModification());
+                    model.Modifications.Add(new EmptyModification());
+                    model.Modifications.Add(new EmptyModification());
+                    model.Modifications.Add(new EmptyModification());
+                    break;
+                case CraftItemQuality.Ultra:
+                    model = new ShipModel(Ship);
+                    model.Modifications.Add(new EmptyModification());
+                    model.Modifications.Add(new EmptyModification());
                     model.Modifications.Add(new EmptyModification());
                     model.Modifications.Add(new EmptyModification());
                     model.Modifications.Add(new EmptyModification());
@@ -184,6 +209,8 @@ namespace DataModel.Technology
 				return localization.GetString("$Reactor");
 			case ComponentCategory.Engine:
                 return localization.GetString("$Engine");
+			case ComponentCategory.Equipment:
+                return localization.GetString("$Equipment");
 			default:
 				return localization.GetString("$Device");
 			}
@@ -202,14 +229,24 @@ namespace DataModel.Technology
                     techs = 1;
                     break;
                 case CraftItemQuality.Excellent:
-                    credits += 2*credits / 3;
+                    credits += 2 * credits / 3;
                     stars += 1 + stars / 2;
                     techs = UnityEngine.Mathf.Max(3, Component.Level / 10);
                     break;
                 case CraftItemQuality.Superior:
                     credits += credits;
                     stars += 1 + stars;
-                    techs = UnityEngine.Mathf.Max(5, Component.Level/20);
+                    techs = UnityEngine.Mathf.Max(5, Component.Level / 20);
+                    break;
+                case CraftItemQuality.Top:
+                    credits += 2 * credits;
+                    stars += 2 + 2 * stars;
+                    techs = UnityEngine.Mathf.Max(8, Component.Level / 30);
+                    break;
+                case CraftItemQuality.Ultra:
+                    credits += 3 * credits;
+                    stars += 3 + 3 * stars;
+                    techs = UnityEngine.Mathf.Max(15, Component.Level / 50);
                     break;
             }
 
@@ -231,6 +268,10 @@ namespace DataModel.Technology
                     return new Product(_factory.CreateComponentItem(ComponentInfo.CreateRandomModification(Component, random, ModificationQuality.P2, ModificationQuality.P2)));
                 case CraftItemQuality.Superior:
                     return new Product(_factory.CreateComponentItem(ComponentInfo.CreateRandomModification(Component, random, ModificationQuality.P2, ModificationQuality.P3)));
+                case CraftItemQuality.Top:
+                    return new Product(_factory.CreateComponentItem(ComponentInfo.CreateRandomModification(Component, random, ModificationQuality.P3, ModificationQuality.P4)));
+                case CraftItemQuality.Ultra:
+                    return new Product(_factory.CreateComponentItem(ComponentInfo.CreateRandomModification(Component, random, ModificationQuality.P3, ModificationQuality.P5)));
                 default:
                     throw new InvalidEnumArgumentException();
             }
@@ -242,45 +283,45 @@ namespace DataModel.Technology
         private readonly ItemTypeFactory _factory;
 	}
 
-	public class SatelliteTechnology : TechnologyBase
-	{
-		public SatelliteTechnology(ITechnologies technologies, ItemTypeFactory factory, Technology_Satellite data)
-			: base(technologies, data)
-		{
-			_factory = factory;
-			_faction = data.Faction;
-		    _satellite = data.Satellite;
-		}
-				
-		public override string GetName(ILocalization localization) { return localization.GetString(_satellite.Name); }
-		public override UnityEngine.Sprite GetImage(IResourceLocator resourceLocator) { return resourceLocator.GetSprite(_satellite.ModelImage); }
-		public override string GetDescription(ILocalization localization) { return localization.GetString("$Satellite"); }
-		public override UnityEngine.Color Color { get { return UnityEngine.Color.white; } }
-		public override Faction Faction { get { return _faction; } }
+    public class SatelliteTechnology : TechnologyBase
+    {
+        public SatelliteTechnology(ITechnologies technologies, ItemTypeFactory factory, Technology_Satellite data)
+            : base(technologies, data)
+        {
+            _factory = factory;
+            _faction = data.Faction;
+            _satellite = data.Satellite;
+        }
 
-	    public override IProduct CreateItem(CraftItemQuality quality, System.Random random)
-	    {
+        public override string GetName(ILocalization localization) { return localization.GetString(_satellite.Name); }
+        public override UnityEngine.Sprite GetImage(IResourceLocator resourceLocator) { return resourceLocator.GetSprite(_satellite.ModelImage); }
+        public override string GetDescription(ILocalization localization) { return localization.GetString("$Satellite"); }
+        public override UnityEngine.Color Color { get { return UnityEngine.Color.white; } }
+        public override Faction Faction { get { return _faction; } }
+
+        public override IProduct CreateItem(CraftItemQuality quality, System.Random random)
+        {
             if (quality != CraftItemQuality.Common)
                 throw new ArgumentException();
 
-	        return new Product(_factory.CreateSatelliteItem(_satellite));
-	    }
+            return new Product(_factory.CreateSatelliteItem(_satellite));
+        }
 
-	    public override CraftingPrice GetCraftPrice(CraftItemQuality quality)
-	    {
-	        var credits = 10*Economy.Price.SatellitePrice(_satellite).Amount;
+        public override CraftingPrice GetCraftPrice(CraftItemQuality quality)
+        {
+            var credits = 10 * Economy.Price.SatellitePrice(_satellite).Amount;
             var stars = UnityEngine.Mathf.Max(0, _satellite.Layout.CellCount / 7 - 1);
-	        var techs = 0;
+            var techs = 0;
 
-	        switch (quality)
-	        {
-	            case CraftItemQuality.Improved:
-	                credits += credits/2;
-	                techs = 1;
-	                break;
+            switch (quality)
+            {
+                case CraftItemQuality.Improved:
+                    credits += credits / 2;
+                    techs = 1;
+                    break;
                 case CraftItemQuality.Excellent:
-                    credits += 2*credits/3;
-                    stars += 3 + stars/2;
+                    credits += 2 * credits / 3;
+                    stars += 3 + stars / 2;
                     techs = 5;
                     break;
                 case CraftItemQuality.Superior:
@@ -288,13 +329,23 @@ namespace DataModel.Technology
                     stars += 5 + stars;
                     techs = 10;
                     break;
+                case CraftItemQuality.Top:
+                    credits += 2 * credits;
+                    stars += 8 + 2 * stars;
+                    techs = 15;
+                    break;
+                case CraftItemQuality.Ultra:
+                    credits += 3 * credits;
+                    stars += 10 + 3 * stars;
+                    techs = 20;
+                    break;
             }
 
             return new CraftingPrice(credits, stars, techs);
         }
 
-	    private readonly Satellite _satellite;
-		private readonly Faction _faction;
-		private readonly ItemTypeFactory _factory;
-	}
+        private readonly Satellite _satellite;
+        private readonly Faction _faction;
+        private readonly ItemTypeFactory _factory;
+    }
 }

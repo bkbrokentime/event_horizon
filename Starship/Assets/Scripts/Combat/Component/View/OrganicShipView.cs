@@ -22,12 +22,11 @@ namespace Combat.Component.View
             var pulse = Mathf.Pow(Mathf.Sin(_time), 8);
 
             var hue = _hue > 0.5f ? _hue - 0.1f * pulse : _hue + 0.1f * pulse;
-            _hsvMaterialInstance.SetColor(Adjust, new Color(hue, _saturation, 0));
+            _hsvMaterialInstance.SetColor("_HSVAAdjust", new Color(hue, _saturation, 0));
         }
 
         private float _hue;
         private float _saturation;
         private float _time;
-        private static readonly int Adjust = Shader.PropertyToID("_HSVAAdjust");
     }
 }

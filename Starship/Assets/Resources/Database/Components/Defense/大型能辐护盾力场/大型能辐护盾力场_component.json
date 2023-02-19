@@ -1,0 +1,18 @@
+{
+  "ItemType": 1,
+  "Id": 320,
+  "Name": "大型能辐护盾力场",
+  "DisplayCategory": 2,
+  "Availability": 1,
+  "ComponentStatsId": 320,
+  "Faction": 7,
+  "Level": 50,
+  "Icon": "armor33",
+  "Color": "#99DCFF",
+  "Layout": "111111111",
+  "CellType": "1",
+  "PossibleModifications": [
+    1,
+    3
+  ]
+}

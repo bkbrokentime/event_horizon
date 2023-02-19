@@ -5,24 +5,26 @@ using Combat.Component.Triggers;
 using Combat.Unit;
 using GameDatabase.Model;
 using UnityEngine;
+using Combat.Component.Ship;
 
 namespace Combat.Component.Systems
 {
     public abstract class SystemBase : ISystem
     {
-        protected SystemBase(int keyBinding, SpriteId controlButtonIcon)
+        protected SystemBase(int keyBinding, SpriteId controlButtonIcon,IShip ship)
         {
             _controlButtonIcon = controlButtonIcon;
             _keyBinding = keyBinding;
             Enabled = true;
-            TimeFromLastUse = 60f;
+            TimeFromLastUse = 0;
+            _ship = ship; 
         }
 
         public bool Enabled { get; set; }
         public bool Active { get; set; }
 
         public virtual float ActivationCost { get { return 0; } }
-        public virtual bool CanBeActivated { get { return Enabled && TimeFromLastUse >= MaxCooldown; } }
+        public virtual bool CanBeActivated { get { return Enabled && TimeFromLastUse >= MaxCooldown && !_ship.Stats.SpaceJump; } }
         public virtual float Cooldown { get { return !Enabled ? 1.0f : MaxCooldown > 0 ? Mathf.Clamp01((MaxCooldown - TimeFromLastUse)/MaxCooldown) : 0f; } }
 
         public int KeyBinding { get { return _keyBinding; } }
@@ -32,6 +34,8 @@ namespace Combat.Component.Systems
         public virtual IFeaturesModification FeaturesModification { get { return null; } }
         public virtual ISystemsModification SystemsModification { get { return null; } }
         public virtual IStatsModification StatsModification { get { return null; } }
+        public virtual IStatsWeaponModification StatsWeaponModification { get { return null; } }
+        public virtual IStatsAttenuationModification StatsAttenuationModifications { get { return null; } }
         public virtual IUnitAction UnitAction { get { return null; } }
 
         public void UpdatePhysics(float elapsedTime)
@@ -80,5 +84,7 @@ namespace Combat.Component.Systems
         private readonly int _keyBinding;
         private readonly SpriteId _controlButtonIcon;
         private readonly UnitTriggers _triggers = new UnitTriggers();
+
+        private readonly IShip _ship;
     }
 }

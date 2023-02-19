@@ -45,6 +45,7 @@ public class StarBorder : MonoBehaviour
 		var center = star.Position;
 		var stars = StarLayout.GetAdjacentStars(star.Id).ToArray();
 		var regions = stars.Select(item => _regionMap.GetStarRegion(item).Id).ToArray();
+		//var regions = stars.Select(item => _regionMap.GetRandomSizeStarRegion(item).Id).ToArray();
 
 		var count = stars.Length;
 	    var seed = _session.Game.Seed;

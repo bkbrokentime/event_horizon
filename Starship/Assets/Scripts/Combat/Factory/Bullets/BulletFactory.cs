@@ -26,6 +26,7 @@ using GameDatabase.Model;
 using Services.Audio;
 using Services.ObjectPool;
 using UnityEngine;
+using static UnityEngine.UI.GridLayoutGroup;
 
 namespace Combat.Factory
 {
@@ -37,6 +38,12 @@ namespace Combat.Factory
         {
             _ammunition = ammunition;
             _statModifier = statModifier;
+/*
+            _statModifier.DamageMultiplier *= owner.Stats.WeaponUpgrade.DamageMultiplier + 1f;
+            _statModifier.FireRateMultiplier *= owner.Stats.WeaponUpgrade.FireRateMultiplier + 1f;
+            _statModifier.RangeMultiplier *= owner.Stats.WeaponUpgrade.RangeMultiplier + 1f;
+            _statModifier.EnergyCostMultiplier *= owner.Stats.WeaponUpgrade.EnergyCostMultiplier + 1f;
+*/
             _scene = scene;
             _soundPlayer = soundPlayer;
             _objectPool = objectPool;
@@ -44,17 +51,19 @@ namespace Combat.Factory
             _effectFactory = effectFactory;
             _prefabCache = prefabCache;
             _owner = owner;
-
             _prefab = new Lazy<GameObject>(() => _prefabCache.GetBulletPrefab(_ammunition.Body.BulletPrefab));
-            _stats = new BulletStats(ammunition, statModifier);
+            _stats = new BulletStats(ammunition, _statModifier,owner);
         }
 
         public IBulletStats Stats
         {
-            get { return _stats; }
+            get 
+            {
+                return _stats; 
+            }
         }
 
-        public IBullet Create(IWeaponPlatform parent, float spread, float rotation, float offset)
+        public IBullet Create(IWeaponPlatform parent, float spread, float rotation, float offset, Vector2 deviation)
         {
             var bulletGameObject = new GameObjectHolder(_prefab, _objectPool);
             bulletGameObject.IsActive = true;
@@ -62,8 +71,14 @@ namespace Combat.Factory
             var bulletSpeed = _stats.GetBulletSpeed();
 
             var body = ConfigureBody(bulletGameObject.GetComponent<IBodyComponent>(), parent, bulletSpeed, spread,
-                rotation, offset);
-            var view = ConfigureView(bulletGameObject.GetComponent<IView>(), _stats.Color);
+                rotation, offset, deviation);
+
+            Color.RGBToHSV(_stats.Color, out var H, out var S, out var V);
+            var color = Color.HSVToRGB(UnityEngine.Random.value, S, V);
+            color.a = _stats.Color.a;
+            var view = _stats.RandomColor ?
+                ConfigureView(bulletGameObject.GetComponent<IView>(), color, _stats.ChangeableColor) :
+                ConfigureView(bulletGameObject.GetComponent<IView>(), _stats.Color, _stats.ChangeableColor);
 
             var bullet = CreateUnit(body, view, bulletGameObject);
             var collisionBehaviour = CreateCollisionBehaviour(parent);
@@ -74,10 +89,6 @@ namespace Combat.Factory
             bullet.CanBeDisarmed = _ammunition.Body.CanBeDisarmed;
             BulletTriggerBuilder.Build(this, bullet, collisionBehaviour);
 
-            if (_ammunition.Body.Type == GameDatabase.Enums.BulletType.Continuous && !parent.IsTemporary)
-            {
-                parent.AddAttachedChild(bullet);
-            }
             _scene.AddUnit(bullet);
             bullet.UpdateView(0);
 
@@ -136,13 +147,12 @@ namespace Combat.Factory
 
             var unitType = new UnitType(unitClass, UnitSide.Undefined, _ammunition.Body.FriendlyFire ? null : _owner);
             var bullet = new Bullet(body, view, new Lifetime(_stats.GetBulletLifetime()), unitType);
-
             bullet.Physics = gameObject.GetComponent<PhysicsManager>();
             return bullet;
         }
 
         private IBody ConfigureBody(IBodyComponent body, IWeaponPlatform parent, float bulletSpeed, float spread,
-            float deltaAngle, float offset)
+            float deltaAngle, float offset, Vector2 deviation)
         {
             IBody parentBody = null;
             var position = Vector2.zero;
@@ -151,20 +161,18 @@ namespace Combat.Factory
             var angularVelocity = 0f;
             var weight = _stats.Weight;
             var scale = _stats.BodySize;
-            var frozen = false;
 
             if (_ammunition.Body.Type == GameDatabase.Enums.BulletType.Continuous && !parent.IsTemporary)
             {
                 parentBody = parent.Body;
                 position = new Vector2(offset, 0);
-                frozen = true;
             }
             else
             {
                 rotation = parent.Body.WorldRotation() + (UnityEngine.Random.value - 0.5f) * spread + deltaAngle;
                 position = parent.Body.WorldPosition() + RotationHelpers.Direction(rotation) * offset;
             }
-
+            position += deviation;
             if (_ammunition.Body.Type != GameDatabase.Enums.BulletType.Continuous)
             {
                 velocity = RotationHelpers.Direction(rotation) * bulletSpeed;
@@ -176,14 +184,15 @@ namespace Combat.Factory
                     velocity += parent.Body.WorldVelocity();
             }
 
-            body.Initialize(parentBody, position, rotation, scale, velocity, angularVelocity, weight, frozen);
+            body.Initialize(parentBody, position, rotation, scale, velocity, angularVelocity, weight);
             return body;
         }
 
-        private IView ConfigureView(IView view, Color color)
+        private IView ConfigureView(IView view, Color color, bool Changeable = false)
         {
             view.Life = 0;
             view.Color = color;
+            view.ChangeableColor = Changeable;
 
             view.UpdateView(0);
             return view;
@@ -224,6 +233,11 @@ namespace Combat.Factory
             if (_ammunition.Body.Type == GameDatabase.Enums.BulletType.Homing)
                 return new HomingController(bullet, bulletSpeed, 120f / (0.2f + weight * 2),
                     0.5f * bulletSpeed / (0.2f + weight * 2), range, _scene);
+            if (_ammunition.Body.Type == GameDatabase.Enums.BulletType.IntelligentHoming)
+                return new HomingController(bullet, bulletSpeed, 120f / (0.2f + weight * 2),
+                    0.5f * bulletSpeed / (0.2f + weight * 2), range, _scene, true);
+            if (_ammunition.Body.Type == GameDatabase.Enums.BulletType.RandomSteering)
+                return new RandomRocketController(bullet, bulletSpeed, 1.0f * bulletSpeed / (0.1f + weight));
             else if (_ammunition.Body.Type == GameDatabase.Enums.BulletType.Continuous && !parent.IsTemporary)
                 return new BeamController(bullet, spread, rotationOffset);
 
@@ -341,8 +355,9 @@ namespace Combat.Factory
 
             public Result Create(BulletTrigger_PlaySfx trigger)
             {
-                CreateSoundEffect(_bullet, trigger.AudioClip, _condition);
-                CreateVisualEffect(_bullet, _collisionBehaviour, _condition, trigger);
+                var condition = FromTriggerCondition(trigger.Condition);
+                CreateSoundEffect(_bullet, trigger.AudioClip, condition);
+                CreateVisualEffect(_bullet, _collisionBehaviour, condition, trigger);
                 return Result.Ok;
             }
 
@@ -355,7 +370,7 @@ namespace Combat.Factory
 
                 var factory = CreateFactory(trigger.Ammunition, trigger);
                 var magazine = Math.Max(trigger.Quantity, 1);
-                _bullet.AddAction(new SpawnBulletsAction(factory, magazine, factory._stats.BodySize / 2, trigger.Cooldown,
+                _bullet.AddAction(new SpawnBulletsAction(factory, magazine, factory._stats.BodySize / 2 * trigger.Offset * UnityEngine.Random.Range(1 - trigger.OffsetRandomFactor, 1), trigger.Cooldown, trigger.OffsetSpread, trigger.isShareOut,
                     _bullet, factory._soundPlayer, trigger.AudioClip, _condition));
 
                 return Result.Ok;
@@ -363,7 +378,8 @@ namespace Combat.Factory
 
             public Result Create(BulletTrigger_Detonate content)
             {
-                _bullet.AddAction(new DetonateAction(_condition));
+                var condition = FromTriggerCondition(content.Condition);
+                _bullet.AddAction(new DetonateAction(condition));
                 return Result.Ok;
             }
 

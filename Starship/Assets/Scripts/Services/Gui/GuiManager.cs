@@ -91,7 +91,7 @@ namespace Services.Gui
 
         private void OnWindowOpened(string id)
         {
-            //OptimizedDebug.Log("Window opened: " + id);
+            //UnityEngine.Debug.Log("Window opened: " + id);
 
             IWindow window;
             if (!_windows.TryGetValue(id, out window))
@@ -104,26 +104,26 @@ namespace Services.Gui
             {
                 if (window.Class.CantBeOpenedDueTo(item.Class))
                 {
-                    OptimizedDebug.Log("Window cant be opened: " + window.Id + " due to " + item.Id);
+                    UnityEngine.Debug.Log("Window cant be opened: " + window.Id + " due to " + item.Id);
                     window.Close();
                     return;
                 }
 
                 if (item.Class.MustBeClosedDueTo(window.Class))
                 {
-                    //OptimizedDebug.Log("Window must be closed: " + item.Id + " due to " + window.Id);
+                    //UnityEngine.Debug.Log("Window must be closed: " + item.Id + " due to " + window.Id);
                     windowsToClose.Add(item);
                     continue;
                 }
 
                 if (item.Class.MustBeDisabledDueTo(window.Class) && item.Enabled)
                 {
-                    //OptimizedDebug.Log("Window must be disabled: " + item.Id + " due to " + window.Id);
+                    //UnityEngine.Debug.Log("Window must be disabled: " + item.Id + " due to " + window.Id);
                     item.Enabled = false;
                 }
                 if (window.Class.MustBeDisabledDueTo(item.Class))
                 {
-                    //OptimizedDebug.Log("Window must be disabled: " + window.Id + " due to " + item.Id);
+                    //UnityEngine.Debug.Log("Window must be disabled: " + window.Id + " due to " + item.Id);
                     enabled = false;
                 }
             }
@@ -137,7 +137,7 @@ namespace Services.Gui
 
         private void OnWindowClosed(string id, WindowExitCode exitCode)
         {
-            //OptimizedDebug.Log("Window closed: " + id);
+            //UnityEngine.Debug.Log("Window closed: " + id);
 
             IWindow window;
             if (!_windows.TryGetValue(id, out window))
@@ -256,7 +256,7 @@ namespace Services.Gui
 
         private void ScanSceneForWindows()
         {
-            OptimizedDebug.Log("GuiManager.ScanSceneForWindows");
+            UnityEngine.Debug.Log("GuiManager.ScanSceneForWindows");
 
             Cleanup();
             var windows = GetLoadedWindows();
@@ -264,20 +264,20 @@ namespace Services.Gui
             {
                 if (_windows.ContainsKey(window.Id))
                 {
-                    OptimizedDebug.LogError("Window already exists - " + window.Id);
-                    OptimizedDebug.Break();
+                    Debug.LogError("Window already exists - " + window.Id);
+                    Debug.Break();
                 }
 
                 _windows.Add(window.Id, window);
 
                 if (window.IsVisible)
                 {
-                    OptimizedDebug.Log("Active window found: " + window.Id);
+                    UnityEngine.Debug.Log("Active window found: " + window.Id);
                     _activeWindows.Add(window);
                 }
                 else
                 {
-                    //OptimizedDebug.Log("Window found: " + window.Id);
+                    //UnityEngine.Debug.Log("Window found: " + window.Id);
                 }
             }
         }

@@ -49,7 +49,10 @@ namespace Gui.Craft
         [SerializeField] private AudioClip _buySound;
         [SerializeField] private CraftPanel _commonCraftPanel;
         [SerializeField] private CraftPanel _improvedCraftPanel;
+        [SerializeField] private CraftPanel _excellentCraftPanel;
         [SerializeField] private CraftPanel _superiorCraftPanel;
+        [SerializeField] private CraftPanel _topCraftPanel;
+        [SerializeField] private CraftPanel _ultraCraftPanel;
         [SerializeField] private Text _creditsText;
         [SerializeField] private Text _starsText;
         [SerializeField] private Text _techsText;
@@ -118,13 +121,19 @@ namespace Gui.Craft
             {
                 _commonCraftPanel.Cleanup();
                 _improvedCraftPanel.Cleanup();
+                _excellentCraftPanel.Cleanup();
                 _superiorCraftPanel.Cleanup();
+                _topCraftPanel.Cleanup();
+                _ultraCraftPanel.Cleanup();
                 return;
             }
 
             _commonCraftPanel.Initialize(_selectedTech);
             _improvedCraftPanel.Initialize(_selectedTech);
+            _excellentCraftPanel.Initialize(_selectedTech);
             _superiorCraftPanel.Initialize(_selectedTech);
+            _topCraftPanel.Initialize(_selectedTech);
+            _ultraCraftPanel.Initialize(_selectedTech);
         }
 
         private void UpdateResources()

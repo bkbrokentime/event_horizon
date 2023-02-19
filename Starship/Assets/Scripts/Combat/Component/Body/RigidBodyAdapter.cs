@@ -1,13 +1,11 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Combat.Component.Body
 {
     [RequireComponent(typeof(Rigidbody2D))]
     public class RigidBodyAdapter : MonoBehaviour, IBodyComponent
     {
-        public void Initialize(IBody parent, Vector2 position, float rotation, float scale, Vector2 velocity,
-            float angularVelocity, float weight, bool frozen = false)
+        public void Initialize(IBody parent, Vector2 position, float rotation, float scale, Vector2 velocity, float angularVelocity, float weight)
         {
             if (parent != null)
                 parent.AddChild(transform);
@@ -19,7 +17,6 @@ namespace Combat.Component.Body
             Rotation = rotation;
             Scale = scale;
             Weight = weight;
-            _frozen = frozen;
 
             if (_rigidbody.bodyType != RigidbodyType2D.Static)
             {
@@ -43,32 +40,26 @@ namespace Combat.Component.Body
 
         public Vector2 Position
         {
-            get { return _cachedPosition; }
+			get { return _cachedPosition; }
             set
             {
                 _cachedPosition = value;
-                var transformCache = transform;
-                if (!this || !transformCache) return;
-                var targetPos = _parent?.ChildPosition(value) ?? value;
-                if (transformCache.localPosition.x != targetPos.x || transformCache.localPosition.y != targetPos.y)
-                    gameObject.Move(targetPos);
+                if (this && transform)
+                    gameObject.Move(_parent == null ? value : _parent.ChildPosition(value));
             }
         }
 
         public float Rotation
         {
-            get { return _cachedRotation; }
+			get { return _cachedRotation; }
             set
             {
                 _cachedRotation = value;
-                var transformCache = transform;
-                if (!this || !transformCache) return;
-                var targetAngle = Mathf.Repeat(value, 360);
-                if (transformCache.localRotation.z != targetAngle)
-                    transform.localEulerAngles = new Vector3(0, 0, targetAngle);
+                if (this && transform)
+                    transform.localEulerAngles = new Vector3(0, 0, Mathf.Repeat(value, 360));
             }
         }
-
+        
         public float Offset { get; set; }
 
         public Vector2 Velocity
@@ -90,7 +81,7 @@ namespace Combat.Component.Body
             set
             {
                 if (Parent == null && _rigidbody)
-                    _rigidbody.angularVelocity = value;
+                    _rigidbody.angularVelocity = value; 
             }
         }
 
@@ -107,8 +98,7 @@ namespace Combat.Component.Body
             {
                 _scale = value;
                 if (transform)
-                    transform.localScale =
-                        Parent == null ? Vector3.one * value : Vector3.one * (Parent.WorldScale() * value);
+                    transform.localScale = Parent == null ? Vector3.one * value : Vector3.one * Parent.WorldScale() * value;
             }
         }
 
@@ -135,11 +125,6 @@ namespace Combat.Component.Body
             _maxVelocity = value;
         }
 
-        public void SetAngularVelocityLimit(float value)
-        {
-            _maxAngularVelocity = value;
-        }
-
         public void Move(Vector2 position)
         {
             Position = position;
@@ -159,23 +144,11 @@ namespace Combat.Component.Body
 
         public void UpdatePhysics(float elapsedTime)
         {
-            if (_frozen)
-            {
-                Position = _cachedPosition;
-                Rotation = _cachedRotation;
-            }
-
             var velocity = _rigidbody.velocity;
-            if (_maxVelocity > 0 && velocity.sqrMagnitude > _maxVelocity * _maxVelocity)
+            if (_maxVelocity > 0 && velocity.magnitude > _maxVelocity)
             {
                 velocity = velocity.normalized * _maxVelocity;
                 _rigidbody.velocity = velocity;
-            }
-
-            var angularVelocity = _rigidbody.angularVelocity;
-            if (_maxAngularVelocity > 0 && Math.Abs(angularVelocity) > _maxAngularVelocity)
-            {
-                _rigidbody.angularVelocity = _maxAngularVelocity * Mathf.Sign(angularVelocity);
             }
 
             _cachedVelocity = velocity;
@@ -183,10 +156,8 @@ namespace Combat.Component.Body
 
         public void UpdateView(float elapsedTime)
         {
-            if (_frozen) return;
-            var transform1 = transform;
-            _cachedPosition = transform1.localPosition;
-            _cachedRotation = transform1.localEulerAngles.z;
+            _cachedPosition = transform.localPosition;
+            _cachedRotation = transform.localEulerAngles.z;
         }
 
         public void AddChild(Transform child)
@@ -215,7 +186,5 @@ namespace Combat.Component.Body
         private float _scale;
         private IBody _parent;
         private float _maxVelocity;
-        private float _maxAngularVelocity;
-        private bool _frozen;
     }
 }

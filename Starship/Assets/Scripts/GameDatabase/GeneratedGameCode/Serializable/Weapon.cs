@@ -18,6 +18,7 @@ namespace GameDatabase.Serializable
 		public WeaponClass WeaponClass;
 		public float FireRate;
 		public float Spread;
+		public float SwingRate;
 		public int Magazine;
 		public ActivationType ActivationType;
 		public string ShotSound;

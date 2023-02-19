@@ -23,6 +23,8 @@ namespace GameDatabase.Serializable
 		public float Weight;
 		public int HitPoints;
 		public string Color;
+		public bool RandomColor;
+		public bool ChangeableColor;
 		public int BulletPrefab;
 		public float EnergyCost;
 		public bool CanBeDisarmed;

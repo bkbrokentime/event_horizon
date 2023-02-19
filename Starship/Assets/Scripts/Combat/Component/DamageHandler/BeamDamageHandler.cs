@@ -1,6 +1,7 @@
 ﻿using Combat.Collision;
 using Combat.Component.Unit;
 using Combat.Unit;
+using Constructor.Modification;
 
 namespace Combat.Component.DamageHandler
 {
@@ -15,9 +16,11 @@ namespace Combat.Component.DamageHandler
         {
             var owner = _unit.Type.Owner;
 
-            if (impact.Repair > 0 && owner.IsActive())
+            if (impact.AllDamageData.Repair.Value > 0 && owner.IsActive())
             {
-                owner.Affect(new Impact { Repair = impact.Repair });
+                var newimpact = new Impact(new GameDatabase.Model.AllDamageData(), 0, 0, new Impulse(), CollisionEffect.None);
+                newimpact.AllDamageData.Repair = impact.AllDamageData.Repair;
+                owner.Affect(newimpact);
             }
 
             return CollisionEffect.None;

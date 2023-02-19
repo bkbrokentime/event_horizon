@@ -30,10 +30,29 @@ namespace GameDatabase.Serializable
 		public float EnergyResistance;
 		public float KineticResistance;
 		public float HeatResistance;
+		public float QuantumResistance;
+		public float ShieldEnergyResistance;
+		public float ShieldKineticResistance;
+		public float ShieldHeatResistance;
+		public float ShieldQuantumResistance;
+		public float EnergyShieldEnergyResistance;
+		public float EnergyShieldKineticResistance;
+		public float EnergyShieldHeatResistance;
+		public float EnergyShieldQuantumResistance;
+		public float ArmorPointsAttenuatableRate;
+		public float ArmorRepairAttenuatableRate;
+		public float EnergyPointsAttenuatableRate;
+		public float EnergyRechargeAttenuatableRate;
+		public float ShieldPointsAttenuatableRate;
+		public float ShieldRechargeAttenuatableRate;
+		public float EnergyShieldPointsAttenuatableRate;
+		public float EnergyShieldRechargeAttenuatableRate;
 		public bool Regeneration;
 		public float BaseWeightModifier;
 		public int[] BuiltinDevices;
 		public string Layout;
+		public string SecondLayout;
+		public UAVLaunchPlatformSerializable[] UAVLaunchPlatforms;
 		public BarrelSerializable[] Barrels;
 	}
 }

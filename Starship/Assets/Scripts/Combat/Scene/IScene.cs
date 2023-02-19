@@ -15,6 +15,7 @@ namespace Combat.Scene
         IUnitList<IUnit> Units { get; }
 
         IShip PlayerShip { get; }
+        IShip AllyShip { get; }
         IShip EnemyShip { get; }
 
         Vector2 FindFreePlace(float minDistance, UnitSide unitSide);

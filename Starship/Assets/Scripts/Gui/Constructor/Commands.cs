@@ -3,6 +3,7 @@ using System.Linq;
 using Constructor;
 using UnityEngine;
 using ViewModel;
+using DebugLogSetting;
 
 namespace Gui.Constructor
 {
@@ -14,18 +15,23 @@ namespace Gui.Constructor
 
     public class InstallComponentCommand : ICommand
     {
-        public InstallComponentCommand(ShipLayoutViewModel layout, Vector2 position, ComponentInfo component, int keyBinding, int behaviour)
+        public InstallComponentCommand(ShipLayoutViewModel layout, int layoutnum, Vector2 position, ComponentInfo component, int keyBinding, int behaviour)
         {
             _layout = layout;
             _position = position;
             _component = component;
+            _layoutnum = layoutnum;
             _keyBinding = keyBinding;
             _behaviour = behaviour;
+
+            if (ComponentDebugLogSetting.ComponentConstructDebugLog)
+                UnityEngine.Debug.Log("InstallComponentCommand set:  " + _layoutnum + "  " + _layout.Layout.Size);
+
         }
 
-        public static bool TryExecuteCommand(ShipLayoutViewModel layout, Vector2 position, ComponentInfo component, int keyBinding, int behaviour, ConstructorViewModel.CommandEvent onCommandEvent)
+        public static bool TryExecuteCommand(ShipLayoutViewModel layout, int layoutnum, Vector2 position, ComponentInfo component, int keyBinding, int behaviour, ConstructorViewModel.CommandEvent onCommandEvent)
         {
-            var command = new InstallComponentCommand(layout, position, component, keyBinding, behaviour);
+            var command = new InstallComponentCommand(layout, layoutnum, position, component, keyBinding, behaviour);
             if (command.TryExecute())
             {
                 onCommandEvent.Invoke(command);
@@ -37,10 +43,19 @@ namespace Gui.Constructor
 
         public bool TryExecute()
         {
-            _id = _layout.InstallComponent(_position, _component, _keyBinding, _behaviour);
-            return _id >= 0;
-        }
+            _id = _layout.InstallComponent(_position, _component, _layoutnum, _keyBinding, _behaviour);
 
+            if (ComponentDebugLogSetting.ComponentConstructDebugLog)
+            {
+                if (_layout == null)
+                    UnityEngine.Debug.Log("TryExecute :  _layout = null");
+                else
+                    UnityEngine.Debug.Log("TryExecute :  _layout != null");
+                UnityEngine.Debug.Log("TryExecute :  _id :   " + _id + "    _layoutnum :  " + _layoutnum);
+            }
+
+                return _id >= 0;
+        }
         public bool TryRollback()
         {
             _layout.RemoveComponent(_id);
@@ -49,6 +64,7 @@ namespace Gui.Constructor
 
         private int _id = -1;
         private readonly Vector2 _position;
+        private readonly int _layoutnum;
         private readonly int _keyBinding;
         private readonly int _behaviour;
         private readonly ComponentInfo _component;
@@ -71,6 +87,7 @@ namespace Gui.Constructor
 
             _x = component.X;
             _y = component.Y;
+            _layoutnum = component.Layout;
             _behaviour = component.Behaviour;
             _keyBinding = component.KeyBinding;
             _component = component.Info;
@@ -82,11 +99,12 @@ namespace Gui.Constructor
 
         public bool TryRollback()
         {
-            return _id == _layout.InstallComponent(_x, _y, _component, _keyBinding, _behaviour, _id);
+            return _id == _layout.InstallComponent(_x, _y, _component, _layoutnum, _keyBinding, _behaviour, _id);
         }
 
         private int _x;
         private int _y;
+        private int _layoutnum;
         private int _keyBinding;
         private int _behaviour;
         private readonly int _id;

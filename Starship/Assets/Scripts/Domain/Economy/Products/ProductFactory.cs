@@ -46,10 +46,10 @@ namespace Economy.Products
             return new SpecialProduct(_playerResources, itemType, price);
         }
 
-        public IProduct CreateRandomComponentProduct(int marketId, int itemId, int itemLevel, Constructor.ComponentQuality maxQuality, Faction itemFaction, bool allowRare,
+        public IProduct CreateRandomComponentProduct(int marketId, int itemId, int itemLevel, Constructor.ComponentQuality maxQuality, Faction itemFaction, bool allowRare, bool blackmarket,
             long renewalTime, bool premium = false, float priceScale = 2f)
         {
-            return new RandomComponentProduct(_database, _itemTypeFactory, _session, _playerResources, marketId, itemId, itemLevel, maxQuality, itemFaction, allowRare, renewalTime, premium, priceScale);
+            return new RandomComponentProduct(_database, _itemTypeFactory, _session, _playerResources, marketId, itemId, itemLevel, maxQuality, itemFaction, allowRare, blackmarket, renewalTime, premium, priceScale);
         }
     }
 }

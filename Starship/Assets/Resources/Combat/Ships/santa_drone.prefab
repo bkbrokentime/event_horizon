@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 114000011597266408}
   - component: {fileID: 114000013775976450}
   - component: {fileID: 60000013232894402}
+  - component: {fileID: 114177355889343456}
   m_Layer: 0
   m_Name: santa_drone
   m_TagString: Untagged
@@ -62,7 +63,6 @@ SpriteRenderer:
   m_ProbeAnchor: {fileID: 0}
   m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
   m_PreserveUVs: 0
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
@@ -188,3 +188,19 @@ PolygonCollider2D:
       - {x: 0.13758337, y: 0.49388576}
       - {x: 0.6038115, y: 0.0011431221}
       - {x: 0.140625, y: -0.48492792}
+--- !u!114 &114177355889343456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000010523886238}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f8c6fe8fc912254b83cf553c9281a9a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ArmorPoints: 0
+  EnergyPoints: 0
+  ShieldPoints: 0
+  EnergyShieldPoints: 0

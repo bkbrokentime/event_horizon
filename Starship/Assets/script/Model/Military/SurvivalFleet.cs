@@ -32,16 +32,17 @@ namespace Model
 					return _ships;
 				}
 			}
-			
-			public int AiLevel { get; private set; }
+
+            public IEnumerable<IShip> AllShips { get { return Ships; } }
+            public int AiLevel { get; private set; }
 			
 			public float Power
 			{
 				get
 				{
 					if (_power < 0)
-						_power = Maths.Threat.GetShipsPower(Ships);
-					return _power;
+                        _power = Maths.Power.GetShipsComprehensivePower(Ships, _database.ShipSettings);//_power = Maths.Threat.GetShipsPower(Ships);
+                    return _power;
 				}
 			}
 			

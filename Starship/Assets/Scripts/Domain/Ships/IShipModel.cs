@@ -16,7 +16,9 @@ namespace Constructor.Ships
         string OriginalName { get; }
         Faction Faction { get; }
         Layout Layout { get; }
+        Layout SecondLayout { get; }
         ImmutableCollection<Barrel> Barrels { get; }
+        ImmutableCollection<UAVLaunchPlatform> UAVLaunchPlatforms { get; }
         SpriteId ModelImage { get; }
         SpriteId IconImage { get; }
         float ModelScale { get; }

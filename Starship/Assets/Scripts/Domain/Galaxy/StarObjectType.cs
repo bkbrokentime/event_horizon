@@ -11,15 +11,17 @@ namespace Galaxy
 		Survival    = 0x0002,
 		Boss        = 0x0004,
 		Wormhole    = 0x0008,
-//		Multiplayer = 0x0010,
-		Arena       = 0x0020,
+		Multiplayer = 0x0010,
+		//Arena       = 0x0020,
 		Challenge   = 0x0040,
 		BlackMarket = 0x0080,
 		Ruins       = 0x0100,
         Military    = 0x0200,
         Event       = 0x0400,
-        Xmas        = 0x0800,
+        Xmas        = 0x0800,//圣诞
         Hive        = 0x1000,
+        Fortification = 0x2000,
+        Endlessness = 0x4000,
     }
 
     public static class StarObjectTypeExtensions
@@ -36,6 +38,8 @@ namespace Galaxy
                     return !star.Challenge.IsCompleted;
                 case StarObjectType.Ruins:
                     return !star.Ruins.IsDefeated;
+                case StarObjectType.Fortification:
+                    return !star.Fortification.IsDefeated;
                 case StarObjectType.Hive:
                     return !star.Pandemic.IsDefeated;
                 default:
@@ -57,6 +61,7 @@ namespace Galaxy
 
         public void Add(StarObjectType type) { _objects |= (uint)type; }
         public bool Contain(StarObjectType type) { return (_objects & (uint)type) == (uint)type;  }
+
 
         public IEnumerable<StarObjectType> ToEnumerable()
         {

@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using Utils;
 
 namespace ModestTree
 {
@@ -14,7 +13,7 @@ namespace ModestTree
 #if NOT_UNITY3D
             //Console.WriteLine(string.Format(message, args));
 #else
-            //OptimizedDebug.Log(string.Format(message, args));
+            //UnityEngine.Debug.Log(string.Format(message, args));
 #endif
         }
 
@@ -25,7 +24,7 @@ namespace ModestTree
 #if NOT_UNITY3D
             Console.WriteLine(string.Format(message, args));
 #else
-            OptimizedDebug.Log(string.Format(message, args));
+            UnityEngine.Debug.Log(string.Format(message, args));
 #endif
         }
 
@@ -36,7 +35,7 @@ namespace ModestTree
 #if NOT_UNITY3D
             Console.WriteLine(string.Format(message, args));
 #else
-            OptimizedDebug.LogWarning(string.Format(message, args));
+            UnityEngine.Debug.LogWarning(string.Format(message, args));
 #endif
         }
 
@@ -47,7 +46,7 @@ namespace ModestTree
 #if NOT_UNITY3D
             Console.WriteLine(string.Format(message, args));
 #else
-            OptimizedDebug.Log(string.Format(message, args));
+            UnityEngine.Debug.Log(string.Format(message, args));
 #endif
         }
 
@@ -58,7 +57,7 @@ namespace ModestTree
 #if NOT_UNITY3D
             Console.WriteLine(e.ToString());
 #else
-            OptimizedDebug.LogException(e);
+            UnityEngine.Debug.LogException(e);
 #endif
         }
 
@@ -67,8 +66,8 @@ namespace ModestTree
 #if NOT_UNITY3D
             Console.WriteLine(message);
 #else
-            OptimizedDebug.LogError(message);
-            OptimizedDebug.LogException(e);
+            UnityEngine.Debug.LogError(message);
+            UnityEngine.Debug.LogException(e);
 #endif
         }
 
@@ -77,8 +76,9 @@ namespace ModestTree
 #if NOT_UNITY3D
             Console.WriteLine(string.Format(message, args));
 #else
-            OptimizedDebug.LogError(string.Format(message, args));
+            UnityEngine.Debug.LogError(string.Format(message, args));
 #endif
         }
     }
 }
+

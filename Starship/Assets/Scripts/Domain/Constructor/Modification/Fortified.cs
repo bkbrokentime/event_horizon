@@ -10,7 +10,7 @@ namespace Constructor.Modification
     {
         public Fortified(ModificationQuality quality)
         {
-            _defenseMultiplier = quality.PowerMultiplier(0.5f, 0.7f, 0.8f, 1.2f, 1.5f, 2.0f);
+            _defenseMultiplier = quality.PowerMultiplier(0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1.2f, 1.5f, 2.0f, 2.5f, 3.0f);
             Quality = quality;
         }
 
@@ -28,8 +28,31 @@ namespace Constructor.Modification
                 stats.ThermalResistance *= _defenseMultiplier;
             if (stats.KineticResistance > 0)
                 stats.KineticResistance *= _defenseMultiplier;
+            if (stats.QuantumResistance > 0)
+                stats.QuantumResistance *= _defenseMultiplier;
+
+            if (stats.ShieldEnergyResistance > 0)
+                stats.ShieldEnergyResistance *= _defenseMultiplier;
+            if (stats.ShieldThermalResistance > 0)
+                stats.ShieldThermalResistance *= _defenseMultiplier;
+            if (stats.ShieldKineticResistance > 0)
+                stats.ShieldKineticResistance *= _defenseMultiplier;
+            if (stats.ShieldQuantumResistance > 0)
+                stats.ShieldQuantumResistance *= _defenseMultiplier;
+
+            if (stats.EnergyShieldEnergyResistance > 0)
+                stats.EnergyShieldEnergyResistance *= _defenseMultiplier;
+            if (stats.EnergyShieldThermalResistance > 0)
+                stats.EnergyShieldThermalResistance *= _defenseMultiplier;
+            if (stats.EnergyShieldKineticResistance > 0)
+                stats.EnergyShieldKineticResistance *= _defenseMultiplier;
+            if (stats.EnergyShieldQuantumResistance > 0)
+                stats.EnergyShieldQuantumResistance *= _defenseMultiplier;
+
             if (stats.ShieldPoints > 0)
                 stats.ShieldPoints *= _defenseMultiplier;
+            if (stats.EnergyShieldPoints > 0)
+                stats.EnergyShieldPoints *= _defenseMultiplier;
         }
 
         public void Apply(ref DeviceStats device) { }

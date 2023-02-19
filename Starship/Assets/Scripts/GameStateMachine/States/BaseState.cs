@@ -17,7 +17,7 @@ namespace GameStateMachine.States
 
         public void Load()
         {
-            OptimizedDebug.Log(GetType().Name + ": loaded");
+            UnityEngine.Debug.Log(GetType().Name + ": loaded");
 
 			OnLoad();
             LoadLevel();
@@ -25,7 +25,7 @@ namespace GameStateMachine.States
 
         public void Unload()
         {
-            OptimizedDebug.Log(GetType().Name + ": unloaded");
+            UnityEngine.Debug.Log(GetType().Name + ": unloaded");
             IsActive = false;
 
             OnUnload();
@@ -74,7 +74,7 @@ namespace GameStateMachine.States
 
 		private void OnLevelLoadedCallback()
 		{
-			OptimizedDebug.Log (GetType ().Name + ": level loaded");
+			UnityEngine.Debug.Log (GetType ().Name + ": level loaded");
 			IsActive = true;
 			OnActivate();
 			OnLevelLoaded();

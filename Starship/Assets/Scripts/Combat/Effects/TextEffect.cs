@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Combat.Effects
 {
@@ -12,14 +11,9 @@ namespace Combat.Effects
             _textMesh.text = gameObject.name;
         }
 
-        private void Start()
-        {
-            _mainCamera = UnityEngine.Camera.main;
-        }
-
         protected override void OnBeforeUpdate()
         {
-            Scale = _mainCamera.orthographicSize;
+            Scale = UnityEngine.Camera.main.orthographicSize;
         }
 
         protected override void SetColor(Color color)
@@ -32,6 +26,5 @@ namespace Combat.Effects
         protected override void UpdateLife() {}
 
         private TextMesh _textMesh;
-        private UnityEngine.Camera _mainCamera;
     }
 }

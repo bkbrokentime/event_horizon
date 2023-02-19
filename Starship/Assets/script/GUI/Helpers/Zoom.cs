@@ -131,6 +131,8 @@ namespace ViewModel
                     target.localScale = scaleVector;
         }
 
+        public void ChangeZoom(Transform target) { _target = target; }
+
         private readonly Dictionary<int, Vector2> _touches = new Dictionary<int, Vector2>();
         private float _scale = 1.0f;
         private float _zoom;

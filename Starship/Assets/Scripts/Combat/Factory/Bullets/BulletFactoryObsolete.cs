@@ -30,6 +30,11 @@ namespace Combat.Factory
         public BulletFactoryObsolete(AmmunitionObsoleteStats ammunitionStats, IScene scene, ISoundPlayer soundPlayer, IObjectPool objectPool, PrefabCache prefabCache, SpaceObjectFactory spaceObjectFactory, EffectFactory effectFactory, IShip owner)
         {
             _stats = ammunitionStats;
+/*
+            _stats.Damage *= owner.Stats.WeaponUpgrade.DamageMultiplier + 1f;
+            _stats.Range *= owner.Stats.WeaponUpgrade.RangeMultiplier + 1f;
+            _stats.EnergyCost *= owner.Stats.WeaponUpgrade.EnergyCostMultiplier + 1f;
+*/
             _scene = scene;
             _soundPlayer = soundPlayer;
             _objectPool = objectPool;
@@ -37,11 +42,10 @@ namespace Combat.Factory
             _effectFactory = effectFactory;
             _prefabCache = prefabCache;
             _owner = owner;
-
             _prefab = new Lazy<GameObject>(() => _prefabCache.LoadPrefab(_stats.BulletPrefab) ?? (_stats.AmmunitionClass.IsBeam() ?
                 _prefabCache.LoadResourcePrefab("Combat/Bullets/Laser") : _prefabCache.LoadResourcePrefab("Combat/Bullets/Plasma2")));
 
-            _bulletStats = new BulletStatsObsolete(ammunitionStats);
+            _bulletStats = new BulletStatsObsolete(_stats, owner);
         }
 
         public IBulletStats Stats { get { return _bulletStats; } }
@@ -70,15 +74,20 @@ namespace Combat.Factory
         //private float DamageMultiplier { get { return PowerLevel; } }
         //private float SizeMultiplier { get { return 0.5f + PowerLevel*0.5f; } }
 
-        public IBullet Create(IWeaponPlatform parent, float spread, float rotation, float offset)
+        public IBullet Create(IWeaponPlatform parent, float spread, float rotation, float offset, Vector2 deviation)
         {
             var color = _stats.AmmunitionClass == AmmunitionClassObsolete.Fireworks ? Color.Lerp(_stats.Color, new Color(Random.value, Random.value, Random.value), 0.75f) : (UnityEngine.Color)_stats.Color;
             var velocity = GetVelocity();
 
             var bulletGameObject = new GameObjectHolder(_prefab, _objectPool);
             bulletGameObject.IsActive = true;
-            var body = ConfigureBody(bulletGameObject.GetComponent<IBodyComponent>(), parent, spread, velocity, rotation, offset);
-            var view = ConfigureView(bulletGameObject.GetComponent<IView>(), color);
+            var body = ConfigureBody(bulletGameObject.GetComponent<IBodyComponent>(), parent, spread, velocity, rotation, offset, deviation);
+
+            Color.RGBToHSV(_stats.Color, out var H, out var S, out var V);
+            var randomcolor = Color.HSVToRGB(Random.value, S, V);
+            randomcolor.a = _stats.Color.A;
+
+            var view = _stats.RandomColor && _stats.AmmunitionClass != AmmunitionClassObsolete.Fireworks ? ConfigureView(bulletGameObject.GetComponent<IView>(), randomcolor, _stats.ChangeableColor) : ConfigureView(bulletGameObject.GetComponent<IView>(), color, _stats.ChangeableColor);
 
             var lifetime = _stats.Velocity > 0 && _bulletStats.Range > 0 ? _stats.AmmunitionClass.IsHoming() ? 1.2f*_bulletStats.Range/velocity : _bulletStats.Range/velocity : _bulletStats.Lifetime;
             var unitType = new UnitType(_stats.HitPoints > 0 ? UnitClass.Missile : _stats.AmmunitionClass.IsProjectile() ? UnitClass.EnergyBolt : UnitClass.AreaOfEffect, UnitSide.Undefined, _stats.AmmunitionClass.CanHitAllies() ? null : _owner);
@@ -108,11 +117,6 @@ namespace Combat.Factory
             _scene.AddUnit(bullet);
             bullet.UpdateView(0);
 
-            if (_stats.AmmunitionClass.IsBoundToCannon() && !parent.IsTemporary)
-            {
-                parent.AddAttachedChild(bullet);
-            }
-
             if (!_stats.AmmunitionClass.IsBoundToCannon() && !_stats.IgnoresShipVelocity && _bulletStats.Recoil > 0)
                 parent.Body.ApplyForce(bullet.Body.WorldPosition(), -_bulletStats.Recoil*(bullet.Body.WorldVelocity() - parent.Body.WorldVelocity()));
 
@@ -134,16 +138,17 @@ namespace Combat.Factory
             return collider;
         }
 
-        private IView ConfigureView(IView view, Color color)
+        private IView ConfigureView(IView view, Color color, bool Changeable = false)
         {
             view.Life = 0;
             view.Color = color;
+            view.ChangeableColor = Changeable;
 
             view.UpdateView(0);
             return view;
         }
 
-        private IBody ConfigureBody(IBodyComponent body, IWeaponPlatform parent, float spread, float bulletVelocity, float deltaAngle, float offset)
+        private IBody ConfigureBody(IBodyComponent body, IWeaponPlatform parent, float spread, float bulletVelocity, float deltaAngle, float offset, Vector2 deviation)
         {
             IBody parentBody = null;
             var position = Vector2.zero;
@@ -152,19 +157,17 @@ namespace Combat.Factory
             var angularVelocity = 0f;
             var weight = _bulletStats.Impulse;
             var scale = _bulletStats.Size;
-            var frozen = false;
 
             if (_stats.AmmunitionClass.IsBoundToCannon() && !parent.IsTemporary)
             {
                 parentBody = parent.Body;
-                frozen = true;
             }
             else
             {
                 position = parent.Body.WorldPosition() + RotationHelpers.Direction(parent.Body.WorldRotation())*offset;
                 rotation = parent.Body.WorldRotation() + deltaAngle + (Random.value - 0.5f)*spread;
             }
-
+            position += deviation;
             if (!_stats.AmmunitionClass.IsBeam())
             {
                 velocity = RotationHelpers.Direction(rotation) * bulletVelocity;
@@ -177,7 +180,7 @@ namespace Combat.Factory
                     velocity += parent.Body.WorldVelocity();
             }
 
-            body.Initialize(parentBody, position, rotation, scale, velocity, angularVelocity, weight, frozen);
+            body.Initialize(parentBody, position, rotation, scale, velocity, angularVelocity, weight);
             return body;
         }
 
@@ -198,9 +201,11 @@ namespace Combat.Factory
             if (_stats.AmmunitionClass.StickToTarget())
                 return new LookAtTargetController(bullet, 60, spread);
             if (_stats.AmmunitionClass.IsHoming())
-                return new HomingController(bullet, velocity, 120f / (0.2f + _bulletStats.Impulse *2), 0.5f * velocity / (0.2f + _bulletStats.Impulse *2), _bulletStats.Range, _scene);
+                return new HomingController(bullet, velocity, 120f / (0.2f + _bulletStats.Impulse * 2), 0.5f * velocity / (0.2f + _bulletStats.Impulse * 2), _bulletStats.Range, _scene, _stats.AmmunitionClass == AmmunitionClassObsolete.IntelligentRocket);
             if (_stats.AmmunitionClass == AmmunitionClassObsolete.UnguidedRocket)
                 return new RocketController(bullet, velocity, 1.0f * velocity / (0.1f + _bulletStats.Impulse));
+            if (_stats.AmmunitionClass == AmmunitionClassObsolete.RandomRocket)
+                return new RandomRocketController(bullet, velocity, 1.0f * velocity / (0.1f + _bulletStats.Impulse));
             if (_stats.AmmunitionClass == AmmunitionClassObsolete.Aura)
                 return new AuraController(bullet, _bulletStats.AreaOfEffect, _stats.LifeTime);
             if (_stats.AmmunitionClass.IsBoundToCannon() && !parent.IsTemporary)
@@ -290,7 +295,7 @@ namespace Combat.Factory
                 stats.Damage = _bulletStats.Damage;
                 stats.DamageType = _stats.DamageType;
                 var factory = new BulletFactoryObsolete(stats, _scene, _soundPlayer, _objectPool, _prefabCache, _spaceObjectFactory, _effectFactory, _owner);
-                bullet.AddAction(new SpawnBulletsAction(factory, 1, 0, 0, bullet, _soundPlayer, AudioClipId.None, explodeCondition));
+                bullet.AddAction(new SpawnBulletsAction(factory, 1, 0, 0, 0, false, bullet, _soundPlayer, AudioClipId.None, explodeCondition));
             }
             if (_stats.AmmunitionClass.IsClusterBomb() && _stats.CoupledAmmunition != null)
             {
@@ -300,7 +305,7 @@ namespace Combat.Factory
                 stats.Range = _bulletStats.AreaOfEffect;
                 var factory = new BulletFactoryObsolete(stats, _scene, _soundPlayer, _objectPool, _prefabCache, _spaceObjectFactory, _effectFactory, _owner);
                 factory.Stats.RandomFactor = 0.75f;
-                bullet.AddAction(new SpawnBulletsAction(factory, 20, 0.5f, 0, bullet, _soundPlayer, AudioClipId.None, explodeCondition));
+                bullet.AddAction(new SpawnBulletsAction(factory, 20, 0.5f, 0, 0, false, bullet, _soundPlayer, AudioClipId.None, explodeCondition));
             }
             if (_stats.AmmunitionClass.EmpIfDetonated())
             {

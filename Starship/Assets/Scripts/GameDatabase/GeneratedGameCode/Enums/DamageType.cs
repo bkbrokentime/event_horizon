@@ -14,5 +14,12 @@ namespace GameDatabase.Enums
 		Energy,
 		Heat,
 		Direct,
+		Flame,
+		Antimatter,
+		Corrosion,
+		Quantum,
+		Darkmatter,
+		Darkenergy,
+		Annihilation,
 	}
 }

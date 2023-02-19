@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using GameServices.Random;
 
 namespace GameModel
 {
@@ -31,12 +32,28 @@ namespace GameModel
 			
 			int x,y;
 			IdToPosition(regionId, out x, out y);
-			x *= 3*RegionFourthSize;
-			y *= 2*RegionFourthSize;
+			x *= RegionFourthSize_X;
+			y *= RegionFourthSize_Y;
+			
+			return StarLayout.PositionToId(x,y);
+		}
+		public static int GetRandomSizeRegionHomeStar(int regionId, int size)
+		{
+			if (regionId < 0)
+				return 0;
+			
+			int x,y;
+			IdToPosition(regionId, out x, out y);
+            x *= RegionFourthSize_X*size;
+			y *= RegionFourthSize_Y*size;
 			
 			return StarLayout.PositionToId(x,y);
 		}
 
-		public const int RegionFourthSize = 2;
+		public const int RegionFourthSize = 3;
+		public const int RegionFourthSize_X = 3 * RegionFourthSize;
+		public const int RegionFourthSize_Y = 2 * RegionFourthSize;
+		//public const int RegionFourthSize_DX = 3 * RegionFourthSize_X;
+		//public const int RegionFourthSize_DY = 3 * RegionFourthSize_Y;
 	}
 }
